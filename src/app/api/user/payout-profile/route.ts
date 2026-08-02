@@ -3,6 +3,7 @@ import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
 import { encrypt, decrypt } from '@/lib/utils/encryption';
 import type { PayoutMethodPreferences } from '@/types';
+import { FieldValue } from 'firebase-admin/firestore';
 
 /**
  * GET /api/user/payout-profile
@@ -29,8 +30,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const userData = userDoc.data() || {};
-    const prefs = userData.payoutPreferences as PayoutMethodPreferences | undefined;
+    // Fetch payoutPreferences from the secure subcollection
+    const securePayoutDoc = await adminDb
+      .collection('users')
+      .doc(uid)
+      .collection('secure_payout_details')
+      .doc('payout')
+      .get();
+
+    const secureData = securePayoutDoc.exists ? securePayoutDoc.data() : null;
+    const prefs = secureData?.payoutPreferences as PayoutMethodPreferences | undefined;
 
     if (!prefs) {
       return NextResponse.json({ payoutPreferences: null });
@@ -149,9 +158,25 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    await adminDb.collection('users').doc(uid).update({
-      payoutPreferences: updatedPreferences,
+    const batch = adminDb.batch();
+    const userRef = adminDb.collection('users').doc(uid);
+    const secureRef = userRef.collection('secure_payout_details').doc('payout');
+
+    batch.set(
+      secureRef,
+      {
+        payoutPreferences: updatedPreferences,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    // Delete legacy field from main users document if it exists
+    batch.update(userRef, {
+      payoutPreferences: FieldValue.delete(),
     });
+
+    await batch.commit();
 
     return NextResponse.json({ status: 'ok' });
   } catch (err: any) {

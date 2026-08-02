@@ -40,6 +40,7 @@ interface RazorpayButtonProps {
   firestoreOrderId: string;
   userEmail?: string;
   userName?: string;
+  isPrebooking?: boolean;
   onSuccess?: () => void;
   onError?: (msg: string) => void;
 }
@@ -51,6 +52,7 @@ export default function RazorpayButton({
   firestoreOrderId,
   userEmail,
   userName,
+  isPrebooking = false,
   onSuccess,
   onError,
 }: RazorpayButtonProps) {
@@ -98,8 +100,10 @@ export default function RazorpayButton({
 
           if (!res.ok) throw new Error('Payment verification failed');
 
-          clearCart();
-          toast("Order confirmed. You're officially less basic.", 'success');
+           if (!isPrebooking) {
+            clearCart();
+          }
+          toast(isPrebooking ? "Pre-booking confirmed. Admin will contact you soon." : "Order confirmed. You're officially less basic.", 'success');
           onSuccess?.();
         } catch {
           toast('Payment received but verification failed. Contact support.', 'error');

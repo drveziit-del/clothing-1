@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
-import { createProductSchema } from '@/lib/utils/validation';
+import { createProductSchema, updateProductSchema } from '@/lib/utils/validation';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
 
@@ -86,14 +86,8 @@ export async function POST(request: NextRequest) {
       updatedAt: FieldValue.serverTimestamp(),
     };
 
-    const rawBody = body as { id?: string };
-    if (rawBody.id) {
-      await adminDb.collection('products').doc(rawBody.id).set(productData);
-      return NextResponse.json({ id: rawBody.id, ...productData });
-    } else {
-      const docRef = await adminDb.collection('products').add(productData);
-      return NextResponse.json({ id: docRef.id, ...productData });
-    }
+    const docRef = await adminDb.collection('products').add(productData);
+    return NextResponse.json({ id: docRef.id, ...productData });
   } catch (err) {
     console.error('Error creating product:', err);
     return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
@@ -107,29 +101,23 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.status });
   }
 
-  let body: any;
+  let body: unknown;
   try { body = await request.json(); } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const { id, price, section, tier, isPublished, title, description, images, videos } = body;
-  if (!id) {
-    return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
+  const result = updateProductSchema.safeParse(body);
+  if (!result.success) {
+    return NextResponse.json({ error: result.error.issues[0].message }, { status: 400 });
   }
+
+  const { id, ...dataToUpdate } = result.data;
 
   try {
     const updateData: Record<string, any> = {
+      ...dataToUpdate,
       updatedAt: FieldValue.serverTimestamp(),
     };
-
-    if (price !== undefined) updateData.price = Number(price);
-    if (section !== undefined) updateData.section = section;
-    if (tier !== undefined) updateData.tier = tier ? Number(tier) : null;
-    if (isPublished !== undefined) updateData.isPublished = Boolean(isPublished);
-    if (title !== undefined) updateData.title = title;
-    if (description !== undefined) updateData.description = description;
-    if (images !== undefined) updateData.images = images;
-    if (videos !== undefined) updateData.videos = videos;
 
     await adminDb.collection('products').doc(id).update(updateData);
     return NextResponse.json({ status: 'ok' });

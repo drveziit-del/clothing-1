@@ -170,7 +170,6 @@
   color: var(--mist-100);
 }
 .deleteBtn {
-  composes: actionBtn;
   color: var(--coral-200);
 }
 .deleteBtn:hover {

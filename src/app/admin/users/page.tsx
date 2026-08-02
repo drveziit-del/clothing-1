@@ -1,6 +1,7 @@
 import DataTable from '@/components/admin/DataTable';
 import styles from '../page.module.css';
 import { adminDb } from '@/lib/firebase/admin';
+import ExportCsvButton from '@/components/admin/ExportCsvButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,7 +32,10 @@ export default async function AdminUsersPage() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Users</h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h1 className={styles.title}>Users</h1>
+          <ExportCsvButton data={users} fileName="users.csv" />
+        </div>
         <p className={styles.subtitle}>Manage accounts and view active customer stats.</p>
       </div>
 

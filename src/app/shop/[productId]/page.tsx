@@ -29,6 +29,33 @@ async function getProduct(productId: string): Promise<Product | null> {
   }
 }
 
+async function getRecommendedProducts(section: string, currentId: string): Promise<Product[]> {
+  try {
+    const snapshot = await adminDb
+      .collection('products')
+      .where('section', '==', section)
+      .where('isPublished', '==', true)
+      .limit(5)
+      .get();
+
+    return snapshot.docs
+      .map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
+          updatedAt: data.updatedAt ? data.updatedAt.toDate() : new Date(),
+        } as unknown as Product;
+      })
+      .filter((p) => p.id !== currentId)
+      .slice(0, 4);
+  } catch (err) {
+    console.error('Error fetching recommended products:', err);
+    return [];
+  }
+}
+
 export default async function ProductDetailPage({ params }: Props) {
   const { productId } = await params;
   const product = await getProduct(productId);
@@ -37,9 +64,11 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
 
+  const recommended = await getRecommendedProducts(product.section, product.id);
+
   return (
     <div className={styles.page}>
-      <ProductDetailClient product={product} />
+      <ProductDetailClient product={product} recommendedProducts={recommended} />
     </div>
   );
 }

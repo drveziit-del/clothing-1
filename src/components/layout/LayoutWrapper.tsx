@@ -31,7 +31,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
         );
       }
     }
-  }, [setReferralCode]);
+  }, [setReferralCode, pathname]);
 
   if (isAdminRoute) {
     return <>{children}</>;

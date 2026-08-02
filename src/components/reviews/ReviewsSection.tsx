@@ -190,7 +190,7 @@ export default function ReviewsSection() {
                     </button>
                     {isAdmin && (
                       <button
-                        className={styles.deleteBtn}
+                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
                         onClick={() => handleDelete(review.id)}
                       >
                         Delete

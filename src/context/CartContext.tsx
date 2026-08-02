@@ -5,6 +5,8 @@ import {
   useContext,
   useEffect,
   useReducer,
+  useCallback,
+  useMemo,
   ReactNode,
 } from 'react';
 import type { CartItem, Product, Variant } from '@/types';
@@ -76,8 +78,11 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       };
     }
 
-    case 'SET_REFERRAL':
-      return { ...state, referralCode: action.code.toUpperCase() };
+    case 'SET_REFERRAL': {
+      const formatted = action.code.toUpperCase();
+      if (state.referralCode === formatted) return state;
+      return { ...state, referralCode: formatted };
+    }
 
     case 'CLEAR':
       return { items: [], referralCode: '' };
@@ -146,30 +151,56 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [state]);
 
-  const itemCount = state.items.reduce((sum, i) => sum + i.quantity, 0);
-  const subtotal  = state.items.reduce((sum, i) => sum + i.variant.price * i.quantity, 0);
-
-  const addItem = (product: Product, variant: Variant, quantity = 1) =>
-    dispatch({ type: 'ADD_ITEM', product, variant, quantity });
-
-  const removeItem = (productId: string, variantId: string) =>
-    dispatch({ type: 'REMOVE_ITEM', productId, variantId });
-
-  const updateQty = (productId: string, variantId: string, quantity: number) =>
-    dispatch({ type: 'UPDATE_QTY', productId, variantId, quantity });
-
-  const setReferralCode = (code: string) =>
-    dispatch({ type: 'SET_REFERRAL', code });
-
-  const clearCart = () => dispatch({ type: 'CLEAR' });
-
-  return (
-    <CartContext.Provider
-      value={{ ...state, itemCount, subtotal, addItem, removeItem, updateQty, setReferralCode, clearCart }}
-    >
-      {children}
-    </CartContext.Provider>
+  const itemCount = useMemo(
+    () => state.items.reduce((sum, i) => sum + i.quantity, 0),
+    [state.items]
   );
+  const subtotal = useMemo(
+    () => state.items.reduce((sum, i) => sum + i.variant.price * i.quantity, 0),
+    [state.items]
+  );
+
+  const addItem = useCallback(
+    (product: Product, variant: Variant, quantity = 1) =>
+      dispatch({ type: 'ADD_ITEM', product, variant, quantity }),
+    []
+  );
+
+  const removeItem = useCallback(
+    (productId: string, variantId: string) =>
+      dispatch({ type: 'REMOVE_ITEM', productId, variantId }),
+    []
+  );
+
+  const updateQty = useCallback(
+    (productId: string, variantId: string, quantity: number) =>
+      dispatch({ type: 'UPDATE_QTY', productId, variantId, quantity }),
+    []
+  );
+
+  const setReferralCode = useCallback(
+    (code: string) => dispatch({ type: 'SET_REFERRAL', code }),
+    []
+  );
+
+  const clearCart = useCallback(() => dispatch({ type: 'CLEAR' }), []);
+
+  const value = useMemo(
+    () => ({
+      items: state.items,
+      referralCode: state.referralCode,
+      itemCount,
+      subtotal,
+      addItem,
+      removeItem,
+      updateQty,
+      setReferralCode,
+      clearCart,
+    }),
+    [state.items, state.referralCode, itemCount, subtotal, addItem, removeItem, updateQty, setReferralCode, clearCart]
+  );
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export function useCart() {

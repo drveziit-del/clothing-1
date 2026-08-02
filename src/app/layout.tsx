@@ -7,7 +7,7 @@ import LayoutWrapper from "@/components/layout/LayoutWrapper";
 import RoastToast from "@/components/ui/RoastToast";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://gerkink.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://gerkink.shop'),
   title: "GERKINK — Provocative Luxury Streetwear",
   description:
     "Two collections. Zero apologies. Society Fuckers & Valueless Bitches — wear your worth or stay basic.",

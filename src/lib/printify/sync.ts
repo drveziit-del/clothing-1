@@ -18,16 +18,71 @@ export async function syncProductsFromPrintify(shopId: string): Promise<{
       try {
         const full = await getProduct(shopId, pp.id);
 
+        // Build option lookup maps from Printify options
+        const sizeMap: Record<number, string> = {};
+        const colorMap: Record<number, string> = {};
+        const colorHexMap: Record<number, string> = {};
+
+        full.options?.forEach((opt: any) => {
+          if (opt.type === 'size') {
+            opt.values?.forEach((val: any) => {
+              sizeMap[val.id] = val.title;
+            });
+          } else if (opt.type === 'color') {
+            opt.values?.forEach((val: any) => {
+              colorMap[val.id] = val.title;
+              if (val.colors && val.colors.length > 0) {
+                colorHexMap[val.id] = val.colors[0];
+              }
+            });
+          }
+        });
+
         const variants: Variant[] = full.variants
           .filter((v) => v.is_enabled)
-          .map((v) => ({
-            id: String(v.id),
-            size: v.options?.size ?? 'One Size',
-            color: v.options?.color ?? 'Default',
-            price: v.price / 100, // Printify returns cents
-            available: v.is_enabled,
-            printifyVariantId: String(v.id),
-          }));
+          .map((v) => {
+            let sizeName = 'One Size';
+            let colorName = 'Default';
+            let hexValue = '#ffffff';
+
+            if (Array.isArray(v.options)) {
+              v.options.forEach((optId: any) => {
+                const idNum = Number(optId);
+                if (sizeMap[idNum]) {
+                  sizeName = sizeMap[idNum];
+                }
+                if (colorMap[idNum]) {
+                  colorName = colorMap[idNum];
+                  hexValue = colorHexMap[idNum] || '#ffffff';
+                }
+              });
+            } else if (v.options && typeof v.options === 'object') {
+              // Fallback for custom formatted options if any
+              const opt = v.options as Record<string, string>;
+              if (opt.size) sizeName = opt.size;
+              if (opt.color) colorName = opt.color;
+            }
+
+            const variantImages = Array.isArray(full.images)
+              ? full.images
+                  .filter((img: any) => {
+                    const ids = img.variant_ids || [];
+                    return ids.some((id: any) => String(id) === String(v.id));
+                  })
+                  .map((img: any) => img.src)
+              : [];
+
+            return {
+              id: String(v.id),
+              size: sizeName,
+              color: colorName,
+              colorHex: hexValue,
+              price: v.price / 100, // Printify returns cents
+              available: v.is_enabled,
+              printifyVariantId: String(v.id),
+              images: variantImages,
+            };
+          });
 
         const basePrice = variants.length > 0 ? Math.min(...variants.map((v) => v.price)) : 0;
 

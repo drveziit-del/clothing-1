@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
 import { encrypt, decrypt } from '@/lib/utils/encryption';
+import { FieldValue } from 'firebase-admin/firestore';
 
 /**
  * GET /api/user/bank
@@ -23,13 +24,14 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const userDoc = await adminDb.collection('users').doc(uid).get();
-    if (!userDoc.exists) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+    const securePayoutDoc = await adminDb
+      .collection('users')
+      .doc(uid)
+      .collection('secure_payout_details')
+      .doc('payout')
+      .get();
 
-    const userData = userDoc.data() || {};
-    const bankDetails = userData.bankDetails;
+    const bankDetails = securePayoutDoc.exists ? securePayoutDoc.data()?.bankDetails : null;
 
     if (!bankDetails) {
       return NextResponse.json({ bankDetails: null });
@@ -94,10 +96,25 @@ export async function POST(request: NextRequest) {
       ifscCode: encrypt(ifscCode),
     };
 
-    // Save to Firestore users collection
-    await adminDb.collection('users').doc(uid).update({
-      bankDetails: encryptedBankDetails,
+    const batch = adminDb.batch();
+    const userRef = adminDb.collection('users').doc(uid);
+    const secureRef = userRef.collection('secure_payout_details').doc('payout');
+
+    batch.set(
+      secureRef,
+      {
+        bankDetails: encryptedBankDetails,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    // Delete legacy field from main users document if it exists
+    batch.update(userRef, {
+      bankDetails: FieldValue.delete(),
     });
+
+    await batch.commit();
 
     return NextResponse.json({ status: 'ok' });
   } catch (err: any) {

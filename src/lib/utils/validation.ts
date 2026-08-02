@@ -77,6 +77,7 @@ export const createProductSchema = z.object({
   section: z.enum(['society_fuckers', 'valueless_bitches']),
   price: z.number().positive(),
   tier: z.number().int().min(1).max(5).optional(),
+  prebookingPrice: z.number().nonnegative().nullish(),
   isPublished: z.boolean().default(false),
   images: z.array(z.string()).optional(),
   videos: z.array(z.string()).optional(),
@@ -89,12 +90,67 @@ export const createProductSchema = z.object({
         colorHex: z.string().optional(),
         price: z.number().positive(),
         available: z.boolean().default(true),
+        images: z.array(z.string()).optional(),
       })
     )
     .optional(),
+  showManifesto: z.boolean().optional(),
+  showSpecs: z.boolean().optional(),
+  showFeatures: z.boolean().optional(),
+  showComparison: z.boolean().optional(),
+  showUgc: z.boolean().optional(),
+  showFaq: z.boolean().optional(),
+  fitRecommendation: z.string().optional(),
+  materialSpec: z.string().optional(),
+  fitSpec: z.string().optional(),
+  weightSpec: z.string().optional(),
+  originSpec: z.string().optional(),
+  manifestoQuote: z.string().optional(),
+  manifestoBody: z.string().optional(),
+  ugcVideos: z
+    .array(
+      z.object({
+        name: z.string(),
+        stars: z.number().int().min(1).max(5),
+        videoUrl: z.string(),
+      })
+    )
+    .optional(),
+  featuresList: z
+    .array(
+      z.object({
+        title: z.string(),
+        description: z.string(),
+      })
+    )
+    .optional(),
+  comparisonRows: z
+    .array(
+      z.object({
+        feature: z.string(),
+        us: z.string(),
+        them: z.string(),
+      })
+    )
+    .optional(),
+  faqsList: z
+    .array(
+      z.object({
+        q: z.string(),
+        a: z.string(),
+      })
+    )
+    .optional(),
+  commitmentText: z.string().optional(),
 });
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;
+
+export const updateProductSchema = createProductSchema.partial().extend({
+  id: z.string().min(1),
+});
+
+export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 
 export const updateSettingsSchema = z.object({
   roastMessages: z.array(z.string().min(5).max(200)).optional(),

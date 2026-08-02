@@ -2,6 +2,7 @@ import { adminDb } from '@/lib/firebase/admin';
 import MetricsCards from '@/components/admin/MetricsCards';
 import DataTable from '@/components/admin/DataTable';
 import styles from '../page.module.css';
+import ExportCsvButton from '@/components/admin/ExportCsvButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -91,7 +92,10 @@ export default async function AdminReferralsPage() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Referrals</h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h1 className={styles.title}>Referrals</h1>
+          <ExportCsvButton data={referrals} fileName="referrals.csv" />
+        </div>
         <p className={styles.subtitle}>
           Every 10 successful referrals → $50 commission. 
           100,000th global customer → $100,000 mega-reward.

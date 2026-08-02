@@ -43,7 +43,7 @@ export async function refundRazorpayPayment(
   paymentId: string,
   amountUSD: number
 ): Promise<{ id: string; status: string }> {
-  if (paymentId.startsWith('pay_mock_')) {
+  if (process.env.NODE_ENV !== 'production' && paymentId.startsWith('pay_mock_')) {
     return {
       id: 'rfnd_mock_' + Math.random().toString(36).substring(2, 10).toUpperCase(),
       status: 'processed',

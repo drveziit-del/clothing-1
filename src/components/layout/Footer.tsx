@@ -68,7 +68,6 @@ export default function Footer() {
           <div className={styles.social}>
             <a href="#" aria-label="Instagram" target="_blank" rel="noopener noreferrer">IG</a>
             <a href="#" aria-label="Twitter / X" target="_blank" rel="noopener noreferrer">X</a>
-            <a href="#" aria-label="TikTok" target="_blank" rel="noopener noreferrer">TT</a>
           </div>
         </div>
       </div>

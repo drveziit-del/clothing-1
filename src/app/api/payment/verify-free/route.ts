@@ -4,6 +4,7 @@ import { processReferral } from '@/lib/referral/engine';
 import { createOrder as createPrintifyOrder } from '@/lib/printify/client';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
+import { sendOrderConfirmationEmail, sendAdminOrderNotification } from '@/lib/email/sender';
 import type { Order } from '@/types';
 
 export async function POST(request: NextRequest) {
@@ -93,6 +94,16 @@ export async function POST(request: NextRequest) {
   // 5. Process referral (fire-and-forget)
   processReferral(order).catch((err) => console.error('Referral processing error:', err));
 
+  // Send order confirmation email to the customer (fire-and-forget)
+  sendOrderConfirmationEmail(order).catch((err) =>
+    console.error('Failed to send order confirmation email:', err)
+  );
+
+  // Send order alert notification to the admin (fire-and-forget)
+  sendAdminOrderNotification(order).catch((err) =>
+    console.error('Failed to send admin order notification email:', err)
+  );
+
   // 6. Submit to Printify (if shop ID configured)
   const shopId = process.env.PRINTIFY_SHOP_ID;
   if (shopId) {
@@ -107,14 +118,14 @@ export async function POST(request: NextRequest) {
         })),
         shipping_method: 1,
         address_to: {
-          first_name: order.shippingAddress.name.split(' ')[0],
-          last_name:  order.shippingAddress.name.split(' ').slice(1).join(' ') || '-',
+          first_name: order.shippingAddress ? order.shippingAddress.name.split(' ')[0] : 'Guest',
+          last_name:  (order.shippingAddress && order.shippingAddress.name.split(' ').slice(1).join(' ')) || '-',
           email:      order.userEmail,
-          country:    order.shippingAddress.country,
-          region:     order.shippingAddress.state,
-          address1:   order.shippingAddress.street,
-          city:       order.shippingAddress.city,
-          zip:        order.shippingAddress.zip,
+          country:    order.shippingAddress ? order.shippingAddress.country : 'US',
+          region:     order.shippingAddress ? order.shippingAddress.state : 'NY',
+          address1:   order.shippingAddress ? order.shippingAddress.street : '123 Main St',
+          city:       order.shippingAddress ? order.shippingAddress.city : 'New York',
+          zip:        order.shippingAddress ? order.shippingAddress.zip : '10001',
         },
       });
 

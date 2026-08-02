@@ -24,6 +24,7 @@ export interface Variant {
   price: number;
   available: boolean;
   printifyVariantId?: string;
+  images?: string[];
 }
 
 export interface Product {
@@ -41,6 +42,25 @@ export interface Product {
   isPublished: boolean;
   createdAt: Date;
   updatedAt?: Date;
+  prebookingPrice?: number;
+  showManifesto?: boolean;
+  showSpecs?: boolean;
+  showFeatures?: boolean;
+  showComparison?: boolean;
+  showUgc?: boolean;
+  showFaq?: boolean;
+  fitRecommendation?: string;
+  materialSpec?: string;
+  fitSpec?: string;
+  weightSpec?: string;
+  originSpec?: string;
+  manifestoQuote?: string;
+  manifestoBody?: string;
+  ugcVideos?: Array<{ name: string; stars: number; videoUrl: string }>;
+  featuresList?: Array<{ title: string; description: string }>;
+  comparisonRows?: Array<{ feature: string; us: string; them: string }>;
+  faqsList?: Array<{ q: string; a: string }>;
+  commitmentText?: string;
 }
 
 // ─── Cart ──────────────────────────────────────────────────────────────────
@@ -87,10 +107,14 @@ export interface Order {
   status: OrderStatus;
   referralCode?: string;
   couponCode?: string;
-  shippingAddress: Address;
+  shippingAddress?: Address;
   printifyOrderId?: string;
   trackingUrl?: string;
   referralRefundedAmount?: number;
+  isPrebooking?: boolean;
+  prebookName?: string;
+  prebookEmail?: string;
+  prebookMessage?: string;
   createdAt: Date;
   updatedAt?: Date;
 }
@@ -164,7 +188,16 @@ export interface PrintifyProduct {
     title: string;
     price: number;
     is_enabled: boolean;
-    options: Record<string, string>;
+    options: any;
+  }>;
+  options?: Array<{
+    name: string;
+    type: string;
+    values: Array<{
+      id: number;
+      title: string;
+      colors?: string[];
+    }>;
   }>;
 }
 

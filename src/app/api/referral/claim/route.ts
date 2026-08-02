@@ -257,7 +257,8 @@ export async function POST(request: NextRequest) {
       }
 
       const userData = userDoc.data() || {};
-      const prefs = userData.payoutPreferences;
+      const securePayoutDoc = await userRef.collection('secure_payout_details').doc('payout').get();
+      const prefs = securePayoutDoc.exists ? securePayoutDoc.data()?.payoutPreferences : null;
 
       if (!prefs || prefs.method !== claimType) {
         return NextResponse.json({ error: `Please configure your ${claimType} payout settings before claiming.` }, { status: 400 });

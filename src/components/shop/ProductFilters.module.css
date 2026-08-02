@@ -30,7 +30,7 @@
   transition: all 0.15s ease;
 }
 .catBtn:hover { border-color: var(--mist-200); color: var(--mist-100); }
-.catBtn.active { background: var(--fog); border-color: var(--fog-light); color: var(--text-primary); }
+.catBtn.active { background: var(--surface-2); border-color: var(--border); color: var(--text-primary); }
 
 .right {
   display: flex;
@@ -65,4 +65,4 @@
   transition: all 0.15s ease;
 }
 .sortBtn:hover { color: var(--text-secondary); }
-.sortBtn.active { background: var(--fog); border-color: var(--border); color: var(--text-primary); }
+.sortBtn.active { background: var(--surface-2); border-color: var(--border); color: var(--text-primary); }

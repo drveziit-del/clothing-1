@@ -79,6 +79,42 @@ export async function POST(request: NextRequest) {
       // 1. Process referral (fire-and-forget)
       processReferral(order).catch((err) => console.error('Webhook Referral processing error:', err));
 
+      if (orderData.isPrebooking) {
+        try {
+          const { sendAdminPrebookNotification } = await import('@/lib/email/sender');
+          await sendAdminPrebookNotification({
+            userName: orderData.prebookName || 'Anonymous User',
+            userEmail: orderData.prebookEmail || orderData.userEmail,
+            productTitle: order.items[0]?.title || 'Luxury Product',
+            prebookingPricePaid: orderData.total,
+            message: orderData.prebookMessage || '',
+          });
+        } catch (err) {
+          console.error('Webhook: Failed to send admin prebook email:', err);
+        }
+        break;
+      }
+
+      // Send order confirmation email to the customer (fire-and-forget)
+      try {
+        const { sendOrderConfirmationEmail } = await import('@/lib/email/sender');
+        sendOrderConfirmationEmail(order).catch((err) =>
+          console.error('Webhook: Failed to send order confirmation email:', err)
+        );
+      } catch (err) {
+        console.error('Webhook: Failed to send order confirmation email:', err);
+      }
+
+      // Send order alert notification to the admin (fire-and-forget)
+      try {
+        const { sendAdminOrderNotification } = await import('@/lib/email/sender');
+        sendAdminOrderNotification(order).catch((err) =>
+          console.error('Webhook: Failed to send admin order notification email:', err)
+        );
+      } catch (err) {
+        console.error('Webhook: Failed to send admin order notification email:', err);
+      }
+
       // 2. Submit to Printify (if shop ID configured and not already attempted)
       const shopId = process.env.PRINTIFY_SHOP_ID;
       if (shopId && !orderData.fulfillmentAttempted) {
@@ -93,14 +129,14 @@ export async function POST(request: NextRequest) {
             })),
             shipping_method: 1,
             address_to: {
-              first_name: order.shippingAddress.name.split(' ')[0],
-              last_name:  order.shippingAddress.name.split(' ').slice(1).join(' ') || '-',
+              first_name: order.shippingAddress ? order.shippingAddress.name.split(' ')[0] : 'Guest',
+              last_name:  (order.shippingAddress && order.shippingAddress.name.split(' ').slice(1).join(' ')) || '-',
               email:      order.userEmail,
-              country:    order.shippingAddress.country,
-              region:     order.shippingAddress.state,
-              address1:   order.shippingAddress.street,
-              city:       order.shippingAddress.city,
-              zip:        order.shippingAddress.zip,
+              country:    order.shippingAddress ? order.shippingAddress.country : 'US',
+              region:     order.shippingAddress ? order.shippingAddress.state : 'NY',
+              address1:   order.shippingAddress ? order.shippingAddress.street : '123 Main St',
+              city:       order.shippingAddress ? order.shippingAddress.city : 'New York',
+              zip:        order.shippingAddress ? order.shippingAddress.zip : '10001',
             },
           });
 
