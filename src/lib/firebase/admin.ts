@@ -10,20 +10,19 @@ import { getFirestore } from 'firebase-admin/firestore';
 function getAdminApp(): App {
   if (getApps().length > 0) return getApps()[0];
 
-  const projectId     = process.env.FIREBASE_PROJECT_ID;
+  const projectId     = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'print-on-demand-895b7';
   const clientEmail   = process.env.FIREBASE_CLIENT_EMAIL;
   const privateKey    = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
-  if (!projectId || !clientEmail || !privateKey) {
-    throw new Error(
-      'Firebase Admin SDK env vars missing: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY'
-    );
+  if (clientEmail && privateKey) {
+    return initializeApp({
+      credential: cert({ projectId, clientEmail, privateKey }),
+      projectId,
+    });
   }
 
-  return initializeApp({
-    credential: cert({ projectId, clientEmail, privateKey }),
-    projectId,
-  });
+  // Running on Google Cloud (App Hosting / Cloud Run) — use Application Default Credentials
+  return initializeApp({ projectId });
 }
 
 // Lazily instantiate so importing this module at build time (when env vars are absent)
