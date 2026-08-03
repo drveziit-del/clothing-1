@@ -111,6 +111,15 @@ export async function POST(request: NextRequest) {
 
         for (const col of collections) {
           if (col.directDoc) {
+            // Delete secure payout details subcollection first
+            const payoutSubcol = adminDb.collection('users').doc(uid).collection('secure_payout_details');
+            const payoutSnap = await payoutSubcol.get();
+            if (!payoutSnap.empty) {
+              const subBatch = adminDb.batch();
+              payoutSnap.docs.forEach((doc) => subBatch.delete(doc.ref));
+              await subBatch.commit();
+            }
+
             // Delete user document directly by UID
             const userDoc = adminDb.collection(col.name).doc(uid);
             const exists = await userDoc.get();

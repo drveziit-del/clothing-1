@@ -18,7 +18,10 @@ function verifyRazorpaySignature(
   if (!secret) throw new Error('RAZORPAY_KEY_SECRET not set');
   const body    = `${orderId}|${paymentId}`;
   const expected = crypto.createHmac('sha256', secret).update(body).digest('hex');
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  const expectedBuf = Buffer.from(expected);
+  const signatureBuf = Buffer.from(signature);
+  if (expectedBuf.length !== signatureBuf.length) return false;
+  return crypto.timingSafeEqual(expectedBuf, signatureBuf);
 }
 
 export async function POST(request: NextRequest) {
@@ -143,9 +146,9 @@ export async function POST(request: NextRequest) {
     console.error('Failed to send admin order notification email:', err)
   );
 
-  // 7. Submit to Printify (if shop ID configured)
+  // 7. Submit to Printify (if shop ID configured and valid shipping address exists)
   const shopId = process.env.PRINTIFY_SHOP_ID;
-  if (shopId) {
+  if (shopId && order.shippingAddress && order.shippingAddress.street && order.shippingAddress.city) {
     try {
       const printifyOrder = await createPrintifyOrder(shopId, {
         external_id: orderId,
@@ -157,14 +160,14 @@ export async function POST(request: NextRequest) {
         })),
         shipping_method: 1,
         address_to: {
-          first_name: order.shippingAddress ? order.shippingAddress.name.split(' ')[0] : 'Guest',
-          last_name:  (order.shippingAddress && order.shippingAddress.name.split(' ').slice(1).join(' ')) || '-',
+          first_name: order.shippingAddress.name.split(' ')[0] || 'Customer',
+          last_name:  order.shippingAddress.name.split(' ').slice(1).join(' ') || 'Customer',
           email:      order.userEmail,
-          country:    order.shippingAddress ? order.shippingAddress.country : 'US',
-          region:     order.shippingAddress ? order.shippingAddress.state : 'NY',
-          address1:   order.shippingAddress ? order.shippingAddress.street : '123 Main St',
-          city:       order.shippingAddress ? order.shippingAddress.city : 'New York',
-          zip:        order.shippingAddress ? order.shippingAddress.zip : '10001',
+          country:    order.shippingAddress.country || 'US',
+          region:     order.shippingAddress.state || 'NY',
+          address1:   order.shippingAddress.street,
+          city:       order.shippingAddress.city,
+          zip:        order.shippingAddress.zip || '00000',
         },
       });
 
@@ -176,6 +179,8 @@ export async function POST(request: NextRequest) {
       // Printify failure doesn't fail the payment — log for manual retry
       console.error('Printify order creation failed:', err);
     }
+  } else if (shopId) {
+    console.warn(`Printify fulfillment skipped for order ${orderId}: Missing valid shipping address.`);
   }
 
   return NextResponse.json({ status: 'ok', orderId });
