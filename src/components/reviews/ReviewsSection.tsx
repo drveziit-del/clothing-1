@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
 import type { Review } from '@/types';
@@ -14,6 +14,14 @@ export default function ReviewsSection() {
   const [formRating, setFormRating] = useState(5);
   const [formText, setFormText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? -340 : 340;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   // Subscribe to reviews collection (real-time with fallback)
   useEffect(() => {
@@ -149,14 +157,37 @@ export default function ReviewsSection() {
               Real people. Real opinions. We didn&apos;t pay them — they just have taste.
             </p>
           </div>
-          {(canWriteReview || isAdmin) && (
-            <button
-              className={`btn btn-primary btn-sm ${styles.writeBtn}`}
-              onClick={openAddForm}
-            >
-              Write a Review
-            </button>
-          )}
+          
+          <div className={styles.headerRight}>
+            {reviews.length > 0 && (
+              <div className={styles.navControls}>
+                <button
+                  type="button"
+                  className={styles.navBtn}
+                  onClick={() => scroll('left')}
+                  aria-label="Scroll left"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  className={styles.navBtn}
+                  onClick={() => scroll('right')}
+                  aria-label="Scroll right"
+                >
+                  →
+                </button>
+              </div>
+            )}
+            {(canWriteReview || isAdmin) && (
+              <button
+                className={`btn btn-primary btn-sm ${styles.writeBtn}`}
+                onClick={openAddForm}
+              >
+                Write a Review
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Reviews Grid */}
@@ -165,7 +196,7 @@ export default function ReviewsSection() {
             No reviews yet. Be the first to say something we can&apos;t delete.
           </div>
         ) : (
-          <div className={styles.grid}>
+          <div className={styles.grid} ref={scrollRef}>
             {reviews.map((review) => (
               <div key={review.id} className={styles.card}>
                 <div className={styles.cardTop}>
