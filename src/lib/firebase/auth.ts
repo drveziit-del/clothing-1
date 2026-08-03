@@ -68,16 +68,25 @@ export async function signInWithEmail(
 }
 
 export async function signInWithGoogle(referralCode?: string): Promise<void> {
-  const { signInWithPopup, GoogleAuthProvider } = require('firebase/auth') as typeof import('firebase/auth');
+  const { signInWithPopup, signInWithRedirect, GoogleAuthProvider } = require('firebase/auth') as typeof import('firebase/auth');
   const provider = new GoogleAuthProvider();
   provider.addScope('email');
   provider.addScope('profile');
 
-  const credential = await signInWithPopup(getFirebaseAuth(), provider);
-  await createUserProfile(credential, undefined, referralCode ?? undefined);
+  try {
+    const credential = await signInWithPopup(getFirebaseAuth(), provider);
+    await createUserProfile(credential, undefined, referralCode ?? undefined);
 
-  const idToken = await credential.user.getIdToken();
-  await setSessionCookie(idToken);
+    const idToken = await credential.user.getIdToken();
+    await setSessionCookie(idToken);
+  } catch (err: any) {
+    if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/cancelled-popup-request') {
+      if (referralCode) sessionStorage.setItem('gerkink_referral', referralCode);
+      await signInWithRedirect(getFirebaseAuth(), provider);
+      return;
+    }
+    throw err;
+  }
 }
 
 /**
