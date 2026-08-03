@@ -1,85 +1,19 @@
-[debug] [2026-08-02T17:56:29.513Z] ----------------------------------------------------------------------
-[debug] [2026-08-02T17:56:29.516Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\SOUMALYA\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting
-[debug] [2026-08-02T17:56:29.516Z] CLI Version:   15.14.0
-[debug] [2026-08-02T17:56:29.516Z] Platform:      win32
-[debug] [2026-08-02T17:56:29.516Z] Node Version:  v24.14.1
-[debug] [2026-08-02T17:56:29.516Z] Time:          Sun Aug 02 2026 23:26:29 GMT+0530 (India Standard Time)
-[debug] [2026-08-02T17:56:29.516Z] ----------------------------------------------------------------------
+[debug] [2026-08-02T18:10:54.545Z] ----------------------------------------------------------------------
+[debug] [2026-08-02T18:10:54.550Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\SOUMALYA\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js apphosting:backends:create --project print-on-demand-895b7 --backend clothing-backend --primary-region us-central1
+[debug] [2026-08-02T18:10:54.551Z] CLI Version:   15.14.0
+[debug] [2026-08-02T18:10:54.551Z] Platform:      win32
+[debug] [2026-08-02T18:10:54.551Z] Node Version:  v24.14.1
+[debug] [2026-08-02T18:10:54.552Z] Time:          Sun Aug 02 2026 23:40:54 GMT+0530 (India Standard Time)
+[debug] [2026-08-02T18:10:54.552Z] ----------------------------------------------------------------------
 [debug] 
-[debug] [2026-08-02T17:56:33.891Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
-[debug] [2026-08-02T17:56:33.891Z] > authorizing via signed-in user (drveziit@gmail.com)
-[debug] [2026-08-02T17:56:33.892Z] [iam] checking project print-on-demand-895b7 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
-[debug] [2026-08-02T17:56:33.893Z] Checked if tokens are valid: true, expires at: 1785694761745
-[debug] [2026-08-02T17:56:33.893Z] Checked if tokens are valid: true, expires at: 1785694761745
-[debug] [2026-08-02T17:56:33.894Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/print-on-demand-895b7:testIamPermissions [none]
-[debug] [2026-08-02T17:56:33.894Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/print-on-demand-895b7:testIamPermissions  x-goog-user-project=print-on-demand-895b7
-[debug] [2026-08-02T17:56:33.894Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/print-on-demand-895b7:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
-[debug] [2026-08-02T17:56:35.571Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/print-on-demand-895b7:testIamPermissions 200
-[debug] [2026-08-02T17:56:35.571Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/print-on-demand-895b7:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
-[debug] [2026-08-02T17:56:35.572Z] Checked if tokens are valid: true, expires at: 1785694761745
-[debug] [2026-08-02T17:56:35.572Z] Checked if tokens are valid: true, expires at: 1785694761745
-[debug] [2026-08-02T17:56:35.573Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/print-on-demand-895b7 [none]
-[debug] [2026-08-02T17:56:36.158Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/print-on-demand-895b7 200
-[debug] [2026-08-02T17:56:36.159Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/print-on-demand-895b7 {"projectId":"print-on-demand-895b7","projectNumber":"659428489572","displayName":"print on demand","name":"projects/print-on-demand-895b7","resources":{"hostingSite":"print-on-demand-895b7"},"state":"ACTIVE","labels":{"firebase":"enabled","firebase/storage-default-bucket":"created"},"etag":"1_e004e89c-6294-4f3b-ac5b-3274cd29b7cc"}
-[debug] [2026-08-02T17:56:40.651Z] defaultcredentials: writing to file C:\Users\SOUMALYA\AppData\Roaming\firebase\drveziit_gmail_com_application_default_credentials.json
-[debug] [2026-08-02T17:56:40.654Z] Checked if tokens are valid: true, expires at: 1785694761745
-[debug] [2026-08-02T17:56:40.654Z] Checked if tokens are valid: true, expires at: 1785694761745
-[debug] [2026-08-02T17:56:40.654Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/print-on-demand-895b7/sites pageToken=&pageSize=10
-[debug] [2026-08-02T17:56:42.285Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/print-on-demand-895b7/sites 200
-[debug] [2026-08-02T17:56:42.285Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/print-on-demand-895b7/sites {"sites":[{"name":"projects/print-on-demand-895b7/sites/print-on-demand-895b7","defaultUrl":"https://print-on-demand-895b7.web.app","type":"DEFAULT_SITE"}]}
-[debug] [2026-08-02T17:56:42.286Z] Checked if tokens are valid: true, expires at: 1785694761745
-[debug] [2026-08-02T17:56:42.287Z] Checked if tokens are valid: true, expires at: 1785694761745
-[debug] [2026-08-02T17:56:42.287Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/print-on-demand-895b7/sites 
-[debug] [2026-08-02T17:56:43.075Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/print-on-demand-895b7/sites 200
-[debug] [2026-08-02T17:56:43.075Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/print-on-demand-895b7/sites {"sites":[{"name":"projects/print-on-demand-895b7/sites/print-on-demand-895b7","defaultUrl":"https://print-on-demand-895b7.web.app","type":"DEFAULT_SITE"}]}
-[debug] [2026-08-02T17:56:43.075Z] Checked if tokens are valid: true, expires at: 1785694761745
-[debug] [2026-08-02T17:56:43.075Z] Checked if tokens are valid: true, expires at: 1785694761745
-[debug] [2026-08-02T17:56:43.075Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/print-on-demand-895b7/webApps/-/config [none]
-[debug] [2026-08-02T17:56:44.414Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/print-on-demand-895b7/webApps/-/config 200
-[debug] [2026-08-02T17:56:44.414Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/print-on-demand-895b7/webApps/-/config {"projectId":"print-on-demand-895b7","appId":"1:659428489572:web:09eb88b692d2399009a271","storageBucket":"print-on-demand-895b7.firebasestorage.app","apiKey":"AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0","authDomain":"print-on-demand-895b7.firebaseapp.com","messagingSenderId":"659428489572","measurementId":"G-R4RRS400DQ","projectNumber":"659428489572","version":"2"}
-[info] 
-   Thank you for trying our early preview of Next.js support on Firebase Hosting.
-   During the preview, support is best-effort and breaking changes can be expected. Proceed with caution.
-   The integration is known to work with Next.js version 12 - 15.0. You may encounter errors.
-
-   Documentation: https://firebase.google.com/docs/hosting/frameworks/nextjs
-   File a bug: https://github.com/firebase/firebase-tools/issues/new?template=bug_report.md
-   Submit a feature request: https://github.com/firebase/firebase-tools/issues/new?template=feature_request.md
-
-   We'd love to learn from you. Express your interest in helping us shape the future of Firebase Hosting: https://goo.gle/41enW5X
-
-[debug] [2026-08-02T17:56:54.141Z] Checked if tokens are valid: true, expires at: 1785694761745
-[debug] [2026-08-02T17:56:54.141Z] Checked if tokens are valid: true, expires at: 1785694761745
-[debug] [2026-08-02T17:56:54.141Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/print-on-demand-895b7/sites/print-on-demand-895b7 [none]
-[debug] [2026-08-02T17:56:55.450Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/print-on-demand-895b7/sites/print-on-demand-895b7 200
-[debug] [2026-08-02T17:56:55.450Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/print-on-demand-895b7/sites/print-on-demand-895b7 {"name":"projects/print-on-demand-895b7/sites/print-on-demand-895b7","defaultUrl":"https://print-on-demand-895b7.web.app","type":"DEFAULT_SITE"}
-[info] ⚠ Attempted to load @next/swc-win32-x64-msvc, but an error occurred: An Application Control policy has blocked this file.
-\\?\C:\Users\SOUMALYA\Desktop\clothing 2\node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node
-
-[info]   Skipping creating a lockfile at C:\Users\SOUMALYA\Desktop\clothing 2\.next\lock because we're using WASM bindings
-
-[info] ▲ Next.js 16.2.12 (Turbopack)
-
-[info] - Environments: .env.local
-
-
-[info]   Creating an optimized production build ...
-
-[info] ⚠ Attempted to load @next/swc-win32-x64-msvc, but an error occurred: An Application Control policy has blocked this file.
-\\?\C:\Users\SOUMALYA\Desktop\clothing 2\node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node
-
-[info] 
-
-[info] > Build error occurred
-
-[info] Error: Turbopack is not supported on this platform (win32/x64) because native bindings are not available. Only WebAssembly (WASM) bindings were loaded, and Turbopack requires native bindings.
-
-To build on this platform, use Webpack instead:
-  next build --webpack
-
-For more information, see: https://nextjs.org/docs/app/api-reference/turbopack#supported-platforms
-    at ignore-listed frames
-
-[debug] [2026-08-02T17:57:11.609Z] Error: ENOENT: no such file or directory, open 'C:\Users\SOUMALYA\Desktop\clothing 2\.next\server\middleware-manifest.json'
-[error] 
-[error] Error: An unexpected error has occurred.
+[debug] [2026-08-02T18:10:54.995Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-08-02T18:10:54.996Z] > authorizing via signed-in user (drveziit@gmail.com)
+[debug] [2026-08-02T18:10:54.998Z] Checked if tokens are valid: false, expires at: 1785694761745
+[debug] [2026-08-02T18:10:54.999Z] Checked if tokens are valid: false, expires at: 1785694761745
+[debug] [2026-08-02T18:10:54.999Z] > refreshing access token with scopes: []
+[debug] [2026-08-02T18:10:55.001Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-08-02T18:10:55.002Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-08-02T18:10:55.336Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-08-02T18:10:55.337Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-08-02T18:10:55.391Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/print-on-demand-895b7/services/firebaseapphosting.googleapis.com [none]
+[debug] [2026-08-02T18:10:55.392Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/print-on-demand-895b7/services/firebaseapphosting.googleapis.com  x-goog-user-project=print-on-demand-895b7
