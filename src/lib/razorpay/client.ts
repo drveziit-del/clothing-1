@@ -74,22 +74,30 @@ async function razorpayxRequest(path: string, method: string, body: any) {
     throw new Error('RazorpayX API credentials missing');
   }
 
-  const auth = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
-  const res = await fetch(`https://api.razorpay.com/v1${path}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Basic ${auth}`,
-    },
-    body: JSON.stringify(body),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error?.description || `RazorpayX Payout API failed with status ${res.status}`);
+  try {
+    const auth = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
+    const res = await fetch(`https://api.razorpay.com/v1${path}`, {
+      method,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${auth}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.error?.description || `RazorpayX Payout API failed with status ${res.status}`);
+    }
+
+    return res.json();
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  return res.json();
 }
 
 /**
