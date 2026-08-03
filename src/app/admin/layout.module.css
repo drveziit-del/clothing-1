@@ -10,3 +10,19 @@
   overflow-x: hidden;
   background: var(--bg);
 }
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .content {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    padding-bottom: 3rem;
+  }
+}

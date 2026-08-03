@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './AdminSidebar.module.css';
@@ -15,33 +16,89 @@ const NAV = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => setIsOpen((prev) => !prev);
+  const closeMenu = () => setIsOpen(false);
 
   return (
-    <aside className={styles.sidebar}>
-      <div className={styles.header}>
-        <Link href="/" className={styles.logo}>GERKINK</Link>
-        <span className={styles.adminLabel}>Admin</span>
+    <>
+      {/* Mobile Top Navigation Header */}
+      <div className={styles.mobileBar}>
+        <div className={styles.mobileLeft}>
+          <Link href="/" className={styles.logo}>GERKINK</Link>
+          <span className={styles.adminLabel}>Admin</span>
+        </div>
+        <button
+          type="button"
+          className={styles.hamburgerBtn}
+          onClick={toggleMenu}
+          aria-label="Toggle Navigation Menu"
+        >
+          {isOpen ? '✕' : '☰ MENU'}
+        </button>
       </div>
 
-      <nav className={styles.nav}>
-        {NAV.map(({ href, label, icon }) => {
-          const active = href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`${styles.link} ${active ? styles.active : ''}`}
-            >
-              <span className={styles.icon}>{icon}</span>
-              {label}
-            </Link>
-          );
-        })}
-      </nav>
+      {/* Mobile Slide-out Navigation Drawer Overlay */}
+      {isOpen && (
+        <div className={styles.mobileOverlay} onClick={closeMenu}>
+          <div className={styles.mobileDrawer} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.drawerHeader}>
+              <span className={styles.drawerTitle}>Admin Navigation</span>
+              <button type="button" className={styles.closeBtn} onClick={closeMenu}>✕</button>
+            </div>
 
-      <div className={styles.footer}>
-        <Link href="/" className={styles.backLink}>← Back to site</Link>
-      </div>
-    </aside>
+            <nav className={styles.nav}>
+              {NAV.map(({ href, label, icon }) => {
+                const active = href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`${styles.link} ${active ? styles.active : ''}`}
+                    onClick={closeMenu}
+                  >
+                    <span className={styles.icon}>{icon}</span>
+                    {label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className={styles.footer}>
+              <Link href="/" className={styles.backLink} onClick={closeMenu}>← Back to site</Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Fixed Sidebar */}
+      <aside className={styles.sidebar}>
+        <div className={styles.header}>
+          <Link href="/" className={styles.logo}>GERKINK</Link>
+          <span className={styles.adminLabel}>Admin</span>
+        </div>
+
+        <nav className={styles.nav}>
+          {NAV.map(({ href, label, icon }) => {
+            const active = href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`${styles.link} ${active ? styles.active : ''}`}
+              >
+                <span className={styles.icon}>{icon}</span>
+                {label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className={styles.footer}>
+          <Link href="/" className={styles.backLink}>← Back to site</Link>
+        </div>
+      </aside>
+    </>
   );
 }

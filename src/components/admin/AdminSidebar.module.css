@@ -1,3 +1,11 @@
+.mobileBar {
+  display: none;
+}
+
+.mobileOverlay {
+  display: none;
+}
+
 .sidebar {
   width: 220px;
   min-width: 220px;
@@ -8,6 +16,7 @@
   height: 100vh;
   position: sticky;
   top: 0;
+  z-index: 50;
 }
 
 .header {
@@ -92,3 +101,99 @@
   transition: color 0.15s ease;
 }
 .backLink:hover { color: var(--text-secondary); }
+
+/* ── Mobile Layout Rules ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+
+  .mobileBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: #0d0f15;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .mobileLeft {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .hamburgerBtn {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .mobileOverlay {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 9, 14, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .mobileDrawer {
+    width: 280px;
+    max-width: 85vw;
+    height: 100%;
+    background: #0c0e14;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    animation: slideRight 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .drawerHeader {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .drawerTitle {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+
+  .closeBtn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideRight {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
