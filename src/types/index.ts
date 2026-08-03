@@ -33,6 +33,7 @@ export interface Product {
   title: string;
   description: string;
   section: ProductSection;
+  category?: string;
   price: number;
   tier?: 1 | 2 | 3 | 4 | 5; // Only for society_fuckers
   images: string[];
