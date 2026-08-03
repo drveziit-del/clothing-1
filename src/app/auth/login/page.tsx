@@ -70,7 +70,11 @@ function LoginContent() {
       const ref = document.cookie.match(/referral=([^;]+)/)?.[1];
       await signInWithGoogle(ref);
       router.replace(redirect);
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.code === 'auth/popup-closed-by-user') {
+        setGoogleLoading(false);
+        return;
+      }
       console.error('Google Sign-in Error:', err);
       toast('Google sign-in failed. Manually type like it\'s 2010.', 'error');
       setGoogleLoading(false);

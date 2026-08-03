@@ -13,7 +13,7 @@
 
 const firebaseConfig = {
   apiKey:            process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0',
-  authDomain:        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'gerkink.shop',
+  authDomain:        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'print-on-demand-895b7.firebaseapp.com',
   projectId:         process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'print-on-demand-895b7',
   storageBucket:     process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'print-on-demand-895b7.firebasestorage.app',
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '659428489572',
