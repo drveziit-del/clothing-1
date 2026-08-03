@@ -200,50 +200,67 @@
 
 @media (max-width: 640px) {
   .card {
-    padding: 8px;
-    border-radius: 10px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .card:hover {
+    border-color: transparent;
+    transform: none;
+    box-shadow: none;
   }
 
   .imageWrap {
-    padding: 8px;
-    border-radius: 6px;
+    padding: 0;
+    border-radius: 2px;
+    background: #090a0d;
+    aspect-ratio: 4 / 5;
   }
 
   .wishlistBtn {
-    width: 28px;
-    height: 28px;
-    top: 6px;
-    right: 6px;
+    width: 32px;
+    height: 32px;
+    top: 8px;
+    right: 8px;
+    background: #ffffff;
+    color: #111111;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   }
 
   .info {
-    padding-top: 8px;
-    gap: 6px;
-  }
-
-  .category {
-    font-size: 0.6rem;
-  }
-
-  .meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    padding: 10px 0 0 0;
+    gap: 3px;
   }
 
   .title {
-    font-size: 0.78rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ffffff;
     line-height: 1.25;
   }
 
+  .category {
+    font-size: 0.72rem;
+    color: #8a90a2;
+    font-weight: 400;
+    text-transform: none;
+  }
+
   .price {
-    font-size: 0.82rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-top: 2px;
   }
 
   .addBtn {
-    height: 36px;
-    font-size: 0.68rem;
-    gap: 6px;
-    padding: 0 6px;
+    margin-top: 8px;
+    height: 38px;
+    font-size: 0.7rem;
+    border-color: #232734;
   }
 }
