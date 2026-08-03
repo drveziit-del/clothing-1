@@ -39,6 +39,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/__/auth/:path*",
+        destination: "https://print-on-demand-895b7.firebaseapp.com/__/auth/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
