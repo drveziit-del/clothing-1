@@ -18,6 +18,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { toast } = useRoast();
   const [hoverRoast, setHoverRoast] = useState('');
   const [roastVisible, setRoastVisible] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
   const defaultVariant = product.variants[0];
 
@@ -34,17 +35,38 @@ export default function ProductCard({ product }: ProductCardProps) {
     toast(getCartRoast(), 'success');
   };
 
-  const tierLabel: Record<number, string> = {
-    1: 'GOD TIER',
-    2: 'OBSCENE',
-    3: 'DELUSIONAL',
-    4: 'WANNABE',
-    5: 'PEASANT PREMIUM',
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsWishlisted(!isWishlisted);
   };
 
+  const categoryLabel = product.category
+    ? product.category.toUpperCase()
+    : product.section === 'society_fuckers'
+    ? 'LUXURY'
+    : 'T-SHIRTS';
+
   return (
-    <Link href={`/shop/${product.id}`} className={styles.card} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <Link
+      href={`/shop/${product.id}`}
+      className={styles.card}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <div className={styles.imageWrap}>
+        {/* Heart Wishlist Button */}
+        <button
+          type="button"
+          className={`${styles.wishlistBtn} ${isWishlisted ? styles.activeWishlist : ''}`}
+          onClick={toggleWishlist}
+          aria-label="Add to wishlist"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill={isWishlisted ? '#ff4d4d' : 'none'} stroke={isWishlisted ? '#ff4d4d' : '#8a90a2'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+        </button>
+
         {product.images[0] ? (
           <Image
             src={product.images[0]}
@@ -63,29 +85,31 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className={`${styles.roastOverlay} ${roastVisible ? styles.visible : ''}`}>
           <p className={styles.roastText}>{hoverRoast}</p>
         </div>
-
-        {/* Tier badge */}
-        {product.tier && (
-          <span className={`${styles.tierBadge} tag tag-coral`}>
-            {tierLabel[product.tier]}
-          </span>
-        )}
       </div>
 
       <div className={styles.info}>
+        <div className={styles.headerRow}>
+          <span className={styles.category}>{categoryLabel}</span>
+        </div>
+
         <div className={styles.meta}>
           <h3 className={styles.title}>{product.title}</h3>
-          <span className={styles.price + ' text-price'}>
-            ${product.price.toLocaleString('en-US', { minimumFractionDigits: 0 })}
+          <span className={styles.price}>
+            ${product.price.toFixed(2)}
           </span>
         </div>
 
         <button
-          className={`${styles.addBtn} btn btn-primary btn-sm`}
+          type="button"
+          className={styles.addBtn}
           onClick={handleAddToCart}
           aria-label={`Add ${product.title} to cart`}
         >
-          Add to Cart
+          <span>ADD TO CART</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.arrowIcon}>
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
         </button>
       </div>
     </Link>
