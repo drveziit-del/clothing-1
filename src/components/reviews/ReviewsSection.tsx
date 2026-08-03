@@ -15,9 +15,9 @@ export default function ReviewsSection() {
   const [formText, setFormText] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Subscribe to reviews collection (real-time)
+  // Subscribe to reviews collection (real-time with fallback)
   useEffect(() => {
-    const { collection, query, orderBy, onSnapshot } = getFirestoreModule();
+    const { collection, query, orderBy, onSnapshot, getDocs } = getFirestoreModule();
     const db = getFirestoreDb();
 
     const q = query(
@@ -36,8 +36,23 @@ export default function ReviewsSection() {
         } as Review;
       });
       setReviews(items);
-    }, (err: any) => {
-      console.warn('Reviews snapshot error:', err);
+    }, async (_err: any) => {
+      // Fallback fetch if snapshot listener hits transient auth/permission sync race
+      try {
+        const snap = await getDocs(q);
+        const items: Review[] = snap.docs.map((doc: any) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate?.() ?? new Date(),
+            updatedAt: data.updatedAt?.toDate?.() ?? undefined,
+          } as Review;
+        });
+        setReviews(items);
+      } catch {
+        // Silent fallback
+      }
     });
 
     return () => unsub();
