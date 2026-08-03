@@ -127,9 +127,10 @@
 }
 
 @media (max-width: 768px) {
-  .grid3 { grid-template-columns: repeat(2, 1fr); }
-  .grid2 { grid-template-columns: 1fr; }
+  .grid3 { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  .grid2 { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
 }
 @media (max-width: 480px) {
-  .grid3 { grid-template-columns: 1fr; }
+  .grid3 { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  .grid2 { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
 }

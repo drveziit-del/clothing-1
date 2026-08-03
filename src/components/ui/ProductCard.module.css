@@ -197,3 +197,53 @@
 .addBtn:hover .arrowIcon {
   transform: translateX(4px);
 }
+
+@media (max-width: 640px) {
+  .card {
+    padding: 8px;
+    border-radius: 10px;
+  }
+
+  .imageWrap {
+    padding: 8px;
+    border-radius: 6px;
+  }
+
+  .wishlistBtn {
+    width: 28px;
+    height: 28px;
+    top: 6px;
+    right: 6px;
+  }
+
+  .info {
+    padding-top: 8px;
+    gap: 6px;
+  }
+
+  .category {
+    font-size: 0.6rem;
+  }
+
+  .meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .title {
+    font-size: 0.78rem;
+    line-height: 1.25;
+  }
+
+  .price {
+    font-size: 0.82rem;
+  }
+
+  .addBtn {
+    height: 36px;
+    font-size: 0.68rem;
+    gap: 6px;
+    padding: 0 6px;
+  }
+}
