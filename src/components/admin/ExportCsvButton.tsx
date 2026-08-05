@@ -41,7 +41,11 @@ export default function ExportCsvButton({
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    if (typeof link.remove === 'function') {
+      link.remove();
+    } else if (link.parentNode) {
+      link.parentNode.removeChild(link);
+    }
     URL.revokeObjectURL(url);
   };
 

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useRoast } from '@/hooks/useRoast';
+import { useCurrency } from '@/context/CurrencyContext';
 import { getCartRoast } from '@/lib/utils/roasts';
 import PriceTag from '@/components/ui/PriceTag';
 import type { Product, Variant } from '@/types';
@@ -105,6 +106,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
   const { addItem } = useCart();
   const { toast } = useRoast();
   const { user, firebaseUser } = useAuth();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
 
   const displayUgcVideos = useMemo(() => {
@@ -577,7 +579,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                 onClick={() => setShowPrebookModal(true)}
                 disabled={!selectedVariant?.available}
               >
-                Pre-book Now — ${(product.prebookingPrice !== undefined && product.prebookingPrice !== null ? product.prebookingPrice : 500).toLocaleString()} USD
+                Pre-book Now — {formatPrice(product.prebookingPrice !== undefined && product.prebookingPrice !== null ? product.prebookingPrice : 500)}
               </button>
             ) : (
               <>
@@ -960,7 +962,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
               )}
               <div className={styles.stickyBarInfo}>
                 <span className={styles.stickyBarTitle}>{product.title}</span>
-                <span className={styles.stickyBarPrice}>${selectedVariant?.price ?? product.price}</span>
+                <span className={styles.stickyBarPrice}>{formatPrice(selectedVariant?.price ?? product.price)}</span>
               </div>
             </div>
             <button
@@ -1016,7 +1018,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
             ) : prebookOrderData ? (
               <div className={styles.paymentContainer}>
                 <p className={styles.paymentLabel}>
-                  Pre-booking created! Complete your payment of <strong>${(product.prebookingPrice !== undefined && product.prebookingPrice !== null ? product.prebookingPrice : 500).toLocaleString()} USD</strong> to finalize.
+                  Pre-booking created! Complete your payment of <strong>{formatPrice(product.prebookingPrice !== undefined && product.prebookingPrice !== null ? product.prebookingPrice : 500)}</strong> to finalize.
                 </p>
                 <RazorpayButton
                   razorpayOrderId={prebookOrderData.razorpayOrderId}
@@ -1026,6 +1028,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                   userEmail={prebookEmail}
                   userName={prebookName}
                   isPrebooking={true}
+                  amountUSD={product.prebookingPrice !== undefined && product.prebookingPrice !== null ? product.prebookingPrice : 500}
                   onSuccess={() => {
                     setShowPrebookModal(false);
                     setPrebookOrderData(null);
@@ -1080,7 +1083,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                     required
                   />
                   <span>
-                    I agree that the pre-booking deposit of ${(product.prebookingPrice !== undefined && product.prebookingPrice !== null ? product.prebookingPrice : 500).toLocaleString()} USD is <strong>non-refundable</strong> and will be used as credit towards the final product purchase.
+                    I agree that the pre-booking deposit of {formatPrice(product.prebookingPrice !== undefined && product.prebookingPrice !== null ? product.prebookingPrice : 500)} is <strong>non-refundable</strong> and will be used as credit towards the final product purchase.
                   </span>
                 </label>
                 <button

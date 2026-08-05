@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useRoast } from '@/hooks/useRoast';
+import { useCurrency } from '@/context/CurrencyContext';
 import styles from './RazorpayButton.module.css';
 
 declare global {
@@ -43,6 +44,7 @@ interface RazorpayButtonProps {
   isPrebooking?: boolean;
   onSuccess?: () => void;
   onError?: (msg: string) => void;
+  amountUSD?: number;
 }
 
 export default function RazorpayButton({
@@ -55,9 +57,11 @@ export default function RazorpayButton({
   isPrebooking = false,
   onSuccess,
   onError,
+  amountUSD,
 }: RazorpayButtonProps) {
   const { clearCart } = useCart();
   const { toast } = useRoast();
+  const { formatPrice } = useCurrency();
   const scriptLoaded = useRef(false);
 
   useEffect(() => {
@@ -68,7 +72,11 @@ export default function RazorpayButton({
     document.body.appendChild(script);
     scriptLoaded.current = true;
     return () => {
-      if (document.body.contains(script)) document.body.removeChild(script);
+      if (typeof script.remove === 'function') {
+        script.remove();
+      } else if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
     };
   }, []);
 
@@ -125,7 +133,7 @@ export default function RazorpayButton({
         <rect x="1" y="4" width="22" height="16" rx="2" />
         <path d="M1 10h22" />
       </svg>
-      Pay Now — {currency} {(amount / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+      Pay Now — {amountUSD !== undefined ? formatPrice(amountUSD) : `${currency} ${(amount / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
     </button>
   );
 }

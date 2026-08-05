@@ -159,6 +159,23 @@
 .mobileLink:last-child { border-bottom: none; }
 .mobileLink:hover { color: var(--text-primary); }
 
+.currencyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.currencyLabel {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
 .mobileSep {
   height: 1px;
   background: var(--border);

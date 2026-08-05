@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import { useRouter } from 'next/navigation';
 import { useRoast } from '@/hooks/useRoast';
 import { addressSchema } from '@/lib/utils/validation';
@@ -16,6 +17,7 @@ type Step = 'address' | 'payment';
 export default function CheckoutPage() {
   const { items, subtotal, referralCode, clearCart } = useCart();
   const { firebaseUser, user } = useAuth();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
   const { toast } = useRoast();
 
@@ -88,7 +90,7 @@ export default function CheckoutPage() {
         const value = couponDoc.value ?? 100;
         setAppliedCoupon(couponInput.trim().toUpperCase());
         setCouponDiscount(value);
-        toast(`$${value} discount applied!`, 'success');
+        toast(`${formatPrice(value)} discount applied!`, 'success');
       }
     } catch (err: any) {
       toast(err.message || 'Error validating coupon', 'error');
@@ -245,7 +247,7 @@ export default function CheckoutPage() {
               ) : (
                 <>
                   <p className={styles.paymentNote}>
-                    You&apos;re paying <strong>${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</strong> USD via Razorpay.
+                    You&apos;re paying <strong>{formatPrice(grandTotal)}</strong> via Razorpay.
                   </p>
                   <RazorpayButton
                     razorpayOrderId={orderData.razorpayOrderId}
@@ -254,6 +256,7 @@ export default function CheckoutPage() {
                     firestoreOrderId={orderData.orderId}
                     userEmail={firebaseUser?.email ?? undefined}
                     userName={user?.displayName ?? undefined}
+                    amountUSD={grandTotal}
                     onSuccess={() => {
                       clearCart();
                       router.push('/account');
@@ -280,21 +283,21 @@ export default function CheckoutPage() {
             {items.map((item) => (
               <div key={`${item.product.id}-${item.variant.id}`} className={styles.summaryItem}>
                 <span className={styles.summaryItemName}>{item.product.title} × {item.quantity}</span>
-                <span className={styles.summaryItemPrice + ' text-price'}>${(item.variant.price * item.quantity).toLocaleString()}</span>
+                <span className={styles.summaryItemPrice + ' text-price'}>{formatPrice(item.variant.price * item.quantity)}</span>
               </div>
             ))}
           </div>
           <div className={styles.summaryTotals}>
-            <div className={styles.totalRow}><span>Subtotal</span><span>${subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span></div>
-            <div className={styles.totalRow}><span>Tax (8%)</span><span>${tax.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span></div>
+            <div className={styles.totalRow}><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
+            <div className={styles.totalRow}><span>Tax (8%)</span><span>{formatPrice(tax)}</span></div>
             {couponDiscount > 0 && (
               <div className={styles.totalRow} style={{ color: 'var(--coral-200)' }}>
                 <span>Discount</span>
-                <span>-${discountAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                <span>-{formatPrice(discountAmount)}</span>
               </div>
             )}
             <div className={styles.divider} />
-            <div className={`${styles.totalRow} ${styles.grand}`}><span>Total</span><span>${grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span></div>
+            <div className={`${styles.totalRow} ${styles.grand}`}><span>Total</span><span>{formatPrice(grandTotal)}</span></div>
           </div>
 
           {/* Coupon Input Block */}

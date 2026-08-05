@@ -7,6 +7,7 @@ import { useCart } from '@/context/CartContext';
 import { useRoast } from '@/hooks/useRoast';
 import { getHoverRoast, getCartRoast } from '@/lib/utils/roasts';
 import type { Product } from '@/types';
+import { useCurrency } from '@/context/CurrencyContext';
 import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
@@ -16,6 +17,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
   const { toast } = useRoast();
+  const { formatPrice } = useCurrency();
   const [hoverRoast, setHoverRoast] = useState('');
   const [roastVisible, setRoastVisible] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -90,7 +92,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className={styles.info}>
         <h3 className={styles.title}>{product.title}</h3>
         <span className={styles.category}>{categoryLabel}</span>
-        <span className={styles.price}>${product.price.toFixed(2)}</span>
+        <span className={styles.price}>{formatPrice(product.price)}</span>
 
         <button
           type="button"

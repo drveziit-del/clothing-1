@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
+import { CurrencyProvider } from "@/context/CurrencyContext";
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
 import RoastToast from "@/components/ui/RoastToast";
 
@@ -36,10 +37,12 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <AuthProvider>
-            <CartProvider>
-              <LayoutWrapper>{children}</LayoutWrapper>
-              <RoastToast />
-            </CartProvider>
+            <CurrencyProvider>
+              <CartProvider>
+                <LayoutWrapper>{children}</LayoutWrapper>
+                <RoastToast />
+              </CartProvider>
+            </CurrencyProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -2,6 +2,7 @@
 
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import { EMPTY_CART_ROAST } from '@/lib/utils/roasts';
@@ -10,6 +11,7 @@ import styles from './page.module.css';
 export default function CartPage() {
   const { items, subtotal, referralCode, removeItem, updateQty, setReferralCode } = useCart();
   const { firebaseUser } = useAuth();
+  const { formatPrice, currency } = useCurrency();
 
   if (items.length === 0) {
     return (
@@ -52,7 +54,7 @@ export default function CartPage() {
                     <button onClick={() => updateQty(item.product.id, item.variant.id, item.quantity + 1)} aria-label="Increase quantity">+</button>
                   </div>
                   <span className={styles.itemPrice + ' text-price'}>
-                    ${(item.variant.price * item.quantity).toLocaleString()}
+                    {formatPrice(item.variant.price * item.quantity)}
                   </span>
                   <button onClick={() => removeItem(item.product.id, item.variant.id)} className={styles.removeBtn} aria-label="Remove item">×</button>
                 </div>
@@ -84,16 +86,16 @@ export default function CartPage() {
           <div className={styles.totals}>
             <div className={styles.totalRow}>
               <span>Subtotal</span>
-              <span className="text-price">${subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              <span className="text-price">{formatPrice(subtotal)}</span>
             </div>
             <div className={styles.totalRow}>
               <span>Tax (est. 8%)</span>
-              <span className="text-price">${tax.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              <span className="text-price">{formatPrice(tax)}</span>
             </div>
             <div className={styles.divider} />
             <div className={`${styles.totalRow} ${styles.grand}`}>
               <span>Total</span>
-              <span className="text-price">${total.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              <span className="text-price">{formatPrice(total)}</span>
             </div>
           </div>
 
@@ -108,7 +110,7 @@ export default function CartPage() {
           )}
 
           <p className={styles.summaryNote}>
-            Shipping calculated at checkout. All prices in USD.
+            Shipping calculated at checkout. All prices in {currency}.
           </p>
         </div>
       </div>

@@ -1,3 +1,6 @@
+'use client';
+
+import { useCurrency } from '@/context/CurrencyContext';
 import styles from './PriceTag.module.css';
 
 interface PriceTagProps {
@@ -16,20 +19,15 @@ const TIER_COLORS: Record<number, string> = {
 };
 
 export default function PriceTag({ price, tier, size = 'md', animate = false }: PriceTagProps) {
+  const { formatPrice } = useCurrency();
   const color = tier ? TIER_COLORS[tier] : 'var(--accent)';
-  const formatted = price >= 1_000_000
-    ? `$${(price / 1_000_000).toFixed(0)}M`
-    : price >= 1_000
-    ? `$${(price / 1_000).toFixed(0)}K`
-    : `$${price.toFixed(0)}`;
 
   return (
     <span
       className={`${styles.tag} ${styles[size]} ${animate ? styles.animate : ''}`}
       style={{ color }}
     >
-      <span className={styles.symbol}>$</span>
-      {price.toLocaleString('en-US')}
+      {formatPrice(price)}
     </span>
   );
 }

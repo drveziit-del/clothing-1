@@ -137,10 +137,16 @@ export async function POST(request: NextRequest) {
   let rzpOrder: { id: string; amount: number; currency: string };
   try {
     rzpOrder = await createRazorpayOrder(total, receipt);
-  } catch (err) {
+  } catch (err: any) {
     await orderRef.delete();
-    console.error('Razorpay order creation failed:', err);
-    return NextResponse.json({ error: 'Payment gateway error' }, { status: 500 });
+    const details = err?.error?.description || err?.message || 'Unknown payment gateway error';
+    console.error('[create-order] Razorpay order creation failed:');
+    console.error('[create-order] Details:', details);
+    console.error('[create-order] Full error:', JSON.stringify(err, Object.getOwnPropertyNames(err), 2));
+    return NextResponse.json({ 
+      error: 'Payment gateway error',
+      details,
+    }, { status: 500 });
   }
 
   // 7. Update Firestore order with Razorpay order ID

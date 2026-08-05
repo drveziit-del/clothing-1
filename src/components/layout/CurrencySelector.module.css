@@ -1,0 +1,26 @@
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+}
+
+.select {
+  background: var(--bg-card, #121212);
+  color: var(--text-primary, #ffffff);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.select:hover, .select:focus {
+  border-color: var(--accent-primary, #FF6B6B);
+}
+
+.select option {
+  background: #181818;
+  color: #ffffff;
+}

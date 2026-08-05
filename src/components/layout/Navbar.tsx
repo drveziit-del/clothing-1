@@ -6,6 +6,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { signOut } from '@/lib/firebase/auth';
 import ThemeToggle from './ThemeToggle';
+import CurrencySelector from './CurrencySelector';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
@@ -84,7 +85,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu (3-lines menu) */}
       {menuOpen && (
         <div className={styles.mobileMenu}>
           <Link href="/shop" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>Shop</Link>
@@ -94,6 +95,12 @@ export default function Navbar() {
           {isAdmin && (
             <Link href="/admin" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>Admin</Link>
           )}
+          
+          <div className={styles.currencyRow}>
+            <span className={styles.currencyLabel}>Currency</span>
+            <CurrencySelector />
+          </div>
+
           <div className={styles.mobileSep} />
           {firebaseUser ? (
             <>

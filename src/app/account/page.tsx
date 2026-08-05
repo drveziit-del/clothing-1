@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { getFirestoreDb, getFirestoreModule, getFirebaseStorage, getStorageModule, getFirebaseAuth } from '@/lib/firebase/config';
@@ -28,6 +29,7 @@ function getTimestampTime(timestamp: any): number {
 
 export default function AccountPage() {
   const { user, loading } = useAuth();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
   const { toast } = useRoast();
   const [copied, setCopied] = useState(false);
@@ -801,7 +803,7 @@ export default function AccountPage() {
       {hasReward && (
         <section className={styles.claimBanner}>
           <div className={styles.claimHeader}>
-            <h2 className={styles.claimTitle}>Available Wallet Balance: ${availableBalance.toFixed(2)} USD</h2>
+            <h2 className={styles.claimTitle}>Available Wallet Balance: {formatPrice(availableBalance)}</h2>
             <p className={styles.claimSub}>Select a method and input the amount you want to claim from your wallet.</p>
           </div>
 
@@ -836,7 +838,7 @@ export default function AccountPage() {
                             onChange={() => setSelectedOrderId(order.id)}
                           />
                           <span className={styles.orderOptionText}>
-                            Order #{order.id.slice(-6)} — Total: ${order.total.toFixed(2)} (Remaining: ${remaining.toFixed(2)}) — Paid: {dateStr}
+                            Order #{order.id.slice(-6)} — Total: {formatPrice(order.total)} (Remaining: {formatPrice(remaining)}) — Paid: {dateStr}
                           </span>
                         </label>
                       );
@@ -905,13 +907,13 @@ export default function AccountPage() {
                   max={availableBalance}
                   value={claimAmount}
                   onChange={(e) => setClaimAmount(e.target.value)}
-                  placeholder={`Max $${availableBalance.toFixed(2)}`}
+                  placeholder={`Max ${formatPrice(availableBalance)}`}
                   required
                   className={styles.formInput}
                 />
                 {claimAmount && (Number(claimAmount) > availableBalance || Number(claimAmount) <= 0) && (
                   <p style={{ color: 'var(--accent)', fontSize: '0.75rem', marginTop: '0.5rem', fontWeight: 'bold' }}>
-                    ⚠️ Security Warning: You cannot claim more than your available wallet balance of ${availableBalance.toFixed(2)}.
+                    ⚠️ Security Warning: You cannot claim more than your available wallet balance of {formatPrice(availableBalance)}.
                   </p>
                 )}
               </div>
@@ -929,7 +931,7 @@ export default function AccountPage() {
             className={`btn btn-primary ${styles.claimBtn}`}
             style={{ marginTop: '1.5rem' }}
           >
-            {claiming ? 'Processing Payout...' : claimType === 'refund' ? 'Claim Refund →' : `Claim $${Number(claimAmount || 0).toFixed(2)} USD →`}
+            {claiming ? 'Processing Payout...' : claimType === 'refund' ? 'Claim Refund →' : `Claim ${formatPrice(Number(claimAmount || 0))} →`}
           </button>
         </section>
       )}
@@ -944,7 +946,7 @@ export default function AccountPage() {
               <div key={coupon.id} className={`${styles.couponItem} ${coupon.isUsed ? styles.couponUsed : ''}`}>
                 <div className={styles.couponInfo}>
                   <span className={styles.couponCodeText}>{coupon.code}</span>
-                  <span className={styles.couponValueText}>Value: ${coupon.value.toFixed(2)}</span>
+                  <span className={styles.couponValueText}>Value: {formatPrice(coupon.value)}</span>
                 </div>
                 <div className={styles.couponAction}>
                   {coupon.isUsed ? (
