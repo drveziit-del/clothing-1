@@ -69,6 +69,14 @@ export default function ContactPage() {
                 gerkinkofficial@gmail.com
               </a>
             </div>
+            <div style={{ marginTop: '1.25rem', display: 'flex', gap: '1rem', fontSize: '0.85rem' }}>
+              <a href="https://www.instagram.com/gerkink.shop" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontWeight: 600 }}>
+                Instagram (@gerkink.shop) →
+              </a>
+              <a href="https://x.com/gerkinkshop" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontWeight: 600 }}>
+                Twitter / X (@gerkinkshop) →
+              </a>
+            </div>
           </div>
         </div>
 

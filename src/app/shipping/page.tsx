@@ -26,10 +26,10 @@ export default function ShippingPage() {
             <h2 className={styles.sectionTitle}>1. Delivery Timeline</h2>
             <p className={styles.bodyText}>
               All items are custom-printed on demand to order. We estimate a standard delivery timeline of{' '}
-              <span className={styles.emphasis}>14 business days</span>. 
+              <span className={styles.emphasis}>21 business days</span>.
             </p>
             <p className={styles.bodyText}>
-              This timeline accounts for print production, packaging, shipping handler processing, and final transit. 
+              This timeline accounts for print production, packaging, shipping handler processing, and final transit.
               Please note that weekends, holidays, and high-demand periods do not count toward business days.
             </p>
           </div>
@@ -37,9 +37,9 @@ export default function ShippingPage() {
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>2. Tracking Your Order</h2>
             <p className={styles.bodyText}>
-              As soon as the print provider completes production and ships your package, a tracking link is generated. 
+              As soon as the print provider completes production and ships your package, a tracking link is generated.
               If you have an account, the tracking details will automatically sync and display in your{' '}
-              <span className={styles.emphasis}>Account Dashboard</span>. You will also receive an email notification 
+              <span className={styles.emphasis}>Account Dashboard</span>. You will also receive an email notification
               containing the tracking link.
             </p>
           </div>
@@ -47,7 +47,7 @@ export default function ShippingPage() {
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>3. Custom Duties &amp; Taxes</h2>
             <p className={styles.bodyText}>
-              Depending on your country and address, imports may be subject to local customs duties or VAT fees. 
+              Depending on your country and address, imports may be subject to local customs duties or VAT fees.
               These fees are set by your local government and are the sole responsibility of the customer.
             </p>
           </div>

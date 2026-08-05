@@ -66,8 +66,8 @@ export default function Footer() {
         <div className={styles.bottom}>
           <span className={styles.copy}>© {new Date().getFullYear()} GERKINK. All rights reserved.</span>
           <div className={styles.social}>
-            <a href="#" aria-label="Instagram" target="_blank" rel="noopener noreferrer">IG</a>
-            <a href="#" aria-label="Twitter / X" target="_blank" rel="noopener noreferrer">X</a>
+            <a href="https://www.instagram.com/gerkink.shop" aria-label="Instagram" target="_blank" rel="noopener noreferrer">IG</a>
+            <a href="https://x.com/gerkinkshop" aria-label="Twitter / X" target="_blank" rel="noopener noreferrer">X</a>
           </div>
         </div>
       </div>
