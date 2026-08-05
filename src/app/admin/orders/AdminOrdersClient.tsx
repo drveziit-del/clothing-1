@@ -1,6 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
+import { useRoast } from '@/hooks/useRoast';
 import DataTable from '@/components/admin/DataTable';
 import ExportCsvButton from '@/components/admin/ExportCsvButton';
 import styles from '../page.module.css';
@@ -12,16 +14,46 @@ interface OrderRow {
   totalRaw: number;
   status: string;
   date: string;
+  printifyOrderId?: string | null;
 }
 
 interface AdminOrdersClientProps {
   orders: OrderRow[];
 }
 
-export default function AdminOrdersClient({ orders }: AdminOrdersClientProps) {
+export default function AdminOrdersClient({ orders: initialOrders }: AdminOrdersClientProps) {
   const { formatPrice } = useCurrency();
+  const { toast } = useRoast();
+  const [ordersList, setOrdersList] = useState(initialOrders);
+  const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const formattedOrders = orders.map((o) => ({
+  const handleRetryPrintify = async (orderId: string) => {
+    setLoadingId(orderId);
+    try {
+      const res = await fetch('/api/admin/orders/retry-printify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to submit order to Printify');
+
+      toast(`Order successfully punched to Printify! (ID: ${data.printifyOrderId})`, 'success');
+      setOrdersList((prev) =>
+        prev.map((o) =>
+          o.id === orderId ? { ...o, status: 'in_production', printifyOrderId: data.printifyOrderId } : o
+        )
+      );
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error submitting to Printify';
+      toast(msg, 'error');
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  const formattedOrders = ordersList.map((o) => ({
     ...o,
     total: formatPrice(o.totalRaw),
   }));
@@ -38,16 +70,50 @@ export default function AdminOrdersClient({ orders }: AdminOrdersClientProps) {
 
       <DataTable
         columns={[
-          { key: 'id',       label: 'Order ID' },
+          { key: 'id', label: 'Order ID' },
           { key: 'customer', label: 'Customer' },
-          { key: 'items',    label: 'Items' },
-          { key: 'total',    label: 'Total', align: 'right' },
-          { key: 'status',   label: 'Status', render: (r) => (
-            <span className={`tag ${r.status === 'paid' || r.status === 'delivered' ? 'tag-coral' : r.status === 'pending' ? '' : 'tag-mist'}`}>
-              {r.status}
-            </span>
-          )},
+          { key: 'items', label: 'Items' },
+          { key: 'total', label: 'Total', align: 'right' },
+          {
+            key: 'status',
+            label: 'Status',
+            render: (r) => (
+              <span
+                className={`tag ${
+                  r.status === 'paid' || r.status === 'delivered' || r.status === 'in_production'
+                    ? 'tag-coral'
+                    : r.status === 'pending'
+                    ? ''
+                    : 'tag-mist'
+                }`}
+              >
+                {r.status}
+              </span>
+            ),
+          },
           { key: 'date', label: 'Date', align: 'right' },
+          {
+            key: 'actions',
+            label: 'Fulfillment',
+            align: 'right',
+            render: (r) => (
+              <div style={{ textAlign: 'right' }}>
+                {r.printifyOrderId ? (
+                  <span style={{ fontSize: '0.75rem', color: 'var(--mist-200)', fontFamily: 'monospace' }}>
+                    Sent ({r.printifyOrderId.slice(-6)})
+                  </span>
+                ) : (
+                  <button
+                    className="btn btn-secondary btn-xs"
+                    disabled={loadingId === r.id}
+                    onClick={() => handleRetryPrintify(r.id)}
+                  >
+                    {loadingId === r.id ? 'Sending...' : 'Punch to Printify'}
+                  </button>
+                )}
+              </div>
+            ),
+          },
         ]}
         data={formattedOrders}
         emptyMessage="No orders yet. The site is live — the customers aren't."

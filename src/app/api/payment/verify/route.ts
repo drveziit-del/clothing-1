@@ -177,11 +177,11 @@ export async function POST(request: NextRequest) {
           first_name: order.shippingAddress.name.split(' ')[0] || 'Customer',
           last_name:  order.shippingAddress.name.split(' ').slice(1).join(' ') || 'Customer',
           email:      order.userEmail,
-          country:    order.shippingAddress.country || 'US',
-          region:     order.shippingAddress.state || 'NY',
+          country:    (order.shippingAddress.country || 'US').toUpperCase().trim(),
+          region:     (order.shippingAddress.state || 'NY').toUpperCase().trim(),
           address1:   order.shippingAddress.street,
           city:       order.shippingAddress.city,
-          zip:        order.shippingAddress.zip || '00000',
+          zip:        String(order.shippingAddress.zip || '00000').trim(),
         },
       });
 

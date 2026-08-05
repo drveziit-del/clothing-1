@@ -21,6 +21,7 @@ async function getOrders() {
         totalRaw: Number(data.total || 0),
         status: data.status,
         date,
+        printifyOrderId: data.printifyOrderId || null,
       };
     });
   } catch (err) {

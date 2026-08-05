@@ -135,11 +135,11 @@ export async function POST(request: NextRequest) {
           first_name: order.shippingAddress ? order.shippingAddress.name.split(' ')[0] : 'Guest',
           last_name:  (order.shippingAddress && order.shippingAddress.name.split(' ').slice(1).join(' ')) || '-',
           email:      order.userEmail,
-          country:    order.shippingAddress ? order.shippingAddress.country : 'US',
-          region:     order.shippingAddress ? order.shippingAddress.state : 'NY',
+          country:    (order.shippingAddress?.country || 'US').toUpperCase().trim(),
+          region:     (order.shippingAddress?.state || 'NY').toUpperCase().trim(),
           address1:   order.shippingAddress ? order.shippingAddress.street : '123 Main St',
           city:       order.shippingAddress ? order.shippingAddress.city : 'New York',
-          zip:        order.shippingAddress ? order.shippingAddress.zip : '10001',
+          zip:        order.shippingAddress ? String(order.shippingAddress.zip).trim() : '10001',
         },
       });
 
