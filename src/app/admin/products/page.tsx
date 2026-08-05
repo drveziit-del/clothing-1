@@ -5,7 +5,7 @@ import DataTable from '@/components/admin/DataTable';
 import Modal from '@/components/ui/Modal';
 import styles from '../page.module.css';
 import { useRoast } from '@/hooks/useRoast';
-import { getFirestoreDb, getFirebaseStorage, getFirestoreModule, getStorageModule } from '@/lib/firebase/config';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface Product {
   id: string;
@@ -22,6 +22,7 @@ interface Product {
 
 export default function AdminProductsPage() {
   const { toast } = useRoast();
+  const { formatPrice } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -146,7 +147,7 @@ export default function AdminProductsPage() {
               key: 'price',
               label: 'Price',
               align: 'right',
-              render: (r) => `$${Number(r.price).toLocaleString()}`,
+              render: (r) => formatPrice(r.price),
             },
             {
               key: 'status',

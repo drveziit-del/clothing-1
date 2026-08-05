@@ -1,6 +1,4 @@
-import MetricsCards from '@/components/admin/MetricsCards';
-import DataTable from '@/components/admin/DataTable';
-import styles from './page.module.css';
+import AdminDashboardClient from './AdminDashboardClient';
 import { adminDb } from '@/lib/firebase/admin';
 
 export const dynamic = 'force-dynamic';
@@ -56,7 +54,7 @@ async function getDashboardData() {
       return {
         id: doc.id,
         user: data.shippingAddress?.name || data.userEmail || 'Anonymous',
-        total: `$${Number(data.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        totalRaw: Number(data.total || 0),
         status: data.status,
         date,
       };
@@ -76,7 +74,7 @@ async function getDashboardData() {
         name: data.displayName || 'Anonymous',
         email: data.email || '—',
         referrals: data.referralCount ?? 0,
-        earnings: `$${Number(data.totalEarnings ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        earningsRaw: Number(data.totalEarnings ?? 0),
       };
     });
 
@@ -86,16 +84,12 @@ async function getDashboardData() {
     const globalCount = settingsData.globalReferralCount ?? 0;
     const milestoneProgress = Math.min(100, (globalCount / 100000) * 100);
 
-    const metrics = [
-      { label: 'Total Revenue', value: `$${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, accent: 'coral' as const },
-      { label: 'Total Orders',  value: totalOrdersCount.toString(),  accent: 'mist' as const },
-      { label: 'Active Users',  value: usersCount.toString() },
-      { label: 'Referrals Count', value: referralsCount.toString() },
-      { label: 'Pending Orders', value: pendingOrdersCount.toString() },
-    ];
-
     return {
-      metrics,
+      totalRevenue,
+      totalOrdersCount,
+      usersCount,
+      referralsCount,
+      pendingOrdersCount,
       recentOrders,
       topAffiliates,
       referralAnalytics: {
@@ -110,13 +104,11 @@ async function getDashboardData() {
   } catch (err) {
     console.error('Error fetching dashboard data:', err);
     return {
-      metrics: [
-        { label: 'Total Revenue', value: '$0.00', accent: 'coral' as const },
-        { label: 'Total Orders',  value: '0',  accent: 'mist' as const },
-        { label: 'Active Users',  value: '0' },
-        { label: 'Referrals Count', value: '0' },
-        { label: 'Pending Orders', value: '0' },
-      ],
+      totalRevenue: 0,
+      totalOrdersCount: 0,
+      usersCount: 0,
+      referralsCount: 0,
+      pendingOrdersCount: 0,
       recentOrders: [],
       topAffiliates: [],
       referralAnalytics: {
@@ -132,142 +124,7 @@ async function getDashboardData() {
 }
 
 export default async function AdminDashboard() {
-  const { metrics, recentOrders, topAffiliates, referralAnalytics } = await getDashboardData();
+  const data = await getDashboardData();
 
-  return (
-    <div className={styles.page}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Dashboard</h1>
-        <p className={styles.subtitle}>Real-time metrics from your active store.</p>
-      </div>
-
-      <section className={styles.section}>
-        <MetricsCards metrics={metrics} />
-      </section>
-
-      {/* Referral & Affiliate Analytics Section */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Referral & Affiliate Analytics</h2>
-        <div className={styles.analyticsLayout}>
-          
-          {/* Top Affiliates Leaderboard */}
-          <div className={styles.analyticsCard}>
-            <h3 className={styles.cardHeader}>Top Performing Affiliates</h3>
-            <div className={styles.tableWrap}>
-              <table className={styles.leaderboardTable}>
-                <thead>
-                  <tr>
-                    <th>Affiliate</th>
-                    <th style={{ textAlign: 'right' }}>Referrals</th>
-                    <th style={{ textAlign: 'right' }}>Total Earned</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topAffiliates.length > 0 ? (
-                    topAffiliates.map((aff) => (
-                      <tr key={aff.id}>
-                        <td>
-                          <div className={styles.affiliateInfo}>
-                            <span className={styles.affName}>{aff.name}</span>
-                            <span className={styles.affEmail}>{aff.email}</span>
-                          </div>
-                        </td>
-                        <td style={{ textAlign: 'right', fontWeight: 600 }}>{aff.referrals}</td>
-                        <td style={{ textAlign: 'right', fontFamily: 'JetBrains Mono', color: 'var(--coral-200)' }}>
-                          {aff.earnings}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={3} className={styles.emptyTable}>No active affiliates yet.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Referral Sales Contribution & Milestone Tracker */}
-          <div className={styles.analyticsCard}>
-            <h3 className={styles.cardHeader}>Referral Revenue Performance</h3>
-            <div className={styles.analyticsRightGroup}>
-              
-              {/* Contribution Row */}
-              <div className={styles.kpiRow}>
-                <div className={styles.kpiBox}>
-                  <span className={styles.kpiVal}>
-                    ${referralAnalytics.referralRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </span>
-                  <span className={styles.kpiLabel}>Referral Revenue</span>
-                </div>
-                <div className={styles.kpiBox}>
-                  <span className={styles.kpiVal}>
-                    {referralAnalytics.referralContribution.toFixed(1)}%
-                  </span>
-                  <span className={styles.kpiLabel}>Revenue Share Contribution</span>
-                </div>
-              </div>
-
-              {/* Commission Box */}
-              <div className={styles.kpiRow}>
-                <div className={styles.kpiBox}>
-                  <span className={styles.kpiVal} style={{ color: 'var(--mist-200)' }}>
-                    ${referralAnalytics.totalCommissionsClaimed.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                  </span>
-                  <span className={styles.kpiLabel}>Paid Commissions</span>
-                </div>
-                <div className={styles.kpiBox}>
-                  <span className={styles.kpiVal} style={{ color: 'var(--text-muted)' }}>
-                    ${referralAnalytics.totalCommissionsPending.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                  </span>
-                  <span className={styles.kpiLabel}>Pending Claims</span>
-                </div>
-              </div>
-
-              {/* Milestone Box */}
-              <div className={styles.milestoneBox}>
-                <div className={styles.milestoneHeader}>
-                  <span className={styles.milestoneTitle}>$100K Customer Milestone Progress</span>
-                  <span className={styles.milestoneCounter}>
-                    {referralAnalytics.globalCount.toLocaleString()} / 100,000
-                  </span>
-                </div>
-                <div className={styles.milestoneBarOuter}>
-                  <div
-                    className={styles.milestoneBarFill}
-                    style={{ width: `${referralAnalytics.milestoneProgress}%` }}
-                  />
-                </div>
-                <span className={styles.milestoneHint}>
-                  {referralAnalytics.milestoneProgress.toFixed(2)}% toward global customer payout.
-                </span>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Recent Orders</h2>
-        <DataTable
-          columns={[
-            { key: 'id',     label: 'Order ID' },
-            { key: 'user',   label: 'Customer' },
-            { key: 'total',  label: 'Total',   align: 'right' },
-            { key: 'status', label: 'Status',  render: (row) => (
-              <span className={`tag ${row.status === 'paid' || row.status === 'delivered' ? 'tag-coral' : row.status === 'pending' ? '' : 'tag-mist'}`}>
-                {row.status}
-              </span>
-            ) },
-            { key: 'date',   label: 'Date',    align: 'right' },
-          ]}
-          data={recentOrders}
-          emptyMessage="No orders yet. The roasts haven't worked hard enough."
-        />
-      </section>
-    </div>
-  );
+  return <AdminDashboardClient data={data} />;
 }
