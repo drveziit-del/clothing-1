@@ -32,8 +32,6 @@
   align-items: flex-start;
 }
 
-.main {}
-
 .items { display: flex; flex-direction: column; gap: 0; }
 
 .item {
@@ -124,7 +122,6 @@
 }
 
 .referralRow { display: flex; flex-direction: column; gap: 0.5rem; }
-.referralInput {}
 
 .totals { display: flex; flex-direction: column; gap: 0.75rem; }
 .totalRow {
