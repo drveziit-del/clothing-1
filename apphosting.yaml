@@ -1,0 +1,56 @@
+# Firebase App Hosting configuration
+# Maps environment variables to Google Cloud Secret Manager secrets.
+# These env vars are available at runtime on the production server.
+
+runConfig:
+  # ─── Non-secret environment variables ───────────────────────────────────────
+  envVariables:
+    - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+      value: AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0
+    - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+      value: gerkink.shop
+    - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+      value: print-on-demand-895b7
+    - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+      value: print-on-demand-895b7.firebasestorage.app
+    - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+      value: "659428489572"
+    - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+      value: 1:659428489572:web:09eb88b692d2399009a271
+    - variable: FIREBASE_PROJECT_ID
+      value: print-on-demand-895b7
+    - variable: PRINTIFY_SHOP_ID
+      value: "27887538"
+    - variable: NEXT_PUBLIC_RAZORPAY_KEY_ID
+      value: rzp_live_TLODuHUQwhVX6n
+    - variable: NEXT_PUBLIC_BASE_URL
+      value: https://gerkink.shop
+    - variable: SMTP_HOST
+      value: smtp.gmail.com
+    - variable: SMTP_PORT
+      value: "587"
+    - variable: SMTP_USER
+      value: gerkinkofficial@gmail.com
+    - variable: ADMIN_EMAIL
+      value: gerkinkofficial@gmail.com
+
+  # ─── Secret environment variables (stored in Google Cloud Secret Manager) ───
+  secrets:
+    - variable: FIREBASE_CLIENT_EMAIL
+      secret: FIREBASE_CLIENT_EMAIL
+    - variable: FIREBASE_PRIVATE_KEY
+      secret: FIREBASE_PRIVATE_KEY
+    - variable: PRINTIFY_ACCESS_TOKEN
+      secret: PRINTIFY_ACCESS_TOKEN
+    - variable: PRINTIFY_WEBHOOK_SECRET
+      secret: PRINTIFY_WEBHOOK_SECRET
+    - variable: RAZORPAY_KEY_ID
+      secret: RAZORPAY_KEY_ID
+    - variable: RAZORPAY_KEY_SECRET
+      secret: RAZORPAY_KEY_SECRET
+    - variable: RAZORPAY_WEBHOOK_SECRET
+      secret: RAZORPAY_WEBHOOK_SECRET
+    - variable: SMTP_PASSWORD
+      secret: SMTP_PASSWORD
+    - variable: ENCRYPTION_KEY
+      secret: ENCRYPTION_KEY
