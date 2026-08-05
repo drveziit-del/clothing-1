@@ -24,3 +24,19 @@
   background: #181818;
   color: #ffffff;
 }
+
+[data-theme="light"] .select {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .select:hover,
+[data-theme="light"] .select:focus {
+  border-color: var(--accent-primary, #FF6B6B);
+}
+
+[data-theme="light"] .select option {
+  background: #ffffff;
+  color: #0f172a;
+}
