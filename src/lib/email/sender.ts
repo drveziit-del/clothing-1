@@ -547,35 +547,37 @@ export async function sendAdminOrderNotification(order: Order): Promise<void> {
 
 /**
  * Ensures order confirmation & admin alert emails are sent AT MOST ONCE per order.
- * Uses a Firestore transaction on `emailSent` to prevent duplicate emails from concurrent webhook & client verify calls.
+ * Uses atomic Firestore `.create()` on `order_email_locks/{orderId}` to prevent duplicate emails from concurrent webhook & client verify calls.
  */
 export async function sendOrderConfirmationEmailsOnce(orderId: string, order: Order): Promise<boolean> {
-  const orderRef = adminDb.collection('orders').doc(orderId);
-  let shouldSend = false;
+  const lockRef = adminDb.collection('order_email_locks').doc(orderId);
 
   try {
-    await adminDb.runTransaction(async (transaction) => {
-      const doc = await transaction.get(orderRef);
-      if (!doc.exists) return;
-      const data = doc.data() || {};
-      if (!data.emailSent) {
-        transaction.update(orderRef, { emailSent: true });
-        shouldSend = true;
-      }
+    // Atomically create lock document. Fails with ALREADY_EXISTS if already created.
+    await lockRef.create({
+      orderId,
+      sentAt: FieldValue.serverTimestamp(),
     });
-  } catch (err) {
-    console.error(`Transaction error checking emailSent for order ${orderId}:`, err);
+  } catch (err: any) {
+    const isAlreadyExists =
+      err?.code === 6 ||
+      err?.code === 'already-exists' ||
+      String(err?.message || '').includes('ALREADY_EXISTS');
+
+    if (isAlreadyExists) {
+      console.log(`Order ${orderId} confirmation emails already sent (lock exists). Skipping duplicate.`);
+      return false;
+    }
+    console.error(`Error creating email lock for order ${orderId}:`, err);
     return false;
   }
 
-  if (shouldSend) {
-    await Promise.allSettled([
-      sendOrderConfirmationEmail(order),
-      sendAdminOrderNotification(order),
-    ]);
-    return true;
-  }
+  // Update order document with emailSent flag as well
+  adminDb.collection('orders').doc(orderId).update({ emailSent: true }).catch(() => {});
 
-  console.log(`Order ${orderId} confirmation emails already sent. Skipping duplicate.`);
-  return false;
+  await Promise.allSettled([
+    sendOrderConfirmationEmail(order),
+    sendAdminOrderNotification(order),
+  ]);
+  return true;
 }
