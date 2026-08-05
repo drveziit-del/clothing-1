@@ -96,24 +96,14 @@ export async function POST(request: NextRequest) {
         break;
       }
 
-      // Send order confirmation email to the customer (fire-and-forget)
+      // Send order confirmation & admin alert emails (at-most-once check)
       try {
-        const { sendOrderConfirmationEmail } = await import('@/lib/email/sender');
-        sendOrderConfirmationEmail(order).catch((err) =>
-          console.error('Webhook: Failed to send order confirmation email:', err)
+        const { sendOrderConfirmationEmailsOnce } = await import('@/lib/email/sender');
+        sendOrderConfirmationEmailsOnce(orderDoc.id, order).catch((err) =>
+          console.error('Webhook: Failed to send order emails:', err)
         );
       } catch (err) {
-        console.error('Webhook: Failed to send order confirmation email:', err);
-      }
-
-      // Send order alert notification to the admin (fire-and-forget)
-      try {
-        const { sendAdminOrderNotification } = await import('@/lib/email/sender');
-        sendAdminOrderNotification(order).catch((err) =>
-          console.error('Webhook: Failed to send admin order notification email:', err)
-        );
-      } catch (err) {
-        console.error('Webhook: Failed to send admin order notification email:', err);
+        console.error('Webhook: Failed to send order emails:', err);
       }
 
       // 2. Submit to Printify (if shop ID configured and not already attempted)

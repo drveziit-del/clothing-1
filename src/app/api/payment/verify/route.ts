@@ -5,7 +5,7 @@ import { processReferral } from '@/lib/referral/engine';
 import { createOrder as createPrintifyOrder } from '@/lib/printify/client';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
-import { sendAdminPrebookNotification, sendOrderConfirmationEmail, sendAdminOrderNotification } from '@/lib/email/sender';
+import { sendAdminPrebookNotification, sendOrderConfirmationEmailsOnce } from '@/lib/email/sender';
 import { normalizeCountryCode, normalizeRegionCode } from '@/lib/utils/isoCodes';
 import type { Order } from '@/types';
 import crypto from 'crypto';
@@ -151,14 +151,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: 'ok', orderId });
   }
 
-  // Send order confirmation email to the customer (fire-and-forget)
-  sendOrderConfirmationEmail(order).catch((err) =>
-    console.error('Failed to send order confirmation email:', err)
-  );
-
-  // Send order alert notification to the admin (fire-and-forget)
-  sendAdminOrderNotification(order).catch((err) =>
-    console.error('Failed to send admin order notification email:', err)
+  // Send order confirmation & admin alert emails (at-most-once check)
+  sendOrderConfirmationEmailsOnce(orderId, order).catch((err) =>
+    console.error('Verify: Failed to send order emails:', err)
   );
 
   // 7. Submit to Printify (if shop ID configured and valid shipping address exists)

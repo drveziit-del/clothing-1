@@ -4,7 +4,7 @@ import { processReferral } from '@/lib/referral/engine';
 import { createOrder as createPrintifyOrder } from '@/lib/printify/client';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
-import { sendOrderConfirmationEmail, sendAdminOrderNotification } from '@/lib/email/sender';
+import { sendOrderConfirmationEmailsOnce } from '@/lib/email/sender';
 import { normalizeCountryCode, normalizeRegionCode } from '@/lib/utils/isoCodes';
 import type { Order } from '@/types';
 
@@ -109,14 +109,9 @@ export async function POST(request: NextRequest) {
   // 5. Process referral (fire-and-forget)
   processReferral(order).catch((err) => console.error('Referral processing error:', err));
 
-  // Send order confirmation email to the customer (fire-and-forget)
-  sendOrderConfirmationEmail(order).catch((err) =>
-    console.error('Failed to send order confirmation email:', err)
-  );
-
-  // Send order alert notification to the admin (fire-and-forget)
-  sendAdminOrderNotification(order).catch((err) =>
-    console.error('Failed to send admin order notification email:', err)
+  // Send order confirmation & admin alert emails (at-most-once check)
+  sendOrderConfirmationEmailsOnce(orderId, order).catch((err) =>
+    console.error('VerifyFree: Failed to send order emails:', err)
   );
 
   // 6. Submit to Printify (if shop ID configured)

@@ -544,3 +544,38 @@ export async function sendAdminOrderNotification(order: Order): Promise<void> {
     });
   }
 }
+
+/**
+ * Ensures order confirmation & admin alert emails are sent AT MOST ONCE per order.
+ * Uses a Firestore transaction on `emailSent` to prevent duplicate emails from concurrent webhook & client verify calls.
+ */
+export async function sendOrderConfirmationEmailsOnce(orderId: string, order: Order): Promise<boolean> {
+  const orderRef = adminDb.collection('orders').doc(orderId);
+  let shouldSend = false;
+
+  try {
+    await adminDb.runTransaction(async (transaction) => {
+      const doc = await transaction.get(orderRef);
+      if (!doc.exists) return;
+      const data = doc.data() || {};
+      if (!data.emailSent) {
+        transaction.update(orderRef, { emailSent: true });
+        shouldSend = true;
+      }
+    });
+  } catch (err) {
+    console.error(`Transaction error checking emailSent for order ${orderId}:`, err);
+    return false;
+  }
+
+  if (shouldSend) {
+    await Promise.allSettled([
+      sendOrderConfirmationEmail(order),
+      sendAdminOrderNotification(order),
+    ]);
+    return true;
+  }
+
+  console.log(`Order ${orderId} confirmation emails already sent. Skipping duplicate.`);
+  return false;
+}
