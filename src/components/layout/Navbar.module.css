@@ -182,9 +182,14 @@
   margin: 0.5rem 0;
 }
 
+.desktopCurrency {
+  display: block;
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
   .desktopNav { display: none; }
+  .desktopCurrency { display: none; }
   .menuToggle { display: flex; }
   .userMenu   { display: none; }
 }

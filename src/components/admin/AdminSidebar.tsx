@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import CurrencySelector from '@/components/layout/CurrencySelector';
 import styles from './AdminSidebar.module.css';
 
 const NAV = [
@@ -67,6 +68,12 @@ export default function AdminSidebar() {
             </nav>
 
             <div className={styles.footer}>
+              <div style={{ marginBottom: '0.75rem' }}>
+                <div style={{ fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.35rem', letterSpacing: '0.05em' }}>
+                  Currency
+                </div>
+                <CurrencySelector />
+              </div>
               <Link href="/" className={styles.backLink} onClick={closeMenu}>← Back to site</Link>
             </div>
           </div>
@@ -97,6 +104,12 @@ export default function AdminSidebar() {
         </nav>
 
         <div className={styles.footer}>
+          <div style={{ marginBottom: '0.75rem' }}>
+            <div style={{ fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.35rem', letterSpacing: '0.05em' }}>
+              Currency
+            </div>
+            <CurrencySelector />
+          </div>
           <Link href="/" className={styles.backLink}>← Back to site</Link>
         </div>
       </aside>

@@ -47,6 +47,9 @@ export default function Navbar() {
 
         {/* Right cluster */}
         <div className={styles.right}>
+          <div className={styles.desktopCurrency}>
+            <CurrencySelector />
+          </div>
           <ThemeToggle />
 
           <Link
