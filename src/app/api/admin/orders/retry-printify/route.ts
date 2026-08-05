@@ -8,11 +8,34 @@ export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get('session')?.value;
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    let decoded: any = null;
 
-    const decoded = await adminAuth.verifySessionCookie(session, true);
+    if (session) {
+      try {
+        decoded = await adminAuth.verifySessionCookie(session, true);
+      } catch (err) {
+        console.warn('[retry-printify] Session cookie verification failed, checking bearer token...');
+      }
+    }
+
+    if (!decoded) {
+      const authHeader = request.headers.get('authorization');
+      if (authHeader?.startsWith('Bearer ')) {
+        const idToken = authHeader.substring(7);
+        try {
+          decoded = await adminAuth.verifyIdToken(idToken);
+        } catch (err) {
+          console.warn('[retry-printify] Bearer token verification failed:', err);
+        }
+      }
+    }
+
+    if (!decoded) {
+      return NextResponse.json({ error: 'Unauthorized. Please log in.' }, { status: 401 });
+    }
+
     if (!decoded.admin) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Forbidden. Admin access required.' }, { status: 403 });
     }
 
     const { orderId } = await request.json();

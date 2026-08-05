@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useRoast } from '@/hooks/useRoast';
+import { useAuth } from '@/context/AuthContext';
 import DataTable from '@/components/admin/DataTable';
 import ExportCsvButton from '@/components/admin/ExportCsvButton';
 import styles from '../page.module.css';
@@ -24,15 +25,24 @@ interface AdminOrdersClientProps {
 export default function AdminOrdersClient({ orders: initialOrders }: AdminOrdersClientProps) {
   const { formatPrice } = useCurrency();
   const { toast } = useRoast();
+  const { firebaseUser } = useAuth();
   const [ordersList, setOrdersList] = useState(initialOrders);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
   const handleRetryPrintify = async (orderId: string) => {
     setLoadingId(orderId);
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (firebaseUser) {
+        try {
+          const idToken = await firebaseUser.getIdToken();
+          headers['Authorization'] = `Bearer ${idToken}`;
+        } catch {}
+      }
+
       const res = await fetch('/api/admin/orders/retry-printify', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ orderId }),
       });
 
