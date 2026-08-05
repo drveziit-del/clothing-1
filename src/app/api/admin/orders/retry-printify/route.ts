@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { createOrder as createPrintifyOrder } from '@/lib/printify/client';
 import { cookies } from 'next/headers';
+import { normalizeCountryCode, normalizeRegionCode } from '@/lib/utils/isoCodes';
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,6 +37,9 @@ export async function POST(request: NextRequest) {
     const firstName = nameParts[0] || 'Customer';
     const lastName = nameParts.slice(1).join(' ') || '-';
 
+    const countryCode = normalizeCountryCode(addr.country);
+    const regionCode = normalizeRegionCode(addr.state, countryCode);
+
     const printifyOrder = await createPrintifyOrder(shopId, {
       external_id: orderId,
       label: `GERKINK-${orderId}`,
@@ -49,8 +53,8 @@ export async function POST(request: NextRequest) {
         first_name: firstName,
         last_name: lastName,
         email: order.userEmail || 'customer@gerkink.shop',
-        country: (addr.country || 'US').toUpperCase().trim(),
-        region: (addr.state || 'NY').toUpperCase().trim(),
+        country: countryCode,
+        region: regionCode,
         address1: addr.street || '123 Main St',
         city: addr.city || 'New York',
         zip: String(addr.zip || '10001').trim(),

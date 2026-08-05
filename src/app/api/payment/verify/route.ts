@@ -6,6 +6,7 @@ import { createOrder as createPrintifyOrder } from '@/lib/printify/client';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
 import { sendAdminPrebookNotification, sendOrderConfirmationEmail, sendAdminOrderNotification } from '@/lib/email/sender';
+import { normalizeCountryCode, normalizeRegionCode } from '@/lib/utils/isoCodes';
 import type { Order } from '@/types';
 import crypto from 'crypto';
 
@@ -164,6 +165,9 @@ export async function POST(request: NextRequest) {
   const shopId = process.env.PRINTIFY_SHOP_ID;
   if (shopId && order.shippingAddress && order.shippingAddress.street && order.shippingAddress.city) {
     try {
+      const countryCode = normalizeCountryCode(order.shippingAddress.country);
+      const regionCode = normalizeRegionCode(order.shippingAddress.state, countryCode);
+
       const printifyOrder = await createPrintifyOrder(shopId, {
         external_id: orderId,
         label:       `GERKINK-${orderId}`,
@@ -177,8 +181,8 @@ export async function POST(request: NextRequest) {
           first_name: order.shippingAddress.name.split(' ')[0] || 'Customer',
           last_name:  order.shippingAddress.name.split(' ').slice(1).join(' ') || 'Customer',
           email:      order.userEmail,
-          country:    (order.shippingAddress.country || 'US').toUpperCase().trim(),
-          region:     (order.shippingAddress.state || 'NY').toUpperCase().trim(),
+          country:    countryCode,
+          region:     regionCode,
           address1:   order.shippingAddress.street,
           city:       order.shippingAddress.city,
           zip:        String(order.shippingAddress.zip || '00000').trim(),

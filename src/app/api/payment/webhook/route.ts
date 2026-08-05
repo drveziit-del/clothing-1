@@ -4,6 +4,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import crypto from 'crypto';
 import { processReferral } from '@/lib/referral/engine';
 import { createOrder as createPrintifyOrder } from '@/lib/printify/client';
+import { normalizeCountryCode, normalizeRegionCode } from '@/lib/utils/isoCodes';
 import type { Order } from '@/types';
 
 function verifyWebhookSignature(body: string, signature: string): boolean {
@@ -119,6 +120,9 @@ export async function POST(request: NextRequest) {
       const shopId = process.env.PRINTIFY_SHOP_ID;
       if (shopId && !orderData.fulfillmentAttempted) {
         try {
+          const countryCode = normalizeCountryCode(order.shippingAddress?.country);
+          const regionCode = normalizeRegionCode(order.shippingAddress?.state, countryCode);
+
           const printifyOrder = await createPrintifyOrder(shopId, {
             external_id: orderDoc.id,
             label:       `GERKINK-${orderDoc.id}`,
@@ -132,8 +136,8 @@ export async function POST(request: NextRequest) {
               first_name: order.shippingAddress ? order.shippingAddress.name.split(' ')[0] : 'Guest',
               last_name:  (order.shippingAddress && order.shippingAddress.name.split(' ').slice(1).join(' ')) || '-',
               email:      order.userEmail,
-              country:    (order.shippingAddress?.country || 'US').toUpperCase().trim(),
-              region:     (order.shippingAddress?.state || 'NY').toUpperCase().trim(),
+              country:    countryCode,
+              region:     regionCode,
               address1:   order.shippingAddress ? order.shippingAddress.street : '123 Main St',
               city:       order.shippingAddress ? order.shippingAddress.city : 'New York',
               zip:        order.shippingAddress ? String(order.shippingAddress.zip).trim() : '10001',
