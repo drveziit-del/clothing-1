@@ -74,6 +74,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           code: couponInput.trim(),
           subtotal,
+          tax,
           userId: user?.uid || null,
         }),
       });

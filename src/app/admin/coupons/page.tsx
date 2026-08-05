@@ -11,6 +11,7 @@ interface Coupon {
   type: 'fixed' | 'percentage';
   value: number;
   isGlobal: boolean;
+  appliesTo?: 'subtotal' | 'grand_total';
   userId?: string | null;
   isActive: boolean;
   isUsed?: boolean;
@@ -32,6 +33,7 @@ export default function AdminCouponsPage() {
   const [code, setCode] = useState('');
   const [type, setType] = useState<'fixed' | 'percentage'>('fixed');
   const [value, setValue] = useState('');
+  const [appliesTo, setAppliesTo] = useState<'subtotal' | 'grand_total'>('subtotal');
   const [isGlobal, setIsGlobal] = useState(true);
   const [userId, setUserId] = useState('');
   const [minSubtotal, setMinSubtotal] = useState('');
@@ -78,6 +80,7 @@ export default function AdminCouponsPage() {
           type,
           value,
           isGlobal,
+          appliesTo,
           userId: isGlobal ? undefined : userId,
           minSubtotal,
           maxUses,
@@ -231,6 +234,18 @@ export default function AdminCouponsPage() {
             </div>
 
             <div className={styles.field}>
+              <label className={styles.label}>Discount Scope (Tax Handling)</label>
+              <select
+                className="input"
+                value={appliesTo}
+                onChange={e => setAppliesTo(e.target.value as 'subtotal' | 'grand_total')}
+              >
+                <option value="subtotal">Subtotal Only (Tax is still paid by customer)</option>
+                <option value="grand_total">Grand Total (Includes Tax / Covers Tax)</option>
+              </select>
+            </div>
+
+            <div className={styles.field}>
               <label className={styles.label}>Min Subtotal (Optional USD)</label>
               <input
                 type="number"
@@ -337,6 +352,9 @@ export default function AdminCouponsPage() {
                         ? `${coupon.value}% OFF`
                         : `${formatPrice(coupon.value)} OFF`}
                     </span>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--muted, #8e8e93)', marginTop: '0.25rem' }}>
+                      {coupon.appliesTo === 'grand_total' ? '✦ Includes Tax' : 'Subtotal Only'}
+                    </div>
                   </td>
                   <td>
                     {coupon.isGlobal ? (

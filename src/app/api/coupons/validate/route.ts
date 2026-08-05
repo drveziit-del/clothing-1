@@ -64,24 +64,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const tax = parseFloat(body.tax) || (subtotal * 0.08);
+    const appliesTo = couponData.appliesTo || 'subtotal';
     const type = couponData.type || 'fixed';
     const val = couponData.value ?? 0;
+
+    const baseAmount = appliesTo === 'grand_total' ? (subtotal + tax) : subtotal;
     let calculatedDiscountUSD = 0;
 
     if (type === 'percentage') {
-      calculatedDiscountUSD = subtotal * (val / 100);
+      calculatedDiscountUSD = baseAmount * (val / 100);
     } else {
       calculatedDiscountUSD = val;
     }
 
-    // Cap discount at subtotal
-    calculatedDiscountUSD = Math.min(calculatedDiscountUSD, subtotal);
+    // Cap discount at baseAmount
+    calculatedDiscountUSD = Math.min(calculatedDiscountUSD, baseAmount);
 
     return NextResponse.json({
       valid: true,
       code,
       type,
       value: val,
+      appliesTo,
       discountUSD: calculatedDiscountUSD,
     });
   } catch (err: unknown) {

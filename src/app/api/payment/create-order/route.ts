@@ -107,17 +107,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Minimum subtotal of $${minSpend} required for this coupon` }, { status: 400 });
     }
 
+    const appliesTo = couponData.appliesTo || 'subtotal';
     const couponType = couponData.type || 'fixed';
     const couponVal = couponData.value ?? 0;
+    const baseAmount = appliesTo === 'grand_total' ? (subtotal + tax) : subtotal;
 
     if (couponType === 'percentage') {
-      discount = Math.round((subtotal * (couponVal / 100)) * 100) / 100;
+      discount = Math.round((baseAmount * (couponVal / 100)) * 100) / 100;
     } else {
       discount = couponVal;
     }
 
-    discount = Math.min(discount, total);
-    total = Math.max(0, total - discount);
+    discount = Math.min(discount, baseAmount);
+    total = Math.max(0, (subtotal + tax) - discount);
   }
 
   // 4. Create Firestore order (pending)

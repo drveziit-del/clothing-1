@@ -91,11 +91,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Coupon code "${code}" already exists` }, { status: 400 });
     }
 
+    const appliesTo = body.appliesTo === 'grand_total' ? 'grand_total' : 'subtotal';
+
     const newCoupon = {
       code,
       type,
       value,
       isGlobal,
+      appliesTo,
       userId: isGlobal ? null : userId,
       isActive: true,
       isUsed: false,
