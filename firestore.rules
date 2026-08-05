@@ -66,7 +66,7 @@ service cloud.firestore {
 
     // ── Coupons ──────────────────────────────────────────────────────
     match /coupons/{couponId} {
-      allow read:   if isSignedIn() && resource.data.userId == request.auth.uid || isAdmin();
+      allow read:   if (isSignedIn() && resource.data.userId == request.auth.uid) || resource.data.isGlobal == true || isAdmin();
       allow write:  if false;  // Server-only
     }
 
