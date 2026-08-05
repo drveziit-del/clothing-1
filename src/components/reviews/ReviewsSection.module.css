@@ -494,13 +494,15 @@
 }
 
 [data-theme="light"] .overlay {
-  background: rgba(240, 242, 245, 0.85);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 [data-theme="light"] .modal {
   background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.15);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.15), 0 10px 25px -5px rgba(0, 0, 0, 0.05);
 }
 
 [data-theme="light"] .modalTitle {
@@ -511,14 +513,24 @@
   color: #cbd5e1;
 }
 
+[data-theme="light"] .starBtnFilled {
+  color: #ff4d4d;
+  filter: drop-shadow(0 2px 8px rgba(255, 77, 77, 0.4));
+}
+
 [data-theme="light"] .textarea {
   background: #f8fafc;
-  border-color: rgba(0, 0, 0, 0.15);
+  border: 1px solid #cbd5e1;
   color: #0f172a;
 }
 
 [data-theme="light"] .textarea::placeholder {
   color: #94a3b8;
+}
+
+[data-theme="light"] .textarea:focus {
+  border-color: #ff4d4d;
+  background: #ffffff;
 }
 
 [data-theme="light"] .charCount {
