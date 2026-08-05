@@ -90,9 +90,20 @@ export default function ReviewsSection() {
     setSubmitting(true);
 
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      if (firebaseUser) {
+        try {
+          const idToken = await firebaseUser.getIdToken();
+          headers['Authorization'] = `Bearer ${idToken}`;
+        } catch {}
+      }
+
       const res = await fetch('/api/reviews', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           reviewId: editingReview ? editingReview.id : undefined,
           rating: formRating,
@@ -117,8 +128,17 @@ export default function ReviewsSection() {
   const handleDelete = async (reviewId: string) => {
     if (!confirm('Delete this review?')) return;
     try {
+      const headers: Record<string, string> = {};
+      if (firebaseUser) {
+        try {
+          const idToken = await firebaseUser.getIdToken();
+          headers['Authorization'] = `Bearer ${idToken}`;
+        } catch {}
+      }
+
       const res = await fetch(`/api/reviews?id=${reviewId}`, {
         method: 'DELETE',
+        headers,
       });
       if (!res.ok) {
         const errorData = await res.json();

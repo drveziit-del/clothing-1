@@ -3,20 +3,40 @@ import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
 
-// POST: Create or Update a Review
-export async function POST(request: NextRequest) {
+async function getAuthenticatedUser(request: NextRequest) {
+  // 1. Try session cookie first
   try {
     const cookieStore = await cookies();
     const session = cookieStore.get('session')?.value;
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized. Please log in.' }, { status: 401 });
+    if (session) {
+      const decoded = await adminAuth.verifySessionCookie(session, true);
+      if (decoded) return decoded;
     }
+  } catch (err) {
+    console.warn('[api/reviews] Session cookie verification failed, checking bearer token...');
+  }
 
-    let decoded: any;
+  // 2. Fallback to Authorization header Bearer token
+  const authHeader = request.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7);
     try {
-      decoded = await adminAuth.verifySessionCookie(session, true);
-    } catch {
-      return NextResponse.json({ error: 'Invalid or expired session. Please log in again.' }, { status: 401 });
+      const decoded = await adminAuth.verifyIdToken(token);
+      if (decoded) return decoded;
+    } catch (err) {
+      console.warn('[api/reviews] Bearer token verification failed:', err);
+    }
+  }
+
+  return null;
+}
+
+// POST: Create or Update a Review
+export async function POST(request: NextRequest) {
+  try {
+    const decoded = await getAuthenticatedUser(request);
+    if (!decoded) {
+      return NextResponse.json({ error: 'Unauthorized. Please log in to write a review.' }, { status: 401 });
     }
 
     const uid = decoded.uid;
@@ -98,17 +118,9 @@ export async function POST(request: NextRequest) {
 // DELETE: Delete a Review
 export async function DELETE(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const session = cookieStore.get('session')?.value;
-    if (!session) {
+    const decoded = await getAuthenticatedUser(request);
+    if (!decoded) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    let decoded: any;
-    try {
-      decoded = await adminAuth.verifySessionCookie(session, true);
-    } catch {
-      return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
