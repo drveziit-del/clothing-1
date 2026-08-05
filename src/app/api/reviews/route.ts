@@ -31,6 +31,26 @@ async function getAuthenticatedUser(request: NextRequest) {
   return null;
 }
 
+// GET: Fetch all reviews (public)
+export async function GET() {
+  try {
+    const snapshot = await adminDb.collection('reviews').orderBy('createdAt', 'desc').get();
+    const reviews = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate?.() ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
+        updatedAt: data.updatedAt?.toDate?.() ? data.updatedAt.toDate().toISOString() : undefined,
+      };
+    });
+    return NextResponse.json(reviews);
+  } catch (err: any) {
+    console.error('[api/reviews] Error fetching reviews:', err);
+    return NextResponse.json({ error: 'Failed to fetch reviews' }, { status: 500 });
+  }
+}
+
 // POST: Create or Update a Review
 export async function POST(request: NextRequest) {
   try {

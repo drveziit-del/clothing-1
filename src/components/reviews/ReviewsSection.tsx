@@ -23,14 +23,29 @@ export default function ReviewsSection() {
     }
   };
 
-  // Subscribe to reviews collection (real-time with fallback)
+  const fetchApiReviews = useCallback(async () => {
+    try {
+      const res = await fetch('/api/reviews');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setReviews(data);
+        }
+      }
+    } catch (err) {
+      console.warn('API reviews fetch error:', err);
+    }
+  }, []);
+
+  // Fetch reviews from API and subscribe to real-time updates
   useEffect(() => {
+    fetchApiReviews();
+
     const { collection, query, orderBy, onSnapshot, getDocs } = getFirestoreModule();
     const db = getFirestoreDb();
 
     const q = query(
-      collection(db, 'reviews'),
-      orderBy('createdAt', 'desc')
+      collection(db, 'reviews')
     );
 
     const unsub = onSnapshot(q, (snap: any) => {
@@ -43,28 +58,23 @@ export default function ReviewsSection() {
           updatedAt: data.updatedAt?.toDate?.() ?? undefined,
         } as Review;
       });
-      setReviews(items);
-    }, async (_err: any) => {
-      // Fallback fetch if snapshot listener hits transient auth/permission sync race
-      try {
-        const snap = await getDocs(q);
-        const items: Review[] = snap.docs.map((doc: any) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            ...data,
-            createdAt: data.createdAt?.toDate?.() ?? new Date(),
-            updatedAt: data.updatedAt?.toDate?.() ?? undefined,
-          } as Review;
-        });
+
+      // Sort client-side to prevent missing/null serverTimestamp index drops
+      items.sort((a: any, b: any) => {
+        const tA = new Date(a.createdAt).getTime() || 0;
+        const tB = new Date(b.createdAt).getTime() || 0;
+        return tB - tA;
+      });
+
+      if (items.length > 0) {
         setReviews(items);
-      } catch {
-        // Silent fallback
       }
+    }, async (_err: any) => {
+      fetchApiReviews();
     });
 
     return () => unsub();
-  }, []);
+  }, [fetchApiReviews]);
 
   const openAddForm = useCallback(() => {
     setEditingReview(null);
@@ -117,6 +127,7 @@ export default function ReviewsSection() {
       }
 
       closeForm();
+      fetchApiReviews();
     } catch (err: any) {
       console.error('Error submitting review:', err);
       alert(err.message || 'Failed to submit review. Please ensure you are logged in.');
@@ -144,6 +155,7 @@ export default function ReviewsSection() {
         const errorData = await res.json();
         throw new Error(errorData.error || 'Failed to delete review');
       }
+      fetchApiReviews();
     } catch (err: any) {
       console.error('Error deleting review:', err);
       alert(err.message || 'Failed to delete review');
@@ -157,8 +169,10 @@ export default function ReviewsSection() {
 
   const canWriteReview = firebaseUser && !userReview;
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
+  const formatDate = (date: Date | string) => {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    if (!d || isNaN(d.getTime())) return 'Recently';
+    return d.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
