@@ -13,9 +13,10 @@ import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
   product: Product;
+  priority?: boolean;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, priority = false }: ProductCardProps) {
   const { addItem } = useCart();
   const { toast } = useRoast();
   const { formatPrice } = useCurrency();
@@ -79,6 +80,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             fill
             sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
             className={styles.image}
+            priority={priority}
           />
         ) : (
           <div className={styles.imagePlaceholder}>

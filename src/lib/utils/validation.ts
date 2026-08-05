@@ -71,42 +71,43 @@ export type ContactInput = z.infer<typeof contactSchema>;
 
 // ─── Admin ────────────────────────────────────────────────────────────────
 export const createProductSchema = z.object({
-  printifyId: z.string().min(1),
+  printifyId: z.string().min(1).optional(),
   title: z.string().min(2).max(200),
-  description: z.string().max(5000),
+  description: z.string().max(5000).nullish(),
   section: z.enum(['society_fuckers', 'valueless_bitches']),
   price: z.number().positive(),
-  tier: z.number().int().min(1).max(5).optional(),
+  tier: z.number().int().min(1).max(5).nullish(),
   prebookingPrice: z.number().nonnegative().nullish(),
   isPublished: z.boolean().default(false),
-  images: z.array(z.string()).optional(),
-  videos: z.array(z.string()).optional(),
+  images: z.array(z.string()).nullish(),
+  videos: z.array(z.string()).nullish(),
   variants: z
     .array(
       z.object({
         id: z.string(),
         size: z.string(),
         color: z.string(),
-        colorHex: z.string().optional(),
+        colorHex: z.string().nullish(),
         price: z.number().positive(),
         available: z.boolean().default(true),
-        images: z.array(z.string()).optional(),
+        images: z.array(z.string()).nullish(),
+        printifyVariantId: z.union([z.string(), z.number()]).nullish(),
       })
     )
-    .optional(),
-  showManifesto: z.boolean().optional(),
-  showSpecs: z.boolean().optional(),
-  showFeatures: z.boolean().optional(),
-  showComparison: z.boolean().optional(),
-  showUgc: z.boolean().optional(),
-  showFaq: z.boolean().optional(),
-  fitRecommendation: z.string().optional(),
-  materialSpec: z.string().optional(),
-  fitSpec: z.string().optional(),
-  weightSpec: z.string().optional(),
-  originSpec: z.string().optional(),
-  manifestoQuote: z.string().optional(),
-  manifestoBody: z.string().optional(),
+    .nullish(),
+  showManifesto: z.boolean().nullish(),
+  showSpecs: z.boolean().nullish(),
+  showFeatures: z.boolean().nullish(),
+  showComparison: z.boolean().nullish(),
+  showUgc: z.boolean().nullish(),
+  showFaq: z.boolean().nullish(),
+  fitRecommendation: z.string().nullish(),
+  materialSpec: z.string().nullish(),
+  fitSpec: z.string().nullish(),
+  weightSpec: z.string().nullish(),
+  originSpec: z.string().nullish(),
+  manifestoQuote: z.string().nullish(),
+  manifestoBody: z.string().nullish(),
   ugcVideos: z
     .array(
       z.object({
@@ -115,7 +116,7 @@ export const createProductSchema = z.object({
         videoUrl: z.string(),
       })
     )
-    .optional(),
+    .nullish(),
   featuresList: z
     .array(
       z.object({
@@ -123,7 +124,7 @@ export const createProductSchema = z.object({
         description: z.string(),
       })
     )
-    .optional(),
+    .nullish(),
   comparisonRows: z
     .array(
       z.object({
@@ -132,7 +133,7 @@ export const createProductSchema = z.object({
         them: z.string(),
       })
     )
-    .optional(),
+    .nullish(),
   faqsList: z
     .array(
       z.object({
@@ -140,8 +141,8 @@ export const createProductSchema = z.object({
         a: z.string(),
       })
     )
-    .optional(),
-  commitmentText: z.string().optional(),
+    .nullish(),
+  commitmentText: z.string().nullish(),
 });
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;
