@@ -10,6 +10,7 @@ import { useCurrency } from '@/context/CurrencyContext';
 import { getCartRoast } from '@/lib/utils/roasts';
 import PriceTag from '@/components/ui/PriceTag';
 import type { Product, Variant } from '@/types';
+import { sortSizes, getSmallVariant } from '@/lib/utils/sizes';
 import styles from './ProductDetailClient.module.css';
 import { useAuth } from '@/hooks/useAuth';
 import RazorpayButton from '@/components/checkout/RazorpayButton';
@@ -141,7 +142,8 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
       { q: "ARE SIZES TRUE TO STREETWEAR MEASUREMENTS?", a: "All garments fit slightly oversized/relaxed off the shoulder. If you prefer a standard fitted silhouette, order one size down." }
     ];
   }, [product.faqsList]);
-  const [selectedVariant, setSelectedVariant] = useState<Variant>(product.variants[0]);
+  const initialVariant = useMemo(() => getSmallVariant(product.variants) || product.variants[0], [product.variants]);
+  const [selectedVariant, setSelectedVariant] = useState<Variant>(initialVariant);
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
@@ -306,12 +308,18 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
   }, [product.variants]);
 
   const sizes = useMemo(() => {
-    return [...new Set(
+    const raw = [...new Set(
       product.variants
         .filter((v) => v.color === selectedVariant?.color)
         .map((v) => v.size)
     )];
+    return sortSizes(raw);
   }, [product.variants, selectedVariant?.color]);
+
+  const smallPrice = useMemo(() => {
+    const small = getSmallVariant(product.variants);
+    return small ? small.price : product.price;
+  }, [product.variants, product.price]);
 
   const displayedImages = useMemo(() => {
     if (!selectedVariant?.color) return product.images;
@@ -471,10 +479,11 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
             </div>
 
             <PriceTag
-              price={selectedVariant?.price ?? product.price}
+              price={smallPrice}
               tier={product.tier}
               size="xl"
               animate
+              prefix="Starting "
             />
 
             {/* Short Benefits Bullet Grid */}

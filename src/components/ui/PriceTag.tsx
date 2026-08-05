@@ -8,6 +8,7 @@ interface PriceTagProps {
   tier?: 1 | 2 | 3 | 4 | 5;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   animate?: boolean;
+  prefix?: string;
 }
 
 const TIER_COLORS: Record<number, string> = {
@@ -18,7 +19,7 @@ const TIER_COLORS: Record<number, string> = {
   5: '#8491A3', // Smoke for peasant premium
 };
 
-export default function PriceTag({ price, tier, size = 'md', animate = false }: PriceTagProps) {
+export default function PriceTag({ price, tier, size = 'md', animate = false, prefix }: PriceTagProps) {
   const { formatPrice } = useCurrency();
   const color = tier ? TIER_COLORS[tier] : 'var(--accent)';
 
@@ -27,7 +28,7 @@ export default function PriceTag({ price, tier, size = 'md', animate = false }: 
       className={`${styles.tag} ${styles[size]} ${animate ? styles.animate : ''}`}
       style={{ color }}
     >
-      {formatPrice(price)}
+      {prefix}{formatPrice(price)}
     </span>
   );
 }

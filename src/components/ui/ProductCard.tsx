@@ -8,6 +8,7 @@ import { useRoast } from '@/hooks/useRoast';
 import { getHoverRoast, getCartRoast } from '@/lib/utils/roasts';
 import type { Product } from '@/types';
 import { useCurrency } from '@/context/CurrencyContext';
+import { getSmallVariant } from '@/lib/utils/sizes';
 import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
@@ -22,7 +23,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [roastVisible, setRoastVisible] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  const defaultVariant = product.variants[0];
+  const smallVariant = getSmallVariant(product.variants) || product.variants[0];
+  const smallPrice = smallVariant ? smallVariant.price : product.price;
+  const defaultVariant = smallVariant || product.variants[0];
 
   const handleMouseEnter = () => {
     setHoverRoast(getHoverRoast());
@@ -92,7 +95,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className={styles.info}>
         <h3 className={styles.title}>{product.title}</h3>
         <span className={styles.category}>{categoryLabel}</span>
-        <span className={styles.price}>{formatPrice(product.price)}</span>
+        <span className={styles.price}>Starting {formatPrice(smallPrice)}</span>
 
         <button
           type="button"
