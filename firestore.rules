@@ -86,10 +86,8 @@ service cloud.firestore {
 
     // ── Reviews ──────────────────────────────────────────────────────
     match /reviews/{reviewId} {
-      allow read:   if true;  // Public — anyone can see reviews
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if (isSignedIn() && resource.data.userId == request.auth.uid) || isAdmin();
-      allow delete: if (isSignedIn() && resource.data.userId == request.auth.uid) || isAdmin();
+      allow read:   if true;  // Public catalog — anyone can see reviews
+      allow write:  if false; // Created, updated & deleted securely via /api/reviews
     }
   }
 }

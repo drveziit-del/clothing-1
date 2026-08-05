@@ -86,35 +86,29 @@ export default function ReviewsSection() {
   }, []);
 
   const handleSubmit = async () => {
-    if (!firebaseUser || !formText.trim()) return;
+    if (!formText.trim()) return;
     setSubmitting(true);
 
     try {
-      const { doc, collection, addDoc, updateDoc, serverTimestamp } = getFirestoreModule();
-      const db = getFirestoreDb();
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reviewId: editingReview ? editingReview.id : undefined,
+          rating: formRating,
+          text: formText.trim(),
+        }),
+      });
 
-      if (editingReview) {
-        // Update existing review
-        await updateDoc(doc(db, 'reviews', editingReview.id), {
-          rating: formRating,
-          text: formText.trim(),
-          updatedAt: serverTimestamp(),
-        });
-      } else {
-        // Create new review
-        await addDoc(collection(db, 'reviews'), {
-          userId: firebaseUser.uid,
-          userName: user?.displayName || firebaseUser.displayName || 'Anonymous',
-          userPhoto: firebaseUser.photoURL || null,
-          rating: formRating,
-          text: formText.trim(),
-          createdAt: serverTimestamp(),
-        });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to submit review');
       }
 
       closeForm();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error submitting review:', err);
+      alert(err.message || 'Failed to submit review. Please ensure you are logged in.');
     } finally {
       setSubmitting(false);
     }
@@ -123,11 +117,16 @@ export default function ReviewsSection() {
   const handleDelete = async (reviewId: string) => {
     if (!confirm('Delete this review?')) return;
     try {
-      const { doc, deleteDoc } = getFirestoreModule();
-      const db = getFirestoreDb();
-      await deleteDoc(doc(db, 'reviews', reviewId));
-    } catch (err) {
+      const res = await fetch(`/api/reviews?id=${reviewId}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to delete review');
+      }
+    } catch (err: any) {
       console.error('Error deleting review:', err);
+      alert(err.message || 'Failed to delete review');
     }
   };
 
