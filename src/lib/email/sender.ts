@@ -550,7 +550,13 @@ export async function sendAdminOrderNotification(order: Order): Promise<void> {
  * Uses atomic Firestore `.create()` on `order_email_locks/{orderId}` to prevent duplicate emails from concurrent webhook & client verify calls.
  */
 export async function sendOrderConfirmationEmailsOnce(orderId: string, order: Order): Promise<boolean> {
+  if (!orderId) {
+    console.warn('[EMAIL-LOCK] Missing orderId, skipping email dispatch.');
+    return false;
+  }
+
   const lockRef = adminDb.collection('order_email_locks').doc(orderId);
+  console.log(`[EMAIL-LOCK] Checking atomic lock for order: ${orderId}...`);
 
   try {
     // Atomically create lock document. Fails with ALREADY_EXISTS if already created.
@@ -558,17 +564,21 @@ export async function sendOrderConfirmationEmailsOnce(orderId: string, order: Or
       orderId,
       sentAt: FieldValue.serverTimestamp(),
     });
+    console.log(`[EMAIL-LOCK] Lock acquired for order ${orderId}. Dispatching emails...`);
   } catch (err: any) {
+    const errStr = String(err?.message || err?.details || err || '').toLowerCase();
     const isAlreadyExists =
       err?.code === 6 ||
+      err?.code === '6' ||
       err?.code === 'already-exists' ||
-      String(err?.message || '').includes('ALREADY_EXISTS');
+      errStr.includes('already') ||
+      errStr.includes('exists');
 
     if (isAlreadyExists) {
-      console.log(`Order ${orderId} confirmation emails already sent (lock exists). Skipping duplicate.`);
+      console.log(`[EMAIL-LOCK] 🛑 BLOCKED duplicate email request for order ${orderId} (Lock already exists).`);
       return false;
     }
-    console.error(`Error creating email lock for order ${orderId}:`, err);
+    console.error(`[EMAIL-LOCK] Error creating email lock for order ${orderId}:`, err);
     return false;
   }
 
@@ -579,5 +589,6 @@ export async function sendOrderConfirmationEmailsOnce(orderId: string, order: Or
     sendOrderConfirmationEmail(order),
     sendAdminOrderNotification(order),
   ]);
+  console.log(`[EMAIL-LOCK] ✅ Confirmation & admin emails dispatched for order ${orderId}.`);
   return true;
 }
