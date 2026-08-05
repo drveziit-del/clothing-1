@@ -9,7 +9,12 @@ import RoastToast from "@/components/ui/RoastToast";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://gerkink.shop'),
-  title: "GERKINK — Provocative Luxury Streetwear",
+  title: "GERKINK",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
   description:
     "Two collections. Zero apologies. Society Fuckers & Valueless Bitches — wear your worth or stay basic.",
   keywords: ["luxury streetwear", "provocative fashion", "GERKINK", "Society Fuckers", "Valueless Bitches"],
@@ -17,12 +22,13 @@ export const metadata: Metadata = {
     title: "GERKINK",
     description: "You dress like your personality — boring as f*ck. Fix it.",
     type: "website",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/logo.png", width: 800, height: 800 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "GERKINK",
     description: "Luxury streetwear that roasts you into buying.",
+    images: ["/logo.png"],
   },
   robots: { index: true, follow: true },
 };
