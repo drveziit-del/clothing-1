@@ -479,11 +479,10 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
             </div>
 
             <PriceTag
-              price={smallPrice}
+              price={selectedVariant?.price ?? smallPrice}
               tier={product.tier}
               size="xl"
               animate
-              prefix="Starting "
             />
 
             {/* Short Benefits Bullet Grid */}
