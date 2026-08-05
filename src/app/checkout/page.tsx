@@ -73,24 +73,60 @@ export default function CheckoutPage() {
     try {
       const { collection, query, where, getDocs, limit } = getFirestoreModule();
       const db = getFirestoreDb();
-      const q = query(
+      const inputCode = couponInput.trim().toUpperCase();
+
+      // 1. Check user-specific coupon
+      let q = query(
         collection(db, 'coupons'),
-        where('code', '==', couponInput.trim().toUpperCase()),
+        where('code', '==', inputCode),
         where('userId', '==', user.uid),
         where('isUsed', '==', false),
         limit(1)
       );
-      const snap = await getDocs(q);
+      let snap = await getDocs(q);
+
+      // 2. Fallback to global coupon
       if (snap.empty) {
-        toast('Invalid or already used coupon code.', 'error');
+        q = query(
+          collection(db, 'coupons'),
+          where('code', '==', inputCode),
+          where('isGlobal', '==', true),
+          where('isActive', '==', true),
+          limit(1)
+        );
+        snap = await getDocs(q);
+      }
+
+      if (snap.empty) {
+        toast('Invalid, inactive, or already used coupon code.', 'error');
         setAppliedCoupon(null);
         setCouponDiscount(0);
       } else {
-        const couponDoc = snap.docs[0].data();
-        const value = couponDoc.value ?? 100;
-        setAppliedCoupon(couponInput.trim().toUpperCase());
-        setCouponDiscount(value);
-        toast(`${formatPrice(value)} discount applied!`, 'success');
+        const couponData = snap.docs[0].data();
+        const minSpend = couponData.minSubtotal ?? 0;
+        if (minSpend > 0 && subtotal < minSpend) {
+          toast(`Minimum order subtotal of ${formatPrice(minSpend)} required for this coupon.`, 'error');
+          setAppliedCoupon(null);
+          setCouponDiscount(0);
+          return;
+        }
+
+        const type = couponData.type || 'fixed';
+        const val = couponData.value ?? 100;
+        let calculatedDiscount = 0;
+
+        if (type === 'percentage') {
+          calculatedDiscount = subtotal * (val / 100);
+        } else {
+          calculatedDiscount = val;
+        }
+
+        setAppliedCoupon(inputCode);
+        setCouponDiscount(calculatedDiscount);
+        toast(
+          `${type === 'percentage' ? `${val}%` : formatPrice(calculatedDiscount)} discount applied!`,
+          'success'
+        );
       }
     } catch (err: any) {
       toast(err.message || 'Error validating coupon', 'error');

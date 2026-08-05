@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
 
   // Validate coupon code
   if (couponCode) {
-    const couponSnap = await adminDb.collection('coupons')
+    let couponSnap = await adminDb.collection('coupons')
       .where('code', '==', couponCode)
       .where('userId', '==', uid)
       .where('isUsed', '==', false)
@@ -89,12 +89,34 @@ export async function POST(request: NextRequest) {
       .get();
 
     if (couponSnap.empty) {
-      return NextResponse.json({ error: 'Invalid or already used coupon code' }, { status: 400 });
+      couponSnap = await adminDb.collection('coupons')
+        .where('code', '==', couponCode)
+        .where('isGlobal', '==', true)
+        .where('isActive', '==', true)
+        .limit(1)
+        .get();
     }
 
-    const couponDoc = couponSnap.docs[0];
-    const couponVal = couponDoc.data().value ?? 100;
-    discount = Math.min(couponVal, total);
+    if (couponSnap.empty) {
+      return NextResponse.json({ error: 'Invalid, inactive, or already used coupon code' }, { status: 400 });
+    }
+
+    const couponData = couponSnap.docs[0].data();
+    const minSpend = couponData.minSubtotal ?? 0;
+    if (minSpend > 0 && subtotal < minSpend) {
+      return NextResponse.json({ error: `Minimum subtotal of $${minSpend} required for this coupon` }, { status: 400 });
+    }
+
+    const couponType = couponData.type || 'fixed';
+    const couponVal = couponData.value ?? 0;
+
+    if (couponType === 'percentage') {
+      discount = Math.round((subtotal * (couponVal / 100)) * 100) / 100;
+    } else {
+      discount = couponVal;
+    }
+
+    discount = Math.min(discount, total);
     total = Math.max(0, total - discount);
   }
 

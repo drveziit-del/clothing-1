@@ -1,0 +1,229 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border, #262626);
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--fg, #ffffff);
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--muted, #a3a3a3);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* Modal / Form Card */
+.formCard {
+  background: var(--bg-surface, #121212);
+  border: 1px solid var(--border-color, #262626);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.formTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  color: var(--fg, #ffffff);
+}
+
+.gridForm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.825rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted, #a3a3a3);
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--fg, #ffffff);
+}
+
+.formFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* Stats / Summary row */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border, #262626);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--fg, #ffffff);
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--muted, #8e8e93);
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
+/* Coupons Table */
+.tableWrapper {
+  background: var(--bg-surface, #121212);
+  border: 1px solid var(--border-color, #262626);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.table th {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  color: var(--muted, #8e8e93);
+  border-bottom: 1px solid var(--border, #262626);
+}
+
+.table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--fg, #ffffff);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.codeBadge {
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.35rem 0.65rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #ff6b6b;
+  display: inline-block;
+  letter-spacing: 0.05em;
+}
+
+.typeBadge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badgeFixed {
+  background: rgba(52, 199, 89, 0.15);
+  color: #34c759;
+}
+
+.badgePercent {
+  background: rgba(0, 122, 255, 0.15);
+  color: #007aff;
+}
+
+.statusActive {
+  color: #34c759;
+  font-weight: 600;
+}
+
+.statusInactive {
+  color: #8e8e93;
+}
+
+.toggleBtn {
+  background: transparent;
+  border: 1px solid var(--border, #3a3a3c);
+  color: var(--fg, #ffffff);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.toggleBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.deleteBtn {
+  background: rgba(255, 59, 48, 0.15);
+  border: 1px solid rgba(255, 59, 48, 0.3);
+  color: #ff3b30;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: background 0.15s ease;
+}
+
+.deleteBtn:hover {
+  background: rgba(255, 59, 48, 0.3);
+}
+
+.empty {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--muted, #8e8e93);
+}

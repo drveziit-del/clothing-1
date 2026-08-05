@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (orderData.couponCode) {
-    const couponSnap = await adminDb.collection('coupons')
+    let couponSnap = await adminDb.collection('coupons')
       .where('code', '==', orderData.couponCode)
       .where('userId', '==', uid)
       .where('isUsed', '==', false)
@@ -104,7 +104,21 @@ export async function POST(request: NextRequest) {
         isUsed: true,
         usedAt: FieldValue.serverTimestamp(),
         orderId: orderId,
+        timesUsed: FieldValue.increment(1),
       });
+    } else {
+      couponSnap = await adminDb.collection('coupons')
+        .where('code', '==', orderData.couponCode)
+        .where('isGlobal', '==', true)
+        .limit(1)
+        .get();
+
+      if (!couponSnap.empty) {
+        batch.update(couponSnap.docs[0].ref, {
+          timesUsed: FieldValue.increment(1),
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+      }
     }
   }
 
