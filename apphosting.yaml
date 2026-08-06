@@ -37,10 +37,6 @@ env:
     value: gerkinkofficial@gmail.com
 
   # ─── Secret environment variables (stored in Google Cloud Secret Manager) ───
-  - variable: FIREBASE_CLIENT_EMAIL
-    secret: FIREBASE_CLIENT_EMAIL
-  - variable: FIREBASE_PRIVATE_KEY
-    secret: FIREBASE_PRIVATE_KEY
   - variable: PRINTIFY_ACCESS_TOKEN
     secret: PRINTIFY_ACCESS_TOKEN
   - variable: PRINTIFY_WEBHOOK_SECRET
