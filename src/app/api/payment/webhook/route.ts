@@ -11,7 +11,10 @@ function verifyWebhookSignature(body: string, signature: string): boolean {
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
   if (!secret) return false;
   const expected = crypto.createHmac('sha256', secret).update(body).digest('hex');
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  const expectedBuf = Buffer.from(expected);
+  const signatureBuf = Buffer.from(signature);
+  if (expectedBuf.length !== signatureBuf.length) return false;
+  return crypto.timingSafeEqual(expectedBuf, signatureBuf);
 }
 
 export async function POST(request: NextRequest) {
@@ -40,7 +43,7 @@ export async function POST(request: NextRequest) {
     .get();
 
   if (snap.empty) {
-    return NextResponse.json({ status: 'order_not_found' });
+    return NextResponse.json({ error: 'Order not found' }, { status: 404 });
   }
 
   const orderRef = snap.docs[0].ref;
@@ -109,23 +112,28 @@ export async function POST(request: NextRequest) {
       // 2. Submit to Printify (if shop ID configured and not already attempted)
       const shopId = process.env.PRINTIFY_SHOP_ID;
       if (shopId && !orderData.fulfillmentAttempted) {
-        try {
-          const countryCode = normalizeCountryCode(order.shippingAddress?.country);
-          const regionCode = normalizeRegionCode(order.shippingAddress?.state, countryCode);
+        const printifyItems = (order.items || [])
+          .filter((i: any) => i.printifyProductId && !isNaN(Number(i.variant?.printifyVariantId ?? i.variant?.id)));
 
-          const printifyOrder = await createPrintifyOrder(shopId, {
-            external_id: orderDoc.id,
-            label:       `GERKINK-${orderDoc.id}`,
-            line_items:  order.items.map((i) => ({
-              product_id: i.printifyProductId ?? '',
-              variant_id: Number(i.variant.printifyVariantId ?? i.variant.id),
-              quantity:   i.quantity,
-            })),
-            shipping_method: 1,
+        if (printifyItems.length > 0) {
+          try {
+            const countryCode = normalizeCountryCode(order.shippingAddress?.country);
+            const regionCode = normalizeRegionCode(order.shippingAddress?.state, countryCode);
+
+            const printifyOrder = await createPrintifyOrder(shopId, {
+              external_id: orderDoc.id,
+              label:       `GERKINK-${orderDoc.id}`,
+              line_items:  printifyItems.map((i) => ({
+                product_id: i.printifyProductId || '',
+                variant_id: Number(i.variant.printifyVariantId ?? i.variant.id),
+                quantity:   i.quantity,
+              })),
+              shipping_method: 1,
             address_to: {
               first_name: order.shippingAddress ? order.shippingAddress.name.split(' ')[0] : 'Guest',
               last_name:  (order.shippingAddress && order.shippingAddress.name.split(' ').slice(1).join(' ')) || '-',
               email:      order.userEmail,
+              phone:      (order.shippingAddress && order.shippingAddress.phone) || '0000000000',
               country:    countryCode,
               region:     regionCode,
               address1:   order.shippingAddress ? order.shippingAddress.street : '123 Main St',
@@ -143,6 +151,7 @@ export async function POST(request: NextRequest) {
           console.error('Webhook Printify order creation failed:', err);
           // Mark fulfillment as attempted even on failure to prevent infinite retries
           await orderRef.update({ fulfillmentAttempted: true }).catch(() => {});
+        }
         }
       }
       break;

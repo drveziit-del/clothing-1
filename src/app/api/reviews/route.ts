@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
+import { isRateLimited } from '@/lib/utils/rateLimit';
 
 async function getAuthenticatedUser(request: NextRequest) {
   // 1. Try session cookie first
@@ -53,6 +54,10 @@ export async function GET() {
 
 // POST: Create or Update a Review
 export async function POST(request: NextRequest) {
+  if (isRateLimited(request, 'reviews', { limit: 15, windowMs: 15 * 60 * 1000 })) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   try {
     const decoded = await getAuthenticatedUser(request);
     if (!decoded) {
@@ -131,12 +136,16 @@ export async function POST(request: NextRequest) {
     }
   } catch (err: any) {
     console.error('[api/reviews] Error processing review:', err);
-    return NextResponse.json({ error: err.message || 'Failed to submit review' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to submit review' }, { status: 500 });
   }
 }
 
 // DELETE: Delete a Review
 export async function DELETE(request: NextRequest) {
+  if (isRateLimited(request, 'reviews_delete', { limit: 15, windowMs: 15 * 60 * 1000 })) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   try {
     const decoded = await getAuthenticatedUser(request);
     if (!decoded) {
@@ -166,6 +175,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error('[api/reviews] Error deleting review:', err);
-    return NextResponse.json({ error: err.message || 'Failed to delete review' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to delete review' }, { status: 500 });
   }
 }

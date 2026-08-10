@@ -10,7 +10,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 function getAdminApp(): App {
   if (getApps().length > 0) return getApps()[0];
 
-  const projectId     = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'print-on-demand-895b7';
+  const projectId     = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   const clientEmail   = process.env.FIREBASE_CLIENT_EMAIL;
   const privateKey    = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 

@@ -1017,7 +1017,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                   You must be signed in to submit a pre-booking request.
                 </p>
                 <Link
-                  href={`/auth/login?redirect=/shop/${product.id}`}
+                  href={`/auth/login?redirect=/shop/${product.slug || product.id}`}
                   className="btn btn-primary btn-full"
                 >
                   Sign In

@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
 
     } catch (err: any) {
       console.error('Razorpay Refund API error:', err);
-      return NextResponse.json({ error: err.message || 'Refund processing failed on payment gateway' }, { status: 500 });
+      return NextResponse.json({ error: 'Refund processing failed on payment gateway' }, { status: 500 });
     }
   }
 
@@ -329,7 +329,7 @@ export async function POST(request: NextRequest) {
 
     } catch (err: any) {
       console.error('Manual payout creation error:', err);
-      return NextResponse.json({ error: err.message || 'Failed to submit payout request' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to submit payout request' }, { status: 500 });
     }
   }
 

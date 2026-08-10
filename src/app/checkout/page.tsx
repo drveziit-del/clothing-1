@@ -9,6 +9,8 @@ import { useRoast } from '@/hooks/useRoast';
 import { addressSchema } from '@/lib/utils/validation';
 import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
 import RazorpayButton from '@/components/checkout/RazorpayButton';
+import PayPalMultiButton from '@/components/checkout/PayPalMultiButton';
+import { COUNTRIES } from '@/lib/utils/countries';
 import styles from './page.module.css';
 import type { Address } from '@/types';
 
@@ -17,7 +19,7 @@ type Step = 'address' | 'payment';
 export default function CheckoutPage() {
   const { items, subtotal, referralCode, clearCart } = useCart();
   const { firebaseUser, user } = useAuth();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, currency: selectedCurrency } = useCurrency();
   const router = useRouter();
   const { toast } = useRoast();
 
@@ -26,6 +28,7 @@ export default function CheckoutPage() {
   const [orderData, setOrderData]     = useState<{ orderId: string; razorpayOrderId: string; amount: number; currency: string } | null>(null);
   const [loading, setLoading]         = useState(false);
   const [errors, setErrors]           = useState<Record<string, string>>({});
+  const [usePayPal, setUsePayPal]     = useState(false);
 
   // Coupon state
   const [couponInput, setCouponInput]         = useState('');
@@ -110,58 +113,70 @@ export default function CheckoutPage() {
   async function handleAddressSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrors({});
-    setLoading(true);
 
-    const fd = new FormData(e.currentTarget);
-    const raw = {
-      name:    fd.get('name') as string,
-      street:  fd.get('street') as string,
-      city:    fd.get('city') as string,
-      state:   fd.get('state') as string,
-      zip:     fd.get('zip') as string,
-      country: fd.get('country') as string,
-      phone:   (fd.get('phone') as string) || undefined,
+    const formData = new FormData(e.currentTarget);
+    const rawData = {
+      name:    (formData.get('name') as string) || '',
+      street:  (formData.get('street') as string) || '',
+      city:    (formData.get('city') as string) || '',
+      state:   (formData.get('state') as string) || '',
+      zip:     (formData.get('zip') as string) || '',
+      country: (formData.get('country') as string) || '',
+      phone:   (formData.get('phone') as string) || undefined,
     };
 
-    const result = addressSchema.safeParse(raw);
+    const result = addressSchema.safeParse(rawData);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
-      result.error.issues.forEach((i) => { fieldErrors[i.path[0] as string] = i.message; });
+      result.error.issues.forEach((err) => {
+        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+      });
       setErrors(fieldErrors);
-      setLoading(false);
       return;
     }
 
-    try {
-      const res = await fetch('/api/payment/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: items.map((i) => ({
-            productId: i.product.id,
-            variantId: i.variant.id,
-            quantity:  i.quantity,
-          })),
-          referralCode: referralCode || undefined,
-          couponCode: appliedCoupon || undefined,
-          shippingAddress: result.data,
-        }),
-      });
+    setAddress(result.data);
+    const countryCode = result.data.country.trim().toUpperCase();
+    const isIndia = countryCode === 'IN';
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Order creation failed');
+    // Routing: Domestic IN (India) -> Razorpay; International non-IN -> PayPal
+    if (isIndia) {
+      setUsePayPal(false);
+      setLoading(true);
+      try {
+        const res = await fetch('/api/payment/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: items.map((i) => ({
+              productId: i.product.id,
+              variantId: i.variant.id,
+              quantity:  i.quantity,
+            })),
+            referralCode: referralCode || undefined,
+            couponCode: appliedCoupon || undefined,
+            shippingAddress: result.data,
+          }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || 'Order creation failed');
+        }
+
+        const data = await res.json();
+        setOrderData(data);
+        setStep('payment');
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Something went wrong';
+        toast(msg, 'error');
+      } finally {
+        setLoading(false);
       }
-
-      const data = await res.json();
-      setAddress(result.data);
-      setOrderData(data);
+    } else {
+      // International / USD Routing -> Direct PayPal & Standalone Cards
+      setUsePayPal(true);
       setStep('payment');
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Something went wrong';
-      toast(msg, 'error');
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -212,7 +227,6 @@ export default function CheckoutPage() {
                 { id: 'city',    label: 'City',         placeholder: 'New York',           type: 'text' },
                 { id: 'state',   label: 'State / Region', placeholder: 'NY',              type: 'text' },
                 { id: 'zip',     label: 'ZIP / Postal', placeholder: '10001',              type: 'text' },
-                { id: 'country', label: 'Country',      placeholder: 'US',                 type: 'text' },
                 { id: 'phone',   label: 'Phone (optional)', placeholder: '+1 555 0000',   type: 'tel'  },
               ].map((field) => (
                 <div key={field.id}>
@@ -223,16 +237,28 @@ export default function CheckoutPage() {
                 </div>
               ))}
 
+              <div>
+                <label htmlFor="country" className="input-label">Country</label>
+                <select id="country" name="country" className="input" defaultValue="US" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--fg-main)' }}>
+                  {COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.name} ({c.code})
+                    </option>
+                  ))}
+                </select>
+                {errors.country && <span className={styles.fieldError}>{errors.country}</span>}
+              </div>
+
               <button type="submit" disabled={loading} className="btn btn-primary btn-lg btn-full">
                 {loading ? 'Processing...' : 'Continue to Payment →'}
               </button>
             </form>
           )}
 
-          {step === 'payment' && orderData && (
+          {step === 'payment' && (
             <div className={styles.paymentStep}>
               <h2 className={styles.formTitle}>Payment</h2>
-              {orderData.razorpayOrderId === 'free_order' ? (
+              {orderData && orderData.razorpayOrderId === 'free_order' ? (
                 <>
                   <p className={styles.paymentNote}>
                     Your order is fully covered by your store coupon. No payment required.
@@ -245,7 +271,22 @@ export default function CheckoutPage() {
                     {loading ? 'Placing Order...' : 'Confirm Free Order →'}
                   </button>
                 </>
-              ) : (
+              ) : usePayPal ? (
+                <>
+                  <p className={styles.paymentNote}>
+                    International USD Order. Pay via <strong>Direct PayPal</strong> or <strong>Debit / Credit Card</strong>.
+                  </p>
+                  <PayPalMultiButton
+                    amountUSD={grandTotal}
+                    items={items.map((i) => ({ productId: i.product.id, variantId: i.variant.id, quantity: i.quantity }))}
+                    referralCode={referralCode || undefined}
+                    couponCode={appliedCoupon || undefined}
+                    shippingAddress={address}
+                    onSuccess={() => router.push('/account')}
+                    onError={(msg) => toast(msg, 'error')}
+                  />
+                </>
+              ) : orderData ? (
                 <>
                   <p className={styles.paymentNote}>
                     You&apos;re paying <strong>{formatPrice(grandTotal)}</strong> via Razorpay.
@@ -265,7 +306,7 @@ export default function CheckoutPage() {
                     onError={(msg) => toast(msg, 'error')}
                   />
                 </>
-              )}
+              ) : null}
               <button
                 className="btn btn-ghost"
                 onClick={() => setStep('address')}

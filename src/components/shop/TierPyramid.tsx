@@ -33,7 +33,7 @@ export default function TierPyramid({ products }: TierPyramidProps) {
             {tierProducts.length > 0 ? (
               <div className={`${styles.tierGrid} ${styles[`grid${Math.min(config.tier, 3)}`]}`}>
                 {tierProducts.map((product) => (
-                  <Link key={product.id} href={`/shop/${product.id}`} className={styles.productCard}>
+                  <Link key={product.id} href={`/shop/${product.slug || product.id}`} className={styles.productCard}>
                     <div className={styles.productImg}>
                       {product.images[0] ? (
                         // eslint-disable-next-line @next/next/no-img-element

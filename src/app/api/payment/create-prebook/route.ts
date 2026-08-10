@@ -3,9 +3,15 @@ import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { createRazorpayOrder } from '@/lib/razorpay/client';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
+import { createPrebookSchema } from '@/lib/utils/validation';
+import { isRateLimited } from '@/lib/utils/rateLimit';
 import type { OrderItem } from '@/types';
 
 export async function POST(request: NextRequest) {
+  if (isRateLimited(request, 'create_prebook', { limit: 10, windowMs: 15 * 60 * 1000 })) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   // 1. Auth check
   const cookieStore = await cookies();
   const session = cookieStore.get('session')?.value;
@@ -24,17 +30,19 @@ export async function POST(request: NextRequest) {
   }
 
   // 2. Parse request body
-  let body: any;
+  let body: unknown;
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const { productId, variantId, name, email: prebookEmail, message } = body;
-  if (!productId || !variantId || !name || !prebookEmail) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+  const result = createPrebookSchema.safeParse(body);
+  if (!result.success) {
+    return NextResponse.json({ error: result.error.issues[0].message }, { status: 400 });
   }
+
+  const { productId, variantId, name, email: prebookEmail, message } = result.data;
 
   // 3. Fetch product details from Firestore
   try {

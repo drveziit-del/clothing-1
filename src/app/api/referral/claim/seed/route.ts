@@ -100,9 +100,24 @@ async function handleRequest(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  return handleRequest(request);
-}
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not allowed in production' }, { status: 403 });
+  }
 
-export async function GET(request: NextRequest) {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('session')?.value;
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const decoded = await adminAuth.verifySessionCookie(session, true);
+    if (!decoded.admin) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   return handleRequest(request);
 }

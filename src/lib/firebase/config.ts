@@ -12,12 +12,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const firebaseConfig = {
-  apiKey:            process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0',
-  authDomain:        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'gerkink.shop',
-  projectId:         process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'print-on-demand-895b7',
-  storageBucket:     process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'print-on-demand-895b7.firebasestorage.app',
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '659428489572',
-  appId:             process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:659428489572:web:09eb88b692d2399009a271',
+  apiKey:            process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain:        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId:         process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket:     process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 // Cache resolved instances so we only import() once.

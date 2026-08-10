@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
@@ -12,6 +13,66 @@ export default function CartPage() {
   const { items, subtotal, referralCode, removeItem, updateQty, setReferralCode } = useCart();
   const { firebaseUser } = useAuth();
   const { formatPrice, currency } = useCurrency();
+
+  const [localCode, setLocalCode] = useState('');
+  const [validating, setValidating] = useState(false);
+  const [isValid, setIsValid] = useState<boolean | null>(null);
+
+  // Validate on mount only if referralCode was pre-populated
+  useEffect(() => {
+    if (referralCode.trim()) {
+      setLocalCode(referralCode);
+      setValidating(true);
+      fetch(`/api/referral/validate?code=${encodeURIComponent(referralCode.trim())}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setIsValid(data.valid);
+          if (!data.valid) {
+            setReferralCode('');
+          }
+        })
+        .catch(() => {
+          setIsValid(false);
+          setReferralCode('');
+        })
+        .finally(() => {
+          setValidating(false);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function handleApplyReferral() {
+    const trimmed = localCode.toUpperCase().trim();
+    if (!trimmed) {
+      setIsValid(null);
+      setReferralCode('');
+      return;
+    }
+
+    setValidating(true);
+    setIsValid(null);
+    try {
+      const res = await fetch(`/api/referral/validate?code=${encodeURIComponent(trimmed)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setIsValid(data.valid);
+        if (data.valid) {
+          setReferralCode(trimmed);
+        } else {
+          setReferralCode('');
+        }
+      } else {
+        setIsValid(false);
+        setReferralCode('');
+      }
+    } catch {
+      setIsValid(false);
+      setReferralCode('');
+    } finally {
+      setValidating(false);
+    }
+  }
 
   if (items.length === 0) {
     return (
@@ -70,17 +131,42 @@ export default function CartPage() {
           {/* Referral Code */}
           <div className={styles.referralRow}>
             <label className="input-label">Referral Code</label>
-            <div className={styles.referralInput}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
               <input
                 type="text"
                 className="input"
+                style={{ flex: 1 }}
                 placeholder="GERK-XXXXXX"
-                value={referralCode}
-                onChange={(e) => setReferralCode(e.target.value)}
-                maxLength={14}
+                value={localCode}
+                onChange={(e) => {
+                  setLocalCode(e.target.value);
+                  if (isValid !== null) setIsValid(null);
+                }}
+                maxLength={20}
               />
+              <button
+                type="button"
+                onClick={handleApplyReferral}
+                disabled={validating || !localCode.trim()}
+                className="btn btn-secondary"
+                style={{ padding: '0 1rem', height: '42px' }}
+              >
+                Apply
+              </button>
             </div>
-            {referralCode && <span className="tag tag-coral">Code applied</span>}
+            {validating && (
+              <span className="tag tag-mist" style={{ width: 'fit-content' }}>Validating...</span>
+            )}
+            {!validating && isValid === true && (
+              <span className="tag" style={{ width: 'fit-content', background: 'rgba(57, 219, 109, 0.08)', borderColor: 'rgba(57, 219, 109, 0.25)', color: '#3fb950' }}>
+                Code applied
+              </span>
+            )}
+            {!validating && isValid === false && (
+              <span className="tag tag-coral" style={{ width: 'fit-content' }}>
+                Invalid code
+              </span>
+            )}
           </div>
 
           <div className={styles.totals}>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useRoast } from '@/hooks/useRoast';
 import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
 import DataTable from '@/components/admin/DataTable';
 import ExportCsvButton from '@/components/admin/ExportCsvButton';
 import styles from '../page.module.css';
@@ -75,12 +76,25 @@ export default function AdminOrdersClient({ orders: initialOrders }: AdminOrders
           <h1 className={styles.title}>Orders</h1>
           <ExportCsvButton data={formattedOrders} fileName="orders.csv" />
         </div>
-        <p className={styles.subtitle}>All orders across both collections. Status updates sync from Printify.</p>
+        <p className={styles.subtitle}>All orders across both collections. Status updates sync from Printify. Click any Order ID to open buyer details in a new tab.</p>
       </div>
 
       <DataTable
         columns={[
-          { key: 'id', label: 'Order ID' },
+          {
+            key: 'id',
+            label: 'Order ID',
+            render: (r) => (
+              <Link
+                href={`/admin/orders/${r.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--coral-200)', textDecoration: 'underline', fontWeight: 600, fontFamily: 'monospace' }}
+              >
+                {r.id} ↗
+              </Link>
+            ),
+          },
           { key: 'customer', label: 'Customer' },
           { key: 'items', label: 'Items' },
           { key: 'total', label: 'Total', align: 'right' },

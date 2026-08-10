@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { verifyPaymentSchema } from '@/lib/utils/validation';
-import { processReferral } from '@/lib/referral/engine';
-import { createOrder as createPrintifyOrder } from '@/lib/printify/client';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
-import { sendAdminPrebookNotification, sendOrderConfirmationEmailsOnce } from '@/lib/email/sender';
-import { normalizeCountryCode, normalizeRegionCode } from '@/lib/utils/isoCodes';
-import type { Order } from '@/types';
+import { sendAdminPrebookNotification } from '@/lib/email/sender';
+import { isRateLimited } from '@/lib/utils/rateLimit';
+import { enqueueOrderProcessing, appendOrderHistory } from '@/lib/orchestrator/orderProcessor';
+import { validateCoupon } from '@/lib/utils/couponValidator';
 import crypto from 'crypto';
 
 function verifyRazorpaySignature(
@@ -26,6 +25,10 @@ function verifyRazorpaySignature(
 }
 
 export async function POST(request: NextRequest) {
+  if (isRateLimited(request, 'payment_verify', { limit: 10, windowMs: 15 * 60 * 1000 })) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   // 1. Auth check
   const cookieStore = await cookies();
   const session = cookieStore.get('session')?.value;
@@ -84,64 +87,48 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Order ID mismatch' }, { status: 400 });
   }
 
+  // Idempotency check: if order is already paid or in production, skip double processing
+  if (orderData.status === 'paid' || orderData.status === 'in_production' || orderData.paymentCaptured) {
+    return NextResponse.json({ status: 'ok', orderId, message: 'Order already verified' });
+  }
+
   // 5. Update order status to paid and update coupon usage if applicable
   const batch = adminDb.batch();
   batch.update(orderRef, {
     status:             'paid',
+    paymentCaptured:    true,
     razorpayPaymentId:  razorpay_payment_id,
     updatedAt:          FieldValue.serverTimestamp(),
   });
 
   if (orderData.couponCode) {
-    let couponSnap = await adminDb.collection('coupons')
-      .where('code', '==', orderData.couponCode)
-      .where('userId', '==', uid)
-      .where('isUsed', '==', false)
-      .limit(1)
-      .get();
-
-    if (!couponSnap.empty) {
-      batch.update(couponSnap.docs[0].ref, {
-        isUsed: true,
-        usedAt: FieldValue.serverTimestamp(),
-        orderId: orderId,
-        timesUsed: FieldValue.increment(1),
-      });
-    } else {
-      couponSnap = await adminDb.collection('coupons')
-        .where('code', '==', orderData.couponCode)
-        .where('isGlobal', '==', true)
-        .limit(1)
-        .get();
-
-      if (!couponSnap.empty) {
-        batch.update(couponSnap.docs[0].ref, {
+    const couponResult = await validateCoupon(orderData.couponCode, uid, orderData.subtotal, orderData.tax);
+    if (couponResult.valid && couponResult.couponRef) {
+      if (couponResult.couponData.isGlobal) {
+        batch.update(couponResult.couponRef, {
           timesUsed: FieldValue.increment(1),
           updatedAt: FieldValue.serverTimestamp(),
+        });
+      } else {
+        batch.update(couponResult.couponRef, {
+          isUsed: true,
+          usedAt: FieldValue.serverTimestamp(),
+          orderId: orderId,
+          timesUsed: FieldValue.increment(1),
         });
       }
     }
   }
 
   await batch.commit();
-
-  const order: Order = {
-    id: orderId,
-    ...orderData,
-    status: 'paid',
-    razorpayPaymentId: razorpay_payment_id,
-    createdAt: orderData.createdAt?.toDate() ?? new Date(),
-  } as Order;
-
-  // 6. Process referral (fire-and-forget — don't block response)
-  processReferral(order).catch((err) => console.error('Referral processing error:', err));
+  await appendOrderHistory(orderId, 'razorpay_payment_verified', 'customer', { razorpay_payment_id });
 
   if (orderData.isPrebooking) {
     try {
       await sendAdminPrebookNotification({
         userName: orderData.prebookName || 'Anonymous User',
         userEmail: orderData.prebookEmail || orderData.userEmail,
-        productTitle: order.items[0]?.title || 'Luxury Product',
+        productTitle: orderData.items?.[0]?.title || 'Luxury Product',
         prebookingPricePaid: orderData.total,
         message: orderData.prebookMessage || '',
       });
@@ -151,50 +138,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: 'ok', orderId });
   }
 
-  // Send order confirmation & admin alert emails (at-most-once check)
-  sendOrderConfirmationEmailsOnce(orderId, order).catch((err) =>
-    console.error('Verify: Failed to send order emails:', err)
-  );
-
-  // 7. Submit to Printify (if shop ID configured and valid shipping address exists)
-  const shopId = process.env.PRINTIFY_SHOP_ID;
-  if (shopId && order.shippingAddress && order.shippingAddress.street && order.shippingAddress.city) {
-    try {
-      const countryCode = normalizeCountryCode(order.shippingAddress.country);
-      const regionCode = normalizeRegionCode(order.shippingAddress.state, countryCode);
-
-      const printifyOrder = await createPrintifyOrder(shopId, {
-        external_id: orderId,
-        label:       `GERKINK-${orderId}`,
-        line_items:  order.items.map((i) => ({
-          product_id: i.printifyProductId ?? '',
-          variant_id: Number(i.variant.printifyVariantId ?? i.variant.id),
-          quantity:   i.quantity,
-        })),
-        shipping_method: 1,
-        address_to: {
-          first_name: order.shippingAddress.name.split(' ')[0] || 'Customer',
-          last_name:  order.shippingAddress.name.split(' ').slice(1).join(' ') || 'Customer',
-          email:      order.userEmail,
-          country:    countryCode,
-          region:     regionCode,
-          address1:   order.shippingAddress.street,
-          city:       order.shippingAddress.city,
-          zip:        String(order.shippingAddress.zip || '00000').trim(),
-        },
-      });
-
-      await orderRef.update({
-        printifyOrderId: printifyOrder.id,
-        status:          'in_production',
-      });
-    } catch (err) {
-      // Printify failure doesn't fail the payment — log for manual retry
-      console.error('Printify order creation failed:', err);
-    }
-  } else if (shopId) {
-    console.warn(`Printify fulfillment skipped for order ${orderId}: Missing valid shipping address.`);
-  }
+  // 6. Delegate background processing (referral, email, Printify) to orchestrator
+  await enqueueOrderProcessing(orderId);
 
   return NextResponse.json({ status: 'ok', orderId });
 }

@@ -1,3 +1,5 @@
+import type { OrderHistoryEvent } from '@/lib/payment/types';
+
 // ─── User ─────────────────────────────────────────────────────────────────
 export interface User {
   uid: string;
@@ -62,6 +64,7 @@ export interface Product {
   comparisonRows?: Array<{ feature: string; us: string; them: string }>;
   faqsList?: Array<{ q: string; a: string }>;
   commitmentText?: string;
+  slug?: string;
 }
 
 // ─── Cart ──────────────────────────────────────────────────────────────────
@@ -72,7 +75,21 @@ export interface CartItem {
 }
 
 // ─── Order ────────────────────────────────────────────────────────────────
-export type OrderStatus = 'pending' | 'paid' | 'in_production' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+export type OrderStatus =
+  | 'pending'
+  | 'authorized'
+  | 'paid'
+  | 'queued_for_printify'
+  | 'in_production'
+  | 'shipped'
+  | 'delivered'
+  | 'completed'
+  | 'payment_reversed'
+  | 'chargeback'
+  | 'disputed'
+  | 'expired'
+  | 'cancelled'
+  | 'refunded';
 
 export interface OrderItem {
   productId: string;
@@ -103,8 +120,12 @@ export interface Order {
   tax: number;
   discount?: number;
   total: number;
-  razorpayOrderId: string;
+  paymentGateway?: 'razorpay' | 'paypal' | 'free';
+  paymentCaptured?: boolean;
+  razorpayOrderId?: string;
   razorpayPaymentId?: string;
+  paypalOrderId?: string;
+  paypalCaptureId?: string;
   status: OrderStatus;
   referralCode?: string;
   couponCode?: string;
@@ -116,6 +137,9 @@ export interface Order {
   prebookName?: string;
   prebookEmail?: string;
   prebookMessage?: string;
+  expiresAt?: Date;
+  emailSent?: boolean;
+  history?: OrderHistoryEvent[];
   createdAt: Date;
   updatedAt?: Date;
 }

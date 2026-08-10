@@ -55,7 +55,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
 
   return (
     <Link
-      href={`/shop/${product.id}`}
+      href={`/shop/${product.slug || product.id}`}
       className={styles.card}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

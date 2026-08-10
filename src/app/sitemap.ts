@@ -1,9 +1,9 @@
 import { MetadataRoute } from 'next';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://gerkink.shop';
 
-  return [
+  const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -65,4 +65,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.4,
     },
   ];
+
+  try {
+    const { adminDb } = await import('@/lib/firebase/admin');
+    const snapshot = await adminDb
+      .collection('products')
+      .where('isPublished', '==', true)
+      .get();
+
+    const productRoutes = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      const updatedAt = data.updatedAt ? data.updatedAt.toDate() : new Date();
+      return {
+        url: `${baseUrl}/shop/${data.slug || doc.id}`,
+        lastModified: updatedAt,
+        changeFrequency: 'daily' as const,
+        priority: 0.8,
+      };
+    });
+
+    return [...staticRoutes, ...productRoutes];
+  } catch (err) {
+    console.error('Error generating dynamic sitemap, returning static routes:', err);
+    return staticRoutes;
+  }
 }

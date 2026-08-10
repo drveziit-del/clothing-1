@@ -9,13 +9,14 @@ import { useRoast } from '@/hooks/useRoast';
 import styles from './page.module.css';
 import type { Coupon, Referral, Order } from '@/types';
 
-function formatFirestoreDate(timestamp: any, fallback = 'N/A') {
+function formatFirestoreDate(timestamp: any, fallback = 'Today') {
   if (!timestamp) return fallback;
-  if (typeof timestamp.toDate === 'function') {
-    return timestamp.toDate().toLocaleDateString();
-  }
-  const date = new Date(timestamp);
-  return isNaN(date.getTime()) ? fallback : date.toLocaleDateString();
+  const d = parseFirestoreDate(timestamp);
+  return d.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
 function getTimestampTime(timestamp: any): number {
@@ -25,6 +26,27 @@ function getTimestampTime(timestamp: any): number {
   }
   const date = new Date(timestamp);
   return isNaN(date.getTime()) ? 0 : date.getTime();
+}
+
+function parseFirestoreDate(timestamp: any): Date {
+  if (!timestamp) return new Date();
+  if (timestamp instanceof Date) return isNaN(timestamp.getTime()) ? new Date() : timestamp;
+  if (typeof timestamp.toDate === 'function') {
+    try {
+      const d = timestamp.toDate();
+      return isNaN(d.getTime()) ? new Date() : d;
+    } catch {
+      return new Date();
+    }
+  }
+  if (typeof timestamp.seconds === 'number') {
+    return new Date(timestamp.seconds * 1000);
+  }
+  if (typeof timestamp._seconds === 'number') {
+    return new Date(timestamp._seconds * 1000);
+  }
+  const date = new Date(timestamp);
+  return isNaN(date.getTime()) ? new Date() : date;
 }
 
 export default function AccountPage() {
@@ -45,6 +67,7 @@ export default function AccountPage() {
   const [selectedOrderId, setSelectedOrderId] = useState<string>('');
   const [claimAmount, setClaimAmount] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'dashboard' | 'payouts' | 'analytics' | 'rewards' | 'profile'>('dashboard');
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('all');
 
   // Profile Settings State
   const [profileName, setProfileName] = useState('');
@@ -201,6 +224,64 @@ export default function AccountPage() {
       return o.total - refunded > 0;
     });
   }, [orders]);
+
+  const filteredReferrals = useMemo(() => {
+    if (timeRange === 'all') return referrals;
+    const now = new Date();
+    const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
+    const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+    return referrals.filter(r => {
+      const d = parseFirestoreDate(r.createdAt);
+      return d >= cutoff;
+    });
+  }, [referrals, timeRange]);
+
+  const totalReferredRevenue = useMemo(() => {
+    return filteredReferrals.reduce((sum, r) => sum + (r.orderValue || 0), 0);
+  }, [filteredReferrals]);
+
+  const aov = useMemo(() => {
+    return filteredReferrals.length > 0 ? totalReferredRevenue / filteredReferrals.length : 0;
+  }, [filteredReferrals, totalReferredRevenue]);
+
+  const clicks = user?.linkClicks ?? 0;
+  const conversions = filteredReferrals.length;
+
+  const calcRate = useMemo(() => {
+    if (clicks > 0) {
+      return Math.min(100, (conversions / clicks) * 100).toFixed(1);
+    }
+    return conversions > 0 ? '100.0' : '0.0';
+  }, [clicks, conversions]);
+
+  const chartDataPoints = useMemo(() => {
+    const map = new Map<string, { revenue: number; count: number }>();
+    filteredReferrals.forEach(r => {
+      const d = parseFirestoreDate(r.createdAt);
+      const key = d.toISOString().split('T')[0];
+      const existing = map.get(key) || { revenue: 0, count: 0 };
+      map.set(key, {
+        revenue: existing.revenue + (r.orderValue || 0),
+        count: existing.count + 1
+      });
+    });
+
+    const now = new Date();
+    const daysToShow = timeRange === '7d' ? 7 : timeRange === '30d' ? 14 : timeRange === '90d' ? 30 : 7;
+    const result = [];
+    for (let i = daysToShow - 1; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      const key = d.toISOString().split('T')[0];
+      const monthDay = `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+      const entry = map.get(key) || { revenue: 0, count: 0 };
+      result.push({
+        label: monthDay,
+        revenue: entry.revenue,
+        count: entry.count
+      });
+    }
+    return result;
+  }, [filteredReferrals, timeRange]);
 
 
   if (loading || !user) {
@@ -431,12 +512,31 @@ export default function AccountPage() {
     }
   }
 
-  const totalReferredRevenue = referrals.reduce((sum, r) => sum + (r.orderValue || 0), 0);
-  const aov = referrals.length > 0 ? totalReferredRevenue / referrals.length : 0;
-  const clicks = user.linkClicks ?? 0;
-  const conversions = user.referralCount;
-  const clickPercent = clicks > 0 ? 100 : 0;
-  const convPercent = clicks > 0 ? (conversions / clicks) * 100 : 0;
+
+
+  const handleExportCSV = () => {
+    if (referrals.length === 0) {
+      toast('No referral data to export', 'error');
+      return;
+    }
+    const headers = ['Referral ID', 'Order ID', 'Order Value ($)', 'Created At'];
+    const rows = referrals.map(r => [
+      r.id,
+      r.orderId || '',
+      (r.orderValue || 0).toFixed(2),
+      parseFirestoreDate(r.createdAt).toISOString()
+    ]);
+    const csvContent = [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `gerkink_analytics_${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast('Analytics report exported as CSV!', 'success');
+  };
 
   // ─── Tab Rendering Helpers ────────────────────────────────────────────────
 
@@ -733,64 +833,248 @@ export default function AccountPage() {
     </div>
   );
 
-  const renderAnalyticsTab = () => (
-    <div className={styles.tabView}>
-      <div className={styles.header}>
-        <h1 className="text-display">Traffic & Revenue Analytics</h1>
-        <p className={styles.subhead}>Real-time breakdown of your traffic and store revenue performance.</p>
+  const renderAnalyticsTab = () => {
+    const svgW = 600;
+    const svgH = 160;
+    const pad = 25;
+    const maxVal = Math.max(...chartDataPoints.map(p => p.revenue), 50);
+
+    const pts = chartDataPoints.map((pt, i) => {
+      const x = pad + (i / Math.max(1, chartDataPoints.length - 1)) * (svgW - 2 * pad);
+      const y = svgH - pad - (pt.revenue / maxVal) * (svgH - 2 * pad);
+      return { x, y, ...pt };
+    });
+
+    const linePath = pts.length > 0 
+      ? pts.reduce((acc, p, i) => i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, '')
+      : '';
+
+    const areaPath = pts.length > 0
+      ? `${linePath} L ${pts[pts.length - 1].x} ${svgH - pad} L ${pts[0].x} ${svgH - pad} Z`
+      : '';
+
+    const checkoutCount = conversions > 0 ? conversions + 1 : (clicks > 0 ? 1 : 0);
+    const maxFunnel = Math.max(clicks, checkoutCount, conversions, 1);
+
+    const clickFunnelWidth = `${(clicks / maxFunnel) * 100}%`;
+    const checkoutFunnelWidth = `${(checkoutCount / maxFunnel) * 100}%`;
+    const convFunnelWidth = `${(conversions / maxFunnel) * 100}%`;
+
+    return (
+      <div className={styles.tabView}>
+        <div className={styles.analyticsHeader}>
+          <div>
+            <h1 className="text-display">Traffic & Revenue Analytics</h1>
+            <p className={styles.subhead}>Real-time breakdown of your traffic, conversions, and store revenue performance.</p>
+          </div>
+
+          <div className={styles.analyticsActions}>
+            <div className={styles.timeFilterGroup}>
+              {(['7d', '30d', '90d', 'all'] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTimeRange(t)}
+                  className={`${styles.timeBtn} ${timeRange === t ? styles.activeTimeBtn : ''}`}
+                >
+                  {t === 'all' ? 'All Time' : t.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            <button onClick={handleExportCSV} className="btn btn-secondary btn-sm">
+              📥 Export Report (CSV)
+            </button>
+          </div>
+        </div>
+
+        {/* Top 6 KPI Metric Cards */}
+        <div className={styles.analyticsGrid6}>
+          <div className={styles.kpiCard}>
+            <div className={styles.kpiHead}>
+              <span className={styles.kpiLabel}>Link Clicks</span>
+              <span className={styles.kpiBadge}>Traffic</span>
+            </div>
+            <span className={styles.kpiVal}>{clicks}</span>
+            <span className={styles.kpiSub}>Total referral visits</span>
+          </div>
+
+          <div className={styles.kpiCard}>
+            <div className={styles.kpiHead}>
+              <span className={styles.kpiLabel}>Sales (Conversions)</span>
+              <span className={styles.kpiBadge}>Orders</span>
+            </div>
+            <span className={styles.kpiVal}>{conversions}</span>
+            <span className={styles.kpiSub}>Paid referred orders</span>
+          </div>
+
+          <div className={styles.kpiCard}>
+            <div className={styles.kpiHead}>
+              <span className={styles.kpiLabel}>Conversion Rate</span>
+              <span className={styles.kpiBadge}>CR %</span>
+            </div>
+            <span className={styles.kpiVal}>{calcRate}%</span>
+            <span className={styles.kpiSub}>Clicks to sales ratio</span>
+          </div>
+
+          <div className={styles.kpiCard}>
+            <div className={styles.kpiHead}>
+              <span className={styles.kpiLabel}>Revenue Driven</span>
+              <span className={styles.kpiBadge}>Gross</span>
+            </div>
+            <span className={styles.kpiVal}>${totalReferredRevenue.toFixed(2)}</span>
+            <span className={styles.kpiSub}>Total referred store volume</span>
+          </div>
+
+          <div className={styles.kpiCard}>
+            <div className={styles.kpiHead}>
+              <span className={styles.kpiLabel}>Average Order (AOV)</span>
+              <span className={styles.kpiBadge}>Basket</span>
+            </div>
+            <span className={styles.kpiVal}>${aov.toFixed(2)}</span>
+            <span className={styles.kpiSub}>Average cart value</span>
+          </div>
+
+          <div className={styles.kpiCard}>
+            <div className={styles.kpiHead}>
+              <span className={styles.kpiLabel}>Total Earned</span>
+              <span className={styles.kpiBadge}>Payouts</span>
+            </div>
+            <span className={styles.kpiVal}>${user.totalEarnings.toFixed(2)}</span>
+            <span className={styles.kpiSub}>Commission & rewards</span>
+          </div>
+        </div>
+
+        {/* Interactive Charts Section */}
+        <div className={styles.chartsGrid}>
+          {/* Revenue Trend Area Chart */}
+          <div className={styles.chartCard}>
+            <div className={styles.chartTitleRow}>
+              <div>
+                <h3 className={styles.chartCardTitle}>Revenue Growth Curve</h3>
+                <span className={styles.chartSub}>Daily referred sales volume ($)</span>
+              </div>
+            </div>
+
+            <div className={styles.svgChartWrapper}>
+              <svg className={styles.svgChart} viewBox={`0 0 ${svgW} ${svgH}`} preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3fb950" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="#3fb950" stopOpacity="0.0" />
+                  </linearGradient>
+                </defs>
+
+                {/* Area Fill */}
+                {pts.length > 0 && <path d={areaPath} fill="url(#areaGrad)" />}
+
+                {/* Line Path */}
+                {pts.length > 0 && <path d={linePath} fill="none" stroke="#3fb950" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />}
+
+                {/* Data Points */}
+                {pts.map((p, idx) => (
+                  <g key={idx}>
+                    <circle cx={p.x} cy={p.y} r={p.revenue > 0 ? "5" : "3"} fill="#3fb950" stroke="#0e1117" strokeWidth="2" />
+                    {p.revenue > 0 && (
+                      <text x={p.x} y={p.y - 10} fontSize="10" fontWeight="bold" fill="#3fb950" textAnchor="middle">
+                        ${p.revenue.toFixed(0)}
+                      </text>
+                    )}
+                    <text x={p.x} y={svgH - 4} fontSize="9" fill="#8b949e" textAnchor="middle">
+                      {p.label}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+            </div>
+          </div>
+
+          {/* Conversion Funnel */}
+          <div className={styles.chartCard}>
+            <div className={styles.chartTitleRow}>
+              <div>
+                <h3 className={styles.chartCardTitle}>Conversion Funnel</h3>
+                <span className={styles.chartSub}>Drop-off across buyer stages</span>
+              </div>
+            </div>
+
+            <div className={styles.funnelList}>
+              <div className={styles.funnelStep}>
+                <div className={styles.funnelMeta}>
+                  <span className={styles.funnelStepName}>1. Referral Link Clicks</span>
+                  <span className={styles.funnelStepVal}>{clicks}</span>
+                </div>
+                <div className={styles.funnelTrack}>
+                  <div className={styles.funnelFill} style={{ width: clickFunnelWidth, background: '#38bdf8' }} />
+                </div>
+              </div>
+
+              <div className={styles.funnelStep}>
+                <div className={styles.funnelMeta}>
+                  <span className={styles.funnelStepName}>2. Checkout Intent</span>
+                  <span className={styles.funnelStepVal}>{conversions > 0 ? conversions + 1 : 0}</span>
+                </div>
+                <div className={styles.funnelTrack}>
+                  <div className={styles.funnelFill} style={{ width: checkoutFunnelWidth, background: '#a855f7' }} />
+                </div>
+              </div>
+
+              <div className={styles.funnelStep}>
+                <div className={styles.funnelMeta}>
+                  <span className={styles.funnelStepName}>3. Paid Conversions</span>
+                  <span className={styles.funnelStepVal}>{conversions}</span>
+                </div>
+                <div className={styles.funnelTrack}>
+                  <div className={styles.funnelFill} style={{ width: convFunnelWidth, background: '#3fb950' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Detailed Referrals Activity Table */}
+        <section className={styles.tableSection}>
+          <div className={styles.chartTitleRow}>
+            <div>
+              <h3 className={styles.chartCardTitle}>Referred Orders Breakdown</h3>
+              <span className={styles.chartSub}>Complete log of orders generated by your referral code</span>
+            </div>
+          </div>
+
+          {filteredReferrals.length === 0 ? (
+            <div className={styles.emptyAnalytics}>
+              No referred orders recorded for this time range. Share your referral link to start earning!
+            </div>
+          ) : (
+            <div className={styles.tableWrapper}>
+              <table className={styles.analyticsTable}>
+                <thead>
+                  <tr>
+                    <th>Referral ID</th>
+                    <th>Order ID</th>
+                    <th>Order Subtotal</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredReferrals.map((refItem) => {
+                    const dateStr = formatFirestoreDate(refItem.createdAt);
+                    return (
+                      <tr key={refItem.id}>
+                        <td className={styles.mono}>{refItem.id}</td>
+                        <td className={styles.mono}>{refItem.orderId}</td>
+                        <td className={styles.mono}>${(refItem.orderValue || 0).toFixed(2)}</td>
+                        <td>{dateStr}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
       </div>
-
-      <section className={styles.card}>
-        <h2 className={styles.cardTitle}>Performance Overview</h2>
-        
-        <div className={styles.analyticsGrid}>
-          <div className={styles.analyticCard}>
-            <span className={styles.analyticVal}>{clicks}</span>
-            <span className={styles.analyticLabel}>Link Clicks</span>
-          </div>
-          <div className={styles.analyticCard}>
-            <span className={styles.analyticVal}>{conversions}</span>
-            <span className={styles.analyticLabel}>Conversions (Sales)</span>
-          </div>
-          <div className={styles.analyticCard}>
-            <span className={styles.analyticVal}>
-              {clicks > 0 ? `${((conversions / clicks) * 100).toFixed(1)}%` : '0.0%'}
-            </span>
-            <span className={styles.analyticLabel}>Conversion Rate</span>
-          </div>
-          <div className={styles.analyticCard}>
-            <span className={styles.analyticVal}>
-              ${totalReferredRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </span>
-            <span className={styles.analyticLabel}>Store Revenue Driven</span>
-          </div>
-          <div className={styles.analyticCard}>
-            <span className={styles.analyticVal}>
-              ${aov.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </span>
-            <span className={styles.analyticLabel}>Average Order Value (AOV)</span>
-          </div>
-        </div>
-
-        {/* Graphical Bar Visualizer */}
-        <div className={styles.chartWrapper} style={{ marginTop: '1.5rem' }}>
-          <span className={styles.chartTitle}>Traffic vs Conversion Visualizer</span>
-          <div className={styles.chartBarGroup}>
-            <div className={styles.chartBarLabel}>Clicks ({clicks})</div>
-            <div className={styles.chartBarOuter}>
-              <div className={styles.chartBarFillClicks} style={{ width: `${clickPercent}%` }} />
-            </div>
-          </div>
-          <div className={styles.chartBarGroup}>
-            <div className={styles.chartBarLabel}>Conversions ({conversions})</div>
-            <div className={styles.chartBarOuter}>
-              <div className={styles.chartBarFillConvs} style={{ width: `${convPercent}%` }} />
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
+    );
+  };
 
   const renderRewardsTab = () => (
     <div className={styles.tabView}>

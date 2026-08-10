@@ -8,11 +8,12 @@ import ReviewsSection from '@/components/reviews/ReviewsSection';
 import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
 import styles from './page.module.css';
 
-const STATIC_COUNT = 2347;
+const BASE_VISITOR_COUNT = 100;
 
 export default function HomePage() {
   const [loaded, setLoaded] = useState(false);
   const [shakeBtn, setShakeBtn] = useState(false);
+  const [visitorCount, setVisitorCount] = useState(BASE_VISITOR_COUNT);
   const heroRef = useRef<HTMLDivElement>(null);
 
   // Site Copy State
@@ -55,6 +56,25 @@ export default function HomePage() {
     return () => unsub();
   }, []);
 
+  useEffect(() => {
+    const { doc, onSnapshot } = getFirestoreModule();
+    const db = getFirestoreDb();
+    const unsub = onSnapshot(
+      doc(db, 'settings', 'global'),
+      (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          const visits = data.siteVisits ?? 0;
+          setVisitorCount(BASE_VISITOR_COUNT + visits);
+        }
+      },
+      (error) => {
+        console.warn('Global settings snapshot error:', error);
+      }
+    );
+    return () => unsub();
+  }, []);
+
   const handleCTAShake = () => {
     setShakeBtn(true);
     setTimeout(() => setShakeBtn(false), 600);
@@ -71,7 +91,7 @@ export default function HomePage() {
 
         <div className={styles.heroInner}>
           <div className={`${styles.heroText} ${loaded ? styles.loaded : ''}`}>
-            <div
+            <h1
               className={styles.headlineWrap}
               aria-label={`${copy.heroLine1} ${copy.heroLine2} ${copy.heroAccent}`}
             >
@@ -84,7 +104,7 @@ export default function HomePage() {
               <span className={`${styles.lineAccent} ${styles.noWrap} animate-fadeUp delay-500`}>
                 {copy.heroAccent}
               </span>
-            </div>
+            </h1>
 
             <p className={`${styles.subText} animate-fadeUp delay-700`} style={{ whiteSpace: 'pre-line' }}>
               {copy.heroSubtext}
@@ -147,8 +167,8 @@ export default function HomePage() {
       {/* ── SOCIAL PROOF ─────────────────────────────────────── */}
       <div className={styles.socialProof}>
         <div className={styles.proofInner}>
-          <span className={styles.proofNumber}>{STATIC_COUNT.toLocaleString()}</span>
-          <span className={styles.proofText}>people got roasted into buying today</span>
+          <span className={styles.proofNumber}>{visitorCount.toLocaleString()}</span>
+          <span className={styles.proofText}>people got roasted by admin</span>
           <div className={styles.proofDots} aria-hidden>
             {Array.from({ length: 6 }).map((_, i) => (
               <span key={i} className={styles.proofDot} style={{ animationDelay: `${i * 0.3}s` }} />

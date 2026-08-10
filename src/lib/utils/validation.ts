@@ -62,9 +62,9 @@ export type VerifyPaymentInput = z.infer<typeof verifyPaymentSchema>;
 
 // ─── Contact ──────────────────────────────────────────────────────────────
 export const contactSchema = z.object({
-  name: z.string().min(2).max(100),
-  email: z.string().email(),
-  message: z.string().min(10).max(2000),
+  name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name too long'),
+  email: z.string().email('Invalid email address'),
+  message: z.string().min(10, 'Message must be at least 10 characters').max(2000, 'Message too long'),
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;
@@ -73,6 +73,7 @@ export type ContactInput = z.infer<typeof contactSchema>;
 export const createProductSchema = z.object({
   printifyId: z.string().min(1).optional(),
   title: z.string().min(2).max(200),
+  slug: z.string().min(2).max(200).optional(),
   description: z.string().max(5000).nullish(),
   section: z.enum(['society_fuckers', 'valueless_bitches']),
   price: z.number().positive(),
@@ -160,3 +161,15 @@ export const updateSettingsSchema = z.object({
 });
 
 export type UpdateSettingsInput = z.infer<typeof updateSettingsSchema>;
+
+// ─── Prebooking ────────────────────────────────────────────────────────────
+export const createPrebookSchema = z.object({
+  productId: z.string().min(1, 'Product ID is required'),
+  variantId: z.string().min(1, 'Variant ID is required'),
+  name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name too long'),
+  email: z.string().email('Invalid email address'),
+  message: z.string().max(2000, 'Message is too long').optional().nullable(),
+});
+
+export type CreatePrebookInput = z.infer<typeof createPrebookSchema>;
+

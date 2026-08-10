@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
-import { processReferral } from '@/lib/referral/engine';
-import { createOrder as createPrintifyOrder } from '@/lib/printify/client';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
-import { sendOrderConfirmationEmailsOnce } from '@/lib/email/sender';
-import { normalizeCountryCode, normalizeRegionCode } from '@/lib/utils/isoCodes';
-import type { Order } from '@/types';
+import { isRateLimited } from '@/lib/utils/rateLimit';
+import { enqueueOrderProcessing, appendOrderHistory } from '@/lib/orchestrator/orderProcessor';
+import { validateCoupon } from '@/lib/utils/couponValidator';
 
 export async function POST(request: NextRequest) {
+  if (isRateLimited(request, 'payment_verify', { limit: 10, windowMs: 15 * 60 * 1000 })) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   // 1. Auth check
   const cookieStore = await cookies();
   const session = cookieStore.get('session')?.value;
@@ -55,7 +57,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (orderData.status !== 'pending') {
-    return NextResponse.json({ error: 'Order has already been processed' }, { status: 400 });
+    return NextResponse.json({ status: 'ok', orderId, message: 'Order has already been processed' });
   }
 
   // 4. Update order status and mark coupon as used atomically
@@ -63,93 +65,34 @@ export async function POST(request: NextRequest) {
 
   batch.update(orderRef, {
     status: 'paid',
+    paymentCaptured: true,
     updatedAt: FieldValue.serverTimestamp(),
   });
 
   if (orderData.couponCode) {
-    let couponSnap = await adminDb.collection('coupons')
-      .where('code', '==', orderData.couponCode)
-      .where('userId', '==', uid)
-      .where('isUsed', '==', false)
-      .limit(1)
-      .get();
-
-    if (!couponSnap.empty) {
-      batch.update(couponSnap.docs[0].ref, {
-        isUsed: true,
-        usedAt: FieldValue.serverTimestamp(),
-        orderId: orderId,
-        timesUsed: FieldValue.increment(1),
-      });
-    } else {
-      couponSnap = await adminDb.collection('coupons')
-        .where('code', '==', orderData.couponCode)
-        .where('isGlobal', '==', true)
-        .limit(1)
-        .get();
-
-      if (!couponSnap.empty) {
-        batch.update(couponSnap.docs[0].ref, {
+    const couponResult = await validateCoupon(orderData.couponCode, uid, orderData.subtotal, orderData.tax);
+    if (couponResult.valid && couponResult.couponRef) {
+      if (couponResult.couponData.isGlobal) {
+        batch.update(couponResult.couponRef, {
           timesUsed: FieldValue.increment(1),
           updatedAt: FieldValue.serverTimestamp(),
+        });
+      } else {
+        batch.update(couponResult.couponRef, {
+          isUsed: true,
+          usedAt: FieldValue.serverTimestamp(),
+          orderId: orderId,
+          timesUsed: FieldValue.increment(1),
         });
       }
     }
   }
 
   await batch.commit();
+  await appendOrderHistory(orderId, 'free_checkout_verified', 'customer');
 
-  const order: Order = {
-    id: orderId,
-    ...orderData,
-    status: 'paid',
-    createdAt: orderData.createdAt?.toDate() ?? new Date(),
-  } as Order;
-
-  // 5. Process referral (fire-and-forget)
-  processReferral(order).catch((err) => console.error('Referral processing error:', err));
-
-  // Send order confirmation & admin alert emails (at-most-once check)
-  sendOrderConfirmationEmailsOnce(orderId, order).catch((err) =>
-    console.error('VerifyFree: Failed to send order emails:', err)
-  );
-
-  // 6. Submit to Printify (if shop ID configured)
-  const shopId = process.env.PRINTIFY_SHOP_ID;
-  if (shopId) {
-    try {
-      const countryCode = normalizeCountryCode(order.shippingAddress?.country);
-      const regionCode = normalizeRegionCode(order.shippingAddress?.state, countryCode);
-
-      const printifyOrder = await createPrintifyOrder(shopId, {
-        external_id: orderId,
-        label:       `GERKINK-${orderId}`,
-        line_items:  order.items.map((i) => ({
-          product_id: i.printifyProductId ?? '',
-          variant_id: Number(i.variant.printifyVariantId ?? i.variant.id),
-          quantity:   i.quantity,
-        })),
-        shipping_method: 1,
-        address_to: {
-          first_name: order.shippingAddress ? order.shippingAddress.name.split(' ')[0] : 'Guest',
-          last_name:  (order.shippingAddress && order.shippingAddress.name.split(' ').slice(1).join(' ')) || '-',
-          email:      order.userEmail,
-          country:    countryCode,
-          region:     regionCode,
-          address1:   order.shippingAddress ? order.shippingAddress.street : '123 Main St',
-          city:       order.shippingAddress ? order.shippingAddress.city : 'New York',
-          zip:        order.shippingAddress ? String(order.shippingAddress.zip).trim() : '10001',
-        },
-      });
-
-      await orderRef.update({
-        printifyOrderId: printifyOrder.id,
-        status:          'in_production',
-      });
-    } catch (err) {
-      console.error('Printify order creation failed:', err);
-    }
-  }
+  // 5. Delegate background fulfillment to orchestrator
+  await enqueueOrderProcessing(orderId);
 
   return NextResponse.json({ status: 'ok', orderId });
 }

@@ -7,32 +7,29 @@
 ## User Review Required
 
 > [!IMPORTANT]
-> **API Keys Needed Before Development Begins**
-> You must provide (or create accounts for) the following before we can wire up real integrations:
-> 1. **Firebase** — Project ID, Web API Key, Service Account JSON
-> 2. **Printify** — Personal Access Token from [printify.com/app/account/api](https://printify.com/app/account/api)
-> 3. **Razorpay** — Key ID + Key Secret from [dashboard.razorpay.com](https://dashboard.razorpay.com)
->
-> Without these, the app will build and run but API calls will fail.
+> **API Keys Needed Before Development Begins (Completed)**
+> All API credentials for Firebase, Printify, and Razorpay have been successfully bound to Google Cloud Secret Manager and `apphosting.yaml` for production.
 
 > [!WARNING]
-> **Brand Voice — Explicit Content**
-> The site's personality uses aggressive, profanity-laced "friend roasting friend" copy. All abusive copy is banter-style humor aimed at ego, not hate speech. Section names include censored profanity ("Society Fu\*kers", "Valueless Bi\*ches"). Confirm you're comfortable with this being baked into every UI component.
+> **Brand Voice — Explicit Content (Accepted)**
+> The branding and ego-roast voice have been fully integrated into the storefront and components.
 
 > [!CAUTION]
-> **Pricing Tiers**
-> Section 1 ("Society Fu\*kers") lists t-shirts at $1,000 / $10,000 / $100,000 / $1,000,000 / $10,000,000. These are real prices sent to Razorpay. Confirm these are intentional and not placeholders.
+> **Pricing Tiers (Confirmed)**
+> Luxury streetwear pricing tiers ($1K to $10M) are confirmed and active for the **Society Fu*kers** collection.
 
 ---
 
-## Open Questions
+## Open Questions & Resolutions
 
-1. **Currency** — Should prices be in USD ($) or INR (₹)? Razorpay supports both, but Printify base costs are in USD. Recommendation: USD globally.
-2. **Printify Shop** — Do you already have products created in your Printify dashboard, or should the admin panel let owners create/upload products directly via the Printify API?
-3. **Admin count** — How many admin/owner accounts? Should there be a super-admin who can add other admins?
-4. **Referral payouts** — How will the $50 / $100,000 affiliate rewards be disbursed? Manual bank transfer? Razorpay Payouts API? Store credit?
-5. **Domain** — Do you have a domain name ready (e.g., `gerkink.com`)? Needed for Firebase Auth redirect URLs and Razorpay webhook config.
-6. **Shipping** — Printify handles fulfillment/shipping. Should the site show shipping costs at checkout, or is it "free shipping" bundled into product price?
+1. **Currency** — *Resolved*. The system supports full dual-currency switching (USD/INR) reactively across all storefront and admin screens.
+2. **Printify Shop** — *Resolved*. Managed via the built-in sync service in Firestore, with color/size variation metadata editable via the custom Admin Variants Manager.
+3. **Admin count** — *Resolved*. The application supports custom claims verification server-side via custom metadata in Auth layout checks.
+4. **Referral payouts** — *Resolved*. Handled via manual claims allowing users to select refunds or shop coupon codes.
+5. **Domain** — *Resolved*. Production hosting domain is live at `https://gerkink.shop`.
+6. **Shipping** — *Resolved*. Addressed shipping policy timelines and integrated standard delivery terms.
+
+---
 
 ---
 
@@ -62,7 +59,7 @@
 
 ## Proposed Changes
 
-### Phase 1: Project Scaffold & Design System
+### Phase 1: Project Scaffold & Design System [COMPLETED]
 
 #### [NEW] Project Initialization
 - Initialize Next.js 14+ with App Router, TypeScript, ESLint
@@ -90,7 +87,7 @@ Complete CSS design system with:
 
 ---
 
-### Phase 2: Firebase Integration
+### Phase 2: Firebase Integration [COMPLETED]
 
 #### [NEW] `src/lib/firebase/config.ts` — Client SDK
 - Initialize Firebase app with environment variables
@@ -140,7 +137,7 @@ Admin only:        /admin/*
 
 ---
 
-### Phase 3: Printify Integration
+### Phase 3: Printify Integration [COMPLETED]
 
 #### [NEW] `src/lib/printify/client.ts` — Printify API Client
 - Base URL: `https://api.printify.com/v1/`
@@ -165,7 +162,7 @@ Admin only:        /admin/*
 
 ---
 
-### Phase 4: Razorpay Integration
+### Phase 4: Razorpay Integration [COMPLETED]
 
 #### [NEW] `src/lib/razorpay/client.ts` — Server-side Razorpay Instance
 ```typescript
@@ -200,7 +197,7 @@ const razorpay = new Razorpay({
 
 ---
 
-### Phase 5: Pages & UI Components
+### Phase 5: Pages & UI Components [COMPLETED]
 
 #### [NEW] `src/app/page.tsx` — Home Page
 **Hero Section:**
@@ -305,7 +302,7 @@ const razorpay = new Razorpay({
 
 ---
 
-### Phase 6: Admin Panel
+### Phase 6: Admin Panel [COMPLETED]
 
 #### [NEW] `src/app/admin/layout.tsx` — Admin Layout
 - Protected by middleware (requires `admin: true` custom claim)
@@ -346,7 +343,7 @@ const razorpay = new Razorpay({
 
 ---
 
-### Phase 7: Referral / Affiliate System
+### Phase 7: Referral / Affiliate System [COMPLETED]
 
 #### [NEW] `src/lib/referral/engine.ts` — Referral Logic
 
@@ -384,7 +381,7 @@ async function processReferral(order) {
 
 ---
 
-### Phase 8: Security Hardening
+### Phase 8: Security Hardening [COMPLETED]
 
 | Layer | Implementation |
 |---|---|
@@ -404,7 +401,7 @@ async function processReferral(order) {
 
 ---
 
-### Phase 9: Components Library
+### Phase 9: Components Library [COMPLETED]
 
 #### Shared Components
 | Component | Description |
@@ -515,19 +512,19 @@ src/
 
 ## Execution Order
 
-| Phase | What | Est. Files |
-|---|---|---|
-| **1** | Next.js scaffold + design system + layout + navbar + footer | ~8 |
-| **2** | Firebase config + auth flows + middleware + Firestore schema | ~7 |
-| **3** | Printify client + product sync | ~3 |
-| **4** | Razorpay payment flow + verification | ~5 |
-| **5** | All pages (Home, Shop, Cart, Manifesto, Contact, Owners, Auth, Account) | ~14 |
-| **6** | Admin panel (all 6 sub-pages) | ~8 |
-| **7** | Referral engine + affiliate dashboard | ~3 |
-| **8** | Security hardening + Firestore rules + headers | ~3 |
-| **9** | Polish — animations, roast system, dark mode refinement, testing | ~5 |
+| Phase | What | Est. Files | Status |
+|---|---|---|---|
+| **1** | Next.js scaffold + design system + layout + navbar + footer | ~8 | **COMPLETED** |
+| **2** | Firebase config + auth flows + middleware + Firestore schema | ~7 | **COMPLETED** |
+| **3** | Printify client + product sync | ~3 | **COMPLETED** |
+| **4** | Razorpay payment flow + verification | ~5 | **COMPLETED** |
+| **5** | All pages (Home, Shop, Cart, Manifesto, Contact, Owners, Auth, Account) | ~14 | **COMPLETED** |
+| **6** | Admin panel (all 6 sub-pages) | ~8 | **COMPLETED** |
+| **7** | Referral engine + affiliate dashboard | ~3 | **COMPLETED** |
+| **8** | Security hardening + Firestore rules + headers | ~3 | **COMPLETED** |
+| **9** | Polish — animations, roast system, dark mode refinement, testing | ~5 | **COMPLETED** |
 
-**Total: ~56 files, estimated 8,000-12,000 lines of code**
+**Total: ~56 files, estimated 8,000-12,000 lines of code (100% Completed)**
 
 ---
 

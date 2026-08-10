@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     apple: "/logo.png",
   },
   description:
-    "Two collections. Zero apologies. Society Fuckers & Valueless Bitches — wear your worth or stay basic.",
+    "Two collections. Zero apologies. Society Fuckers & Valueless Bitches — buy the world's most provocative luxury streetwear from GERKINK and wear your worth.",
   keywords: ["luxury streetwear", "provocative fashion", "GERKINK", "Society Fuckers", "Valueless Bitches"],
   openGraph: {
     title: "GERKINK",
@@ -38,8 +38,40 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "GERKINK",
+    "url": "https://gerkink.shop",
+    "logo": "https://gerkink.shop/logo.png",
+    "description": "Two collections. Zero apologies. Society Fuckers & Valueless Bitches — wear your worth or stay basic.",
+    "sameAs": [
+      "https://www.instagram.com/gerkink.shop",
+      "https://x.com/gerkinkshop",
+      "https://www.reddit.com/u/gerkinkshop/s/BvlrtcmSGK",
+      "https://discord.gg/549V3MMy7"
+    ]
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "GERKINK",
+    "url": "https://gerkink.shop"
+  };
+
   return (
     <html lang="en" data-theme="dark" data-scroll-behavior="smooth" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema).replace(/</g, '\\u003c') }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema).replace(/</g, '\\u003c') }}
+        />
+      </head>
       <body>
         <ThemeProvider>
           <AuthProvider>

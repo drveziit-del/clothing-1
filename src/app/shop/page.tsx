@@ -3,7 +3,19 @@ import styles from './page.module.css';
 
 export const metadata = {
   title: 'Shop — GERKINK',
-  description: 'Two collections. No mercy.',
+  description: 'Browse the official GERKINK shop. Explore the Society Fuckers and Valueless Bitches luxury streetwear collections. Pick your poison and wear your worth.',
+  openGraph: {
+    title: 'Shop — GERKINK',
+    description: 'Browse the official GERKINK shop. Explore the Society Fuckers and Valueless Bitches luxury streetwear collections. Pick your poison and wear your worth.',
+    url: '/shop',
+  },
+  twitter: {
+    title: 'Shop — GERKINK',
+    description: 'Browse the official GERKINK shop. Explore the Society Fuckers and Valueless Bitches luxury streetwear collections. Pick your poison and wear your worth.',
+  },
+  alternates: {
+    canonical: '/shop',
+  },
 };
 
 export default function ShopPage() {

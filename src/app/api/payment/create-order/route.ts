@@ -4,11 +4,17 @@ import { createRazorpayOrder } from '@/lib/razorpay/client';
 import { createOrderSchema } from '@/lib/utils/validation';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
+import { isRateLimited } from '@/lib/utils/rateLimit';
+import { validateCoupon } from '@/lib/utils/couponValidator';
 import type { OrderItem } from '@/types';
 
 const TAX_RATE = 0.08;
 
 export async function POST(request: NextRequest) {
+  if (isRateLimited(request, 'create_order', { limit: 10, windowMs: 15 * 60 * 1000 })) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   // 1. Auth check
   const cookieStore = await cookies();
   const session = cookieStore.get('session')?.value;
@@ -45,13 +51,32 @@ export async function POST(request: NextRequest) {
   const orderItems: OrderItem[] = [];
   let subtotal = 0;
 
+  // Batch read all unique products
+  const uniqueProductIds = Array.from(new Set(items.map(item => item.productId)));
+  const productRefs = uniqueProductIds.map(id => adminDb.collection('products').doc(id));
+  let productSnapshots: any[] = [];
+
+  try {
+    productSnapshots = await adminDb.getAll(...productRefs);
+  } catch (err) {
+    console.error('Error fetching products in batch:', err);
+    return NextResponse.json({ error: 'Failed to retrieve product details' }, { status: 500 });
+  }
+
+  // Map product snapshots by their ID
+  const productMap = new Map<string, any>();
+  for (const doc of productSnapshots) {
+    if (doc.exists) {
+      productMap.set(doc.id, doc.data());
+    }
+  }
+
   for (const item of items) {
-    const productDoc = await adminDb.collection('products').doc(item.productId).get();
-    if (!productDoc.exists) {
+    const product = productMap.get(item.productId);
+    if (!product) {
       return NextResponse.json({ error: `Product ${item.productId} not found` }, { status: 400 });
     }
 
-    const product = productDoc.data()!;
     if (!product.isPublished) {
       return NextResponse.json({ error: `Product is not available` }, { status: 400 });
     }
@@ -81,44 +106,11 @@ export async function POST(request: NextRequest) {
 
   // Validate coupon code
   if (couponCode) {
-    let couponSnap = await adminDb.collection('coupons')
-      .where('code', '==', couponCode)
-      .where('userId', '==', uid)
-      .where('isUsed', '==', false)
-      .limit(1)
-      .get();
-
-    if (couponSnap.empty) {
-      couponSnap = await adminDb.collection('coupons')
-        .where('code', '==', couponCode)
-        .where('isGlobal', '==', true)
-        .where('isActive', '==', true)
-        .limit(1)
-        .get();
+    const couponResult = await validateCoupon(couponCode, uid, subtotal, tax);
+    if (!couponResult.valid) {
+      return NextResponse.json({ error: couponResult.error }, { status: 400 });
     }
-
-    if (couponSnap.empty) {
-      return NextResponse.json({ error: 'Invalid, inactive, or already used coupon code' }, { status: 400 });
-    }
-
-    const couponData = couponSnap.docs[0].data();
-    const minSpend = couponData.minSubtotal ?? 0;
-    if (minSpend > 0 && subtotal < minSpend) {
-      return NextResponse.json({ error: `Minimum subtotal of $${minSpend} required for this coupon` }, { status: 400 });
-    }
-
-    const appliesTo = couponData.appliesTo || 'subtotal';
-    const couponType = couponData.type || 'fixed';
-    const couponVal = couponData.value ?? 0;
-    const baseAmount = appliesTo === 'grand_total' ? (subtotal + tax) : subtotal;
-
-    if (couponType === 'percentage') {
-      discount = Math.round((baseAmount * (couponVal / 100)) * 100) / 100;
-    } else {
-      discount = couponVal;
-    }
-
-    discount = Math.min(discount, baseAmount);
+    discount = couponResult.discount;
     total = Math.max(0, (subtotal + tax) - discount);
   }
 
@@ -168,8 +160,7 @@ export async function POST(request: NextRequest) {
     console.error('[create-order] Details:', details);
     console.error('[create-order] Full error:', JSON.stringify(err, Object.getOwnPropertyNames(err), 2));
     return NextResponse.json({ 
-      error: 'Payment gateway error',
-      details,
+      error: 'Payment gateway error'
     }, { status: 500 });
   }
 

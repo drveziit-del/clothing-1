@@ -33,7 +33,12 @@ function verifyPrintifyWebhook(rawBody: string, request: NextRequest): boolean {
   const token = request.headers.get('x-printify-webhook-token')
     || request.headers.get('authorization')?.replace('Bearer ', '');
 
-  return token === secret;
+  if (!token) return false;
+
+  const expectedBuf = Buffer.from(secret);
+  const tokenBuf = Buffer.from(token);
+  if (expectedBuf.length !== tokenBuf.length) return false;
+  return crypto.timingSafeEqual(expectedBuf, tokenBuf);
 }
 
 /**

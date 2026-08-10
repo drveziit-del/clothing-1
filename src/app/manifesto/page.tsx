@@ -4,7 +4,19 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Manifesto — GERKINK',
-  description: 'Why we exist. Why you need us.',
+  description: 'Why we exist. Why you need us. Read the GERKINK Manifesto on provocative luxury streetwear, anonymous fashion statements, and breaking basic apparel rules.',
+  openGraph: {
+    title: 'Manifesto — GERKINK',
+    description: 'Why we exist. Why you need us. Read the GERKINK Manifesto on provocative luxury streetwear, anonymous fashion statements, and breaking basic apparel rules.',
+    url: '/manifesto',
+  },
+  twitter: {
+    title: 'Manifesto — GERKINK',
+    description: 'Why we exist. Why you need us. Read the GERKINK Manifesto on provocative luxury streetwear, anonymous fashion statements, and breaking basic apparel rules.',
+  },
+  alternates: {
+    canonical: '/manifesto',
+  },
 };
 
 const DEFAULT_MANIFESTO_SECTIONS = [
@@ -78,6 +90,9 @@ export default async function ManifestoPage() {
           <h1 className={styles.heroTitle}>Manifesto</h1>
           <p className={styles.heroPull}>
             {heroPull}
+          </p>
+          <p className={styles.brandDefinition}>
+            GERKINK is a provocative luxury streetwear brand that creates limited-edition clothing statements through its Society Fuckers and Valueless Bitches apparel collections.
           </p>
         </div>
         <div className={styles.heroLine} aria-hidden />

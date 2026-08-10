@@ -452,7 +452,7 @@ export async function sendAdminOrderNotification(order: Order): Promise<void> {
         <p style="margin: 0 0 12px; font-size: 14px; color: #8b949e;">
           <strong>Order ID:</strong> #${order.id}<br />
           <strong>Customer Email:</strong> ${order.userEmail}<br />
-          <strong>Razorpay Payment ID:</strong> ${order.razorpayPaymentId || 'N/A'}
+          <strong>Transaction ID:</strong> ${order.paypalCaptureId || order.razorpayPaymentId || 'N/A'}
         </p>
         <table style="width: 100%; border-collapse: collapse;">
           <thead>
@@ -591,4 +591,110 @@ export async function sendOrderConfirmationEmailsOnce(orderId: string, order: Or
   ]);
   console.log(`[EMAIL-LOCK] ✅ Confirmation & admin emails dispatched for order ${orderId}.`);
   return true;
+}
+
+export interface ContactMessageDetails {
+  name: string;
+  email: string;
+  message: string;
+}
+
+/**
+ * Sends an email notification to the administrator when a contact form is submitted.
+ * Logs to Firestore fallback if SMTP details are missing or fail.
+ */
+export async function sendAdminContactMessage(details: ContactMessageDetails): Promise<void> {
+  const adminEmail = process.env.ADMIN_EMAIL || 'gerkinkofficial@gmail.com';
+  const subject = `📥 New Contact Form Submission from ${details.name}`;
+  const dateStr = new Date().toLocaleString('en-US', { timeZone: 'UTC' }) + ' UTC';
+
+  const htmlBody = `
+    <div style="font-family: 'Inter', sans-serif; background-color: #07090e; color: #f3f4f6; padding: 32px; border-radius: 12px; max-width: 600px; margin: 0 auto; border: 1px solid #1f2937;">
+      <h2 style="color: #ff6b6b; font-size: 24px; font-weight: 700; margin-bottom: 24px; border-bottom: 1px solid #1f2937; padding-bottom: 12px;">
+        New Contact Message
+      </h2>
+      
+      <div style="background-color: #0d1117; padding: 20px; border-radius: 8px; border: 1px solid #21262d; margin: 24px 0;">
+        <h3 style="margin-top: 0; color: #58a6ff; font-size: 18px;">Sender Details</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 6px 0; font-weight: 600; color: #8b949e; width: 120px;">Name:</td>
+            <td style="padding: 6px 0; color: #c9d1d9;">${details.name}</td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; font-weight: 600; color: #8b949e;">Email:</td>
+            <td style="padding: 6px 0; color: #c9d1d9;">
+              <a href="mailto:${details.email}" style="color: #58a6ff; text-decoration: none;">${details.email}</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 0; font-weight: 600; color: #8b949e;">Date:</td>
+            <td style="padding: 6px 0; color: #c9d1d9;">${dateStr}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="background-color: #0d1117; padding: 20px; border-radius: 8px; border: 1px solid #21262d; margin: 24px 0;">
+        <h3 style="margin-top: 0; color: #58a6ff; font-size: 18px;">Message Content</h3>
+        <div style="color: #c9d1d9; white-space: pre-wrap; font-size: 15px; line-height: 1.6;">${details.message}</div>
+      </div>
+      
+      <p style="font-size: 12px; color: #8b949e; margin-top: 32px; text-align: center; border-top: 1px solid #1f2937; padding-top: 16px;">
+        Sent automatically by GERKINK Storefront.
+      </p>
+    </div>
+  `;
+
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASSWORD;
+
+  if (!user || !pass || !host) {
+    console.warn('SMTP Credentials missing. Writing contact email alert payload to Firestore "system_emails" collection...');
+    await adminDb.collection('system_emails').add({
+      to: adminEmail,
+      subject,
+      html: htmlBody,
+      status: 'pending_smtp_config',
+      createdAt: FieldValue.serverTimestamp(),
+    });
+    return;
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user, pass },
+    });
+
+    await transporter.sendMail({
+      from: `"GERKINK Contact Form" <${user}>`,
+      to: adminEmail,
+      subject,
+      html: htmlBody,
+      replyTo: details.email
+    });
+
+    console.log(`Contact alert email successfully sent to ${adminEmail}`);
+
+    await adminDb.collection('system_emails').add({
+      to: adminEmail,
+      subject,
+      status: 'sent',
+      createdAt: FieldValue.serverTimestamp(),
+    });
+  } catch (err: any) {
+    console.error('Failed to send contact alert SMTP email. Writing to fallback log database:', err.message);
+    await adminDb.collection('system_emails').add({
+      to: adminEmail,
+      subject,
+      html: htmlBody,
+      status: 'failed_smtp_delivery',
+      errorMessage: err.message,
+      createdAt: FieldValue.serverTimestamp(),
+    });
+  }
 }

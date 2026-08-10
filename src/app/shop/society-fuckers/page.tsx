@@ -7,7 +7,19 @@ export const revalidate = 0;
 
 export const metadata = {
   title: 'Society Fu*kers — GERKINK',
-  description: 'Tier-based luxury from $1,000 to $10,000,000. Pick your delusion.',
+  description: 'Collection I: Tier-based luxury from $1,000 to $10,000,000. For those with more money than shame.',
+  openGraph: {
+    title: 'Society Fu*kers — GERKINK',
+    description: 'Collection I: Tier-based luxury from $1,000 to $10,000,000. For those with more money than shame.',
+    url: '/shop/society-fuckers',
+  },
+  twitter: {
+    title: 'Society Fu*kers — GERKINK',
+    description: 'Collection I: Tier-based luxury from $1,000 to $10,000,000. For those with more money than shame.',
+  },
+  alternates: {
+    canonical: '/shop/society-fuckers',
+  },
 };
 
 import { adminDb } from '@/lib/firebase/admin';
@@ -37,9 +49,39 @@ async function getSocietyFuckersProducts(): Promise<Product[]> {
 
 export default async function SocietyFuckersPage() {
   const products = await getSocietyFuckersProducts();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://gerkink.shop';
+  
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": baseUrl
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Shop",
+        "item": `${baseUrl}/shop`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Society Fuckers",
+        "item": `${baseUrl}/shop/society-fuckers`
+      }
+    ]
+  };
 
   return (
     <div className={styles.page}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <div className={styles.hero}>
         <div className={styles.heroInner}>
           <span className="tag tag-mist">Collection I</span>

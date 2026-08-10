@@ -65,12 +65,19 @@ export async function POST(request: NextRequest) {
 
     let printifyOrderId: string | null = null;
 
+    const printifyItems = (order.items || [])
+      .filter((i: any) => i.printifyProductId && !isNaN(Number(i.variant?.printifyVariantId ?? i.variant?.id)));
+
+    if (printifyItems.length === 0) {
+      return NextResponse.json({ error: 'This order does not contain any Printify products to submit.' }, { status: 400 });
+    }
+
     try {
       const printifyOrder = await createPrintifyOrder(shopId, {
         external_id: orderId,
         label: `GERKINK-${orderId}`,
-        line_items: (order.items || []).map((i: any) => ({
-          product_id: i.printifyProductId ?? '',
+        line_items: printifyItems.map((i: any) => ({
+          product_id: i.printifyProductId,
           variant_id: Number(i.variant?.printifyVariantId ?? i.variant?.id),
           quantity: i.quantity || 1,
         })),
@@ -79,6 +86,7 @@ export async function POST(request: NextRequest) {
           first_name: firstName,
           last_name: lastName,
           email: order.userEmail || 'customer@gerkink.shop',
+          phone: addr.phone || '0000000000',
           country: countryCode,
           region: regionCode,
           address1: addr.street || '123 Main St',
@@ -126,7 +134,7 @@ export async function POST(request: NextRequest) {
       printifyOrderId,
     });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Printify order submission failed';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('Printify order retry failed:', err);
+    return NextResponse.json({ error: 'Printify order submission failed' }, { status: 500 });
   }
 }

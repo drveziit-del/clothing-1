@@ -18,6 +18,40 @@ async function checkAdminAuth() {
   }
 }
 
+function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+}
+
+async function generateUniqueSlug(title: string, currentProductId?: string): Promise<string> {
+  const baseSlug = slugify(title);
+  let slug = baseSlug;
+  let exists = true;
+  let counter = 0;
+
+  while (exists) {
+    const snap = await adminDb.collection('products')
+      .where('slug', '==', slug)
+      .limit(1)
+      .get();
+    
+    if (snap.empty || (currentProductId && snap.docs[0].id === currentProductId)) {
+      exists = false;
+    } else {
+      counter++;
+      slug = `${baseSlug}-${counter}`;
+    }
+  }
+  return slug;
+}
+
 // GET all products or a single product
 export async function GET(request: NextRequest) {
   const authResult = await checkAdminAuth();
@@ -67,8 +101,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const slug = await generateUniqueSlug(result.data.slug || result.data.title);
     const productData = {
       ...result.data,
+      slug,
       images: result.data.images && result.data.images.length > 0 ? result.data.images : ['/placeholder-product.png'],
       videos: result.data.videos || [],
       variants: result.data.variants && result.data.variants.length > 0
@@ -114,12 +150,26 @@ export async function PUT(request: NextRequest) {
   const { id, ...dataToUpdate } = result.data;
 
   try {
+    const docRef = adminDb.collection('products').doc(id);
+    const existingDoc = await docRef.get();
+    if (!existingDoc.exists) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+    const existingData = existingDoc.data()!;
+
+    let finalSlug = existingData.slug;
+    if (dataToUpdate.slug || dataToUpdate.title || !finalSlug) {
+      const baseSlugSource = dataToUpdate.slug || dataToUpdate.title || existingData.title;
+      finalSlug = await generateUniqueSlug(baseSlugSource, id);
+    }
+
     const updateData: Record<string, any> = {
       ...dataToUpdate,
+      slug: finalSlug,
       updatedAt: FieldValue.serverTimestamp(),
     };
 
-    await adminDb.collection('products').doc(id).update(updateData);
+    await docRef.update(updateData);
     return NextResponse.json({ status: 'ok' });
   } catch (err) {
     console.error('Error updating product:', err);

@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
         result.firestoreDeleted['referrals (as referred)'] = referredCount;
       }
     } catch (err: any) {
-      result.error = err.message || 'Unknown error during purge';
+      result.error = 'Unknown error during purge';
       console.error(`Purge error for ${email}:`, err);
     }
 

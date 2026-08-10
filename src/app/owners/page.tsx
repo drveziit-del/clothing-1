@@ -3,7 +3,19 @@ import styles from './page.module.css';
 
 export const metadata = {
   title: 'Owners — GERKINK',
-  description: 'Anonymous. Unverifiable. Real.',
+  description: 'Anonymous. Unverifiable. Real. Meet the creative minds, designers, and visionaries operating behind the scenes of provocative luxury streetwear brand GERKINK.',
+  openGraph: {
+    title: 'Owners — GERKINK',
+    description: 'Anonymous. Unverifiable. Real. Meet the creative minds, designers, and visionaries operating behind the scenes of provocative luxury streetwear brand GERKINK.',
+    url: '/owners',
+  },
+  twitter: {
+    title: 'Owners — GERKINK',
+    description: 'Anonymous. Unverifiable. Real. Meet the creative minds, designers, and visionaries operating behind the scenes of provocative luxury streetwear brand GERKINK.',
+  },
+  alternates: {
+    canonical: '/owners',
+  },
 };
 
 const DEFAULT_OWNERS = [

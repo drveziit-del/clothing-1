@@ -17,6 +17,15 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    // Track site visit once per session
+    if (!sessionStorage.getItem('gk_visited')) {
+      sessionStorage.setItem('gk_visited', 'true');
+      fetch('/api/analytics/visit', { method: 'POST' }).catch((err) =>
+        console.error('Visit tracking error:', err)
+      );
+    }
+
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
     if (ref) {

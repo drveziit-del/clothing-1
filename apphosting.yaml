@@ -36,6 +36,11 @@ env:
   - variable: ADMIN_EMAIL
     value: gerkinkofficial@gmail.com
 
+  - variable: NEXT_PUBLIC_PAYPAL_CLIENT_ID
+    value: BAA0FXeEfhQGPJRKfisCPkD1Y1g2ogXYXnJGiVPKEPZQB7DoCPBFxET8LzgJVKCQJpy6gCgrmNt4sqSvRg
+  - variable: PAYPAL_MODE
+    value: live
+
   # ─── Secret environment variables (stored in Google Cloud Secret Manager) ───
   - variable: PRINTIFY_ACCESS_TOKEN
     secret: PRINTIFY_ACCESS_TOKEN
@@ -47,6 +52,10 @@ env:
     secret: RAZORPAY_KEY_SECRET
   - variable: RAZORPAY_WEBHOOK_SECRET
     secret: RAZORPAY_WEBHOOK_SECRET
+  - variable: PAYPAL_CLIENT_SECRET
+    secret: PAYPAL_CLIENT_SECRET
+  - variable: PAYPAL_WEBHOOK_ID
+    secret: PAYPAL_WEBHOOK_ID
   - variable: SMTP_PASSWORD
     secret: SMTP_PASSWORD
   - variable: ENCRYPTION_KEY

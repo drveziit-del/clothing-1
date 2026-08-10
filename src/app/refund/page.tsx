@@ -3,12 +3,59 @@ import styles from '../support.module.css';
 
 export const metadata = {
   title: 'Refund & Replacement Policy — GERKINK',
-  description: 'No refunds. Replacements are possible if we made a mistake. Details inside.',
+  description: 'Learn about our strict no-refund policy, free replacements for damaged items, and how to request replacements for your GERKINK clothing orders. Know the terms.',
+  openGraph: {
+    title: 'Refund & Replacement Policy — GERKINK',
+    description: 'Learn about our strict no-refund policy, free replacements for damaged items, and how to request replacements for your GERKINK clothing orders. Know the terms.',
+    url: '/refund',
+  },
+  twitter: {
+    title: 'Refund & Replacement Policy — GERKINK',
+    description: 'Learn about our strict no-refund policy, free replacements for damaged items, and how to request replacements for your GERKINK clothing orders. Know the terms.',
+  },
+  alternates: {
+    canonical: '/refund',
+  },
 };
 
 export default function RefundPage() {
+  const refundFaqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Can I get a refund?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We enforce a strict No Refunds policy on all purchases. Once an order is paid and submitted, Printify automatically prints it. We do not refund money because you changed your mind, picked the wrong size, or decided your personal brand isn't ready for our clothing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the replacement policy?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "If your item arrived damaged, defective, or we sent you the wrong design/size by mistake, we will gladly issue a Free Replacement. To initiate a replacement, you must contact us within 14 days of delivery."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I request a replacement?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Please email us at gerkinkofficial@gmail.com or submit a message on our Contact Page. Include your order number (e.g. #2347), a description of the issue, and clear photo evidence of the damage or defect."
+        }
+      }
+    ]
+  };
+
   return (
     <div className={styles.page}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(refundFaqSchema) }}
+      />
       {/* Hero */}
       <div className={styles.hero}>
         <div className={styles.heroInner}>
@@ -24,7 +71,7 @@ export default function RefundPage() {
       <div className={styles.content}>
         <div className={styles.article}>
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>1. No Refunds</h2>
+            <h2 className={styles.sectionTitle}>1. Can I get a refund?</h2>
             <p className={styles.bodyText}>
               We enforce a strict <span className={styles.emphasis}>No Refunds</span> policy on all purchases.
               Once an order is paid and submitted, Printify automatically prints it. We do not refund money
@@ -34,7 +81,7 @@ export default function RefundPage() {
           </div>
 
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>2. Replacement Policy</h2>
+            <h2 className={styles.sectionTitle}>2. What is the replacement policy?</h2>
             <p className={styles.bodyText}>
               If your item arrived damaged, defective, or we sent you the wrong design/size by mistake, we will gladly
               issue a <span className={styles.emphasis}>Free Replacement</span>.
@@ -45,7 +92,7 @@ export default function RefundPage() {
           </div>
 
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>3. How to Request a Replacement</h2>
+            <h2 className={styles.sectionTitle}>3. How do I request a replacement?</h2>
             <p className={styles.bodyText}>
               Please email us at <span className={styles.emphasis}>gerkinkofficial@gmail.com</span> or submit a message on our{' '}
               <Link href="/contact" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>

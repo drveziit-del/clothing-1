@@ -1,8 +1,9 @@
 import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
+const SALT = 'gerkink_encryption_salt_123';
 
-// Derive a 32-byte key from the environment secret
+// Derive a 32-byte key from the environment secret using scrypt
 const getEncryptionKey = (): Buffer => {
   const secret = process.env.ENCRYPTION_KEY;
   if (!secret) {
@@ -11,7 +12,7 @@ const getEncryptionKey = (): Buffer => {
       'Please add a strong random key to your .env.local file.'
     );
   }
-  return crypto.createHash('sha256').update(secret).digest();
+  return crypto.scryptSync(secret, SALT, 32);
 };
 
 /**
@@ -29,7 +30,7 @@ export function encrypt(text: string): string {
 }
 
 /**
- * Decrypts encrypted text (format "iv:authTag:ciphertext" or legacy "iv:ciphertext")
+ * Decrypts encrypted text (format "iv:authTag:ciphertext")
  */
 export function decrypt(encryptedText: string): string {
   if (!encryptedText) return '';
@@ -42,17 +43,6 @@ export function decrypt(encryptedText: string): string {
     const key = getEncryptionKey();
     const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
     decipher.setAuthTag(authTag);
-    let decrypted = decipher.update(ciphertext);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString('utf8');
-  }
-
-  // Backward compatibility fallback for legacy aes-256-cbc format
-  if (parts.length === 2) {
-    const iv = Buffer.from(parts[0], 'hex');
-    const ciphertext = Buffer.from(parts[1], 'hex');
-    const key = getEncryptionKey();
-    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
     let decrypted = decipher.update(ciphertext);
     decrypted = Buffer.concat([decrypted, decipher.final()]);
     return decrypted.toString('utf8');

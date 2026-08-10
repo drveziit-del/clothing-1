@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       discountUSD: calculatedDiscountUSD,
     });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Error validating coupon';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('Coupon validation error:', err);
+    return NextResponse.json({ error: 'Error validating coupon' }, { status: 500 });
   }
 }

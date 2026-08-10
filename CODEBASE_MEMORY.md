@@ -2,7 +2,7 @@
 
 > **Project**: GERKINK — Provocative Luxury Streetwear E-Commerce
 > **Framework**: Next.js 16.2.9 (App Router) + React 19.2.4
-> **Last Updated**: 2026-07-01
+> **Last Updated**: 2026-08-07
 
 ---
 
@@ -125,6 +125,14 @@ All server-side modules (`lib/firebase/admin.ts`, `lib/printify/client.ts`, `lib
 - Self-referral and duplicate-referral prevention
 - Min order value: $100 USD
 
+### 7. Reactive Multi-Currency System
+- Supports dynamic switching between USD ($) and INR (₹).
+- Pricing changes are reactive globally (headers, product listing/detail cards, and the entire admin analytics suite).
+
+### 8. Atomic Order Locking & Confirmation
+- Utilizes Firestore atomic locks via `order_email_locks/{orderId}`.
+- Prevents race conditions and duplicate email dispatches from concurrent client redirects and webhooks.
+
 ---
 
 ## Environment Variables
@@ -186,7 +194,21 @@ npm run lint     # ESLint
 
 ---
 
-## Recent Fixes (June 2026)
+## Recent Fixes & Deployments (July & August 2026)
+
+| Fix / Feature | Component / File | Change |
+| ----- | ------ | -------- |
+| **Multi-Currency System** | `src/components/*`, `src/app/admin/*` | Implemented reactive storefront and admin panel currency conversion (USD/INR) for analytics, product pricing, and referrals tracking. |
+| **Server Coupon Validation** | `src/app/api/coupons/validate/*` | Created a dedicated server API endpoint for secure coupon application, checking validation rules and scope configurations (Subtotal Only vs Grand Total). |
+| **Address & ISO Standardization** | `src/lib/printify/*`, `src/app/admin/*` | Added full country/state normalization to 2-letter ISO 3166-1 alpha-2 codes for Printify API compliance, with an admin "1-click punch to Printify" manual trigger. |
+| **Email Dispatch De-duplication** | `src/lib/email/*` | Integrated atomic `order_email_locks` to guarantee order confirmation emails are sent exactly once under concurrent redirection and webhook invocations. |
+| **Reviews Endpoint Routing** | `src/app/api/reviews/*`, `src/components/reviews/*` | Routed reviews creation and deletions through a secure server-side bridge API to prevent Firestore security rule permission errors. |
+| **Firebase App Hosting Configuration** | `apphosting.yaml` | Created and configured `apphosting.yaml` to specify serverless parameters (CPU/Memory) and bind production client variables alongside Secret Manager bindings. |
+| **UI Aesthetics & Light Theme Refinements** | `src/app/globals.css`, `src/components/*` | Added light-theme contrast overrides, fixed filled star rating button specificity, and set up official Instagram and Twitter/X handles. |
+
+---
+
+## Historical Fixes (June 2026)
 
 | Fix | File | Change |
 |-----|------|--------|

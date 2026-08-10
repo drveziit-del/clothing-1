@@ -99,6 +99,19 @@ export async function syncProductsFromPrintify(shopId: string): Promise<{
           updatedAt: new Date(),
         };
 
+        // Generate unique slug
+        const slugify = (text: string) =>
+          text
+            .toString()
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')
+            .replace(/&/g, '-and-')
+            .replace(/[^\w\-]+/g, '')
+            .replace(/\-\-+/g, '-');
+
+        const baseSlug = slugify(full.title);
+
         // Upsert by Printify ID
         const existing = await adminDb
           .collection('products')
@@ -107,20 +120,60 @@ export async function syncProductsFromPrintify(shopId: string): Promise<{
           .get();
 
         if (existing.empty) {
+          let uniqueSlug = baseSlug;
+          let suffix = 1;
+          let isUnique = false;
+          while (!isUnique) {
+            const dupSnap = await adminDb.collection('products')
+              .where('slug', '==', uniqueSlug)
+              .limit(1)
+              .get();
+            if (dupSnap.empty) {
+              isUnique = true;
+            } else {
+              uniqueSlug = `${baseSlug}-${suffix}`;
+              suffix++;
+            }
+          }
+
           await adminDb.collection('products').add({
             ...productData,
+            slug: uniqueSlug,
             createdAt: FieldValue.serverTimestamp(),
             updatedAt: FieldValue.serverTimestamp(),
           });
         } else {
-          await existing.docs[0].ref.update({
+          const existingDoc = existing.docs[0];
+          const existingData = existingDoc.data();
+          const updateData: any = {
             title: productData.title,
             description: productData.description,
             images: productData.images,
             variants: productData.variants,
             price: productData.price,
             updatedAt: FieldValue.serverTimestamp(),
-          });
+          };
+
+          if (!existingData.slug) {
+            let uniqueSlug = baseSlug;
+            let suffix = 1;
+            let isUnique = false;
+            while (!isUnique) {
+              const dupSnap = await adminDb.collection('products')
+                .where('slug', '==', uniqueSlug)
+                .limit(1)
+                .get();
+              if (dupSnap.empty || dupSnap.docs[0].id === existingDoc.id) {
+                isUnique = true;
+              } else {
+                uniqueSlug = `${baseSlug}-${suffix}`;
+                suffix++;
+              }
+            }
+            updateData.slug = uniqueSlug;
+          }
+
+          await existingDoc.ref.update(updateData);
         }
 
         synced++;

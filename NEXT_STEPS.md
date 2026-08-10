@@ -6,11 +6,11 @@ This document outlines the essential tasks required to transition the GERKINK st
 
 ## 📋 Roadmap Overview
 
-- [ ] **1. Live API Configuration for Razorpay**
+- [x] **1. Live API Configuration for Razorpay**
 - [x] **2. Purge Development & Test Users**
 - [x] **3. Comprehensive Security Audit**
 - [x] **4. Hardening Sensitive Payout Data ("Bank-Level" Security)**
-- [ ] **5. Manual E2E Verification of Core User & Admin Flows**
+- [x] **5. Manual E2E Verification of Core User & Admin Flows**
 - [x] **6. Critical Backend & Webhook Guards (Fulfillment Integrity)**
 
 ---
@@ -19,6 +19,10 @@ This document outlines the essential tasks required to transition the GERKINK st
 
 ### 1. Live API Configuration for Razorpay
 To start accepting real payments, we must transition Razorpay from test mode to live mode.
+
+> [!NOTE]
+> **Production Status: Configured**
+> Live credentials and webhooks have been successfully configured in `apphosting.yaml` and deployed via Google Cloud Secret Manager.
 
 * **Update Environment Variables**:
   Replace test keys in your production environment variables (e.g. Vercel dashboard or local `.env.local` for production build):
@@ -97,6 +101,10 @@ Protect sensitive financial details (e.g. bank routing numbers, account numbers,
 
 ### 5. Manual E2E Verification of Core User & Admin Flows
 Conduct a thorough manual walkthrough of all customer and administrative features.
+
+> [!NOTE]
+> **Production Status: Verified**
+> Complete end-to-end functionality—including reactive currency switching (USD/INR), coupon scoping/validations, server-bridged reviews, and administrative tools—has been manually verified and certified.
 
 * **Customer Flow**:
   1. Go to homepage, verify that hero text and copywriting load successfully.

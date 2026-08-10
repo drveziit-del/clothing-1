@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
+import { isRateLimited } from '@/lib/utils/rateLimit';
 
 /**
  * POST /api/auth/session
  * Creates an HTTP-only session cookie from a Firebase ID token.
  */
 export async function POST(request: NextRequest) {
+  if (isRateLimited(request, 'auth_session', { limit: 15, windowMs: 15 * 60 * 1000 })) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   try {
     const { idToken } = (await request.json()) as { idToken: string };
 
@@ -34,9 +39,9 @@ export async function POST(request: NextRequest) {
       path: '/',
     });
 
-    // Set admin indicator cookie (non-httpOnly for middleware to read)
+    // Set admin indicator cookie (httpOnly for security)
     cookieStore.set('is_admin', String(isAdmin), {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: expiresIn / 1000,
