@@ -34,3 +34,10 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## ⚠️ Security Notice & Secret Rotation
+
+Before deploying to production:
+1. **Environment Variables:** Never commit `.env.local` or raw environment files containing live credentials.
+2. **Key Rotation:** If any live production secret (Razorpay Secret, PayPal Client Secret, Printify Token, Google App Password, or Firebase Private Key) was ever committed to git history during early development, **rotate those keys immediately** in their respective developer portals before launching publicly.
+3. **Google Cloud Secret Manager:** In production (App Hosting / Cloud Run), all server-side secrets are injected via GCP Secret Manager rather than plain text environment files.

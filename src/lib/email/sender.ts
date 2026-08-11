@@ -419,7 +419,7 @@ export async function sendOrderConfirmationEmail(order: Order): Promise<void> {
       html: htmlBody,
     });
 
-    console.log(`Order confirmation email successfully sent to ${customerEmail}`);
+    console.log(`Order confirmation email successfully sent to [REDACTED]`);
 
     await adminDb.collection('system_emails').add({
       to: customerEmail,
