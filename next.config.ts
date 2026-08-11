@@ -13,10 +13,7 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
-    const isProd = process.env.NODE_ENV === 'production';
-    const scriptCSP = isProd
-      ? "script-src 'self' https://checkout.razorpay.com https://*.razorpay.com https://apis.google.com https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com"
-      : "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://checkout.razorpay.com https://*.razorpay.com https://apis.google.com https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com";
+    const scriptCSP = "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://checkout.razorpay.com https://*.razorpay.com https://apis.google.com https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com";
 
     return [
       {
