@@ -121,12 +121,18 @@ export async function handleGoogleRedirectResult(): Promise<void> {
 
 export async function signOut(): Promise<void> {
   const { signOut: firebaseSignOut } = require('firebase/auth') as typeof import('firebase/auth');
-  await firebaseSignOut(getFirebaseAuth());
-  // Clear session cookie via API (also revokes refresh tokens)
-  // Fire-and-forget with keepalive so page navigation/redirect doesn't abort it
-  fetch('/api/auth/session', { method: 'DELETE', keepalive: true }).catch((err) => {
+  try {
+    await firebaseSignOut(getFirebaseAuth());
+  } catch (err) {
+    console.error('Firebase signOut error:', err);
+  }
+  try {
+    await fetch('/api/auth/session', { method: 'DELETE' });
+  } catch (err) {
     console.error('Error clearing session cookie on logout:', err);
-  });
+  }
+  // Hard redirect to login page to wipe out memory state, React contexts, and Next.js router cache
+  window.location.href = '/auth/login';
 }
 
 export async function getUserProfile(uid: string): Promise<User | null> {

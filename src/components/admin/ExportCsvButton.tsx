@@ -24,8 +24,10 @@ export default function ExportCsvButton({
     for (const row of data) {
       const values = headers.map((header) => {
         const val = row[header];
-        // Format to string, escape double quotes
-        const escaped = String(val ?? '').replace(/"/g, '""');
+        // Format to string, sanitize potential formula characters, escape double quotes
+        const strVal = String(val ?? '');
+        const sanitized = /^[=+\-@\t\r]/.test(strVal) ? `'${strVal}` : strVal;
+        const escaped = sanitized.replace(/"/g, '""');
         return `"${escaped}"`;
       });
       csvRows.push(values.join(','));
@@ -41,9 +43,7 @@ export default function ExportCsvButton({
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
-    if (typeof link.remove === 'function') {
-      link.remove();
-    } else if (link.parentNode) {
+    if (link.parentNode) {
       link.parentNode.removeChild(link);
     }
     URL.revokeObjectURL(url);

@@ -260,8 +260,8 @@ a:hover { color: var(--accent); }
   color: var(--mist-100);
 }
 
-/* ─── Inputs ─── */
-.input {
+/* ─── Inputs & Selects ─── */
+.input, select {
   width: 100%;
   padding: 0.75rem 1rem;
   background: var(--surface-2);
@@ -272,9 +272,10 @@ a:hover { color: var(--accent); }
   font-size: 0.875rem;
   transition: border-color 0.15s ease;
   outline: none;
+  color-scheme: dark;
 }
 .input::placeholder { color: var(--text-muted); }
-.input:focus { border-color: var(--mist-200); }
+.input:focus, select:focus { border-color: var(--mist-200); }
 .input-label {
   display: block;
   font-family: 'Space Grotesk', sans-serif;
@@ -284,6 +285,24 @@ a:hover { color: var(--accent); }
   text-transform: uppercase;
   color: var(--text-secondary);
   margin-bottom: 0.4rem;
+}
+
+/* ─── Select Options Popup Styling ─── */
+select option, option {
+  background-color: var(--ash, #111318) !important;
+  color: var(--text-primary, #E8EBF0) !important;
+  padding: 8px 12px;
+}
+
+[data-theme="light"] select,
+[data-theme="light"] .input {
+  color-scheme: light;
+}
+
+[data-theme="light"] select option,
+[data-theme="light"] option {
+  background-color: #FFFFFF !important;
+  color: #0A0B0F !important;
 }
 
 /* ─── Animations ─── */

@@ -29,9 +29,9 @@ function LoginContent() {
 
   useEffect(() => {
     if (!authLoading && firebaseUser && !loading && !googleLoading) {
-      router.replace(redirect);
+      window.location.href = redirect;
     }
-  }, [firebaseUser, authLoading, loading, googleLoading, redirect, router]);
+  }, [firebaseUser, authLoading, loading, googleLoading, redirect]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -52,6 +52,7 @@ function LoginContent() {
 
     try {
       await signInWithEmail(result.data.email, result.data.password);
+      // Wait for useEffect redirect to trigger hard reload
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Sign in failed';
       if (msg.includes('wrong-password') || msg.includes('user-not-found') || msg.includes('invalid-credential')) {
@@ -69,7 +70,7 @@ function LoginContent() {
     try {
       const ref = document.cookie.match(/referral=([^;]+)/)?.[1];
       await signInWithGoogle(ref);
-      router.replace(redirect);
+      window.location.href = redirect;
     } catch (err: any) {
       if (err?.code === 'auth/popup-closed-by-user') {
         setGoogleLoading(false);

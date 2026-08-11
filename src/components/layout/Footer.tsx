@@ -12,20 +12,25 @@ export default function Footer() {
   const [tagline, setTagline] = useState('We are nobody.\nOur clothes speak louder.');
 
   useEffect(() => {
-    const { doc, onSnapshot } = getFirestoreModule();
-    const db = getFirestoreDb();
-    const unsub = onSnapshot(
-      doc(db, 'settings', 'copywriting'),
-      (snap) => {
-        if (snap.exists() && snap.data().footerTagline) {
-          setTagline(snap.data().footerTagline);
+    try {
+      const db = getFirestoreDb();
+      if (!db) return;
+      const { doc, onSnapshot } = getFirestoreModule();
+      const unsub = onSnapshot(
+        doc(db, 'settings', 'copywriting'),
+        (snap) => {
+          if (snap.exists() && snap.data().footerTagline) {
+            setTagline(snap.data().footerTagline);
+          }
+        },
+        (error) => {
+          console.warn('Footer copywriting settings snapshot error:', error);
         }
-      },
-      (error) => {
-        console.warn('Footer copywriting settings snapshot error:', error);
-      }
-    );
-    return () => unsub();
+      );
+      return () => unsub();
+    } catch (err) {
+      console.warn('Footer copywriting effect error:', err);
+    }
   }, []);
 
   return (
@@ -130,6 +135,7 @@ export default function Footer() {
             <div className={styles.linkGroup}>
               <span className={styles.groupLabel}>Brand</span>
               <Link href="/manifesto">Manifesto</Link>
+              <Link href="/referral">Referral Program</Link>
               <Link href="/owners">Owners</Link>
               <Link href="/contact">Contact</Link>
             </div>
@@ -144,6 +150,7 @@ export default function Footer() {
               <Link href="/terms">Terms &amp; Conditions</Link>
               <Link href="/refund">Refund &amp; Replace</Link>
               <Link href="/shipping">Shipment</Link>
+              <Link href="/disclaimer">Disclaimer</Link>
             </div>
           </nav>
         </div>

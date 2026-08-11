@@ -19,7 +19,7 @@ type Step = 'address' | 'payment';
 export default function CheckoutPage() {
   const { items, subtotal, referralCode, clearCart } = useCart();
   const { firebaseUser, user } = useAuth();
-  const { formatPrice, currency: selectedCurrency } = useCurrency();
+  const { formatPrice, currency: selectedCurrency, setCurrency } = useCurrency();
   const router = useRouter();
   const { toast } = useRoast();
 
@@ -55,8 +55,49 @@ export default function CheckoutPage() {
 
   if (!mounted) {
     return (
-      <div className={styles.loading}>
-        <span>Preparing checkout...</span>
+      <div className={styles.page}>
+        <div className={styles.inner}>
+          {/* Left Column Skeleton */}
+          <div className={styles.main}>
+            {/* Steps Skeleton */}
+            <div className={styles.stepsSkeleton}>
+              <div className={styles.skeletonStep} />
+              <div className={styles.skeletonStepSep} />
+              <div className={styles.skeletonStep} />
+            </div>
+
+            {/* Form Skeleton */}
+            <div className={styles.formSkeleton}>
+              <div className={styles.skeletonTitle} />
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className={styles.skeletonField}>
+                  <div className={styles.skeletonLabel} />
+                  <div className={styles.skeletonInput} />
+                </div>
+              ))}
+              <div className={styles.skeletonButton} />
+            </div>
+          </div>
+
+          {/* Right Column Skeleton */}
+          <div className={styles.summarySkeleton}>
+            <div className={styles.skeletonSummaryTitle} />
+            <div className={styles.skeletonSummaryItems}>
+              {[1, 2].map((i) => (
+                <div key={i} className={styles.skeletonSummaryItem}>
+                  <div className={styles.skeletonSummaryItemName} />
+                  <div className={styles.skeletonSummaryItemPrice} />
+                </div>
+              ))}
+            </div>
+            <div className={styles.skeletonDivider} />
+            <div className={styles.skeletonSummaryTotals}>
+              {[1, 2, 3].map((i) => (
+                <div key={i} className={styles.skeletonTotalRow} />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -167,6 +208,7 @@ export default function CheckoutPage() {
         const data = await res.json();
         setOrderData(data);
         setStep('payment');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Something went wrong';
         toast(msg, 'error');
@@ -177,6 +219,7 @@ export default function CheckoutPage() {
       // International / USD Routing -> Direct PayPal & Standalone Cards
       setUsePayPal(true);
       setStep('payment');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -239,7 +282,36 @@ export default function CheckoutPage() {
 
               <div>
                 <label htmlFor="country" className="input-label">Country</label>
-                <select id="country" name="country" className="input" defaultValue="US" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--fg-main)' }}>
+                <select
+                  id="country"
+                  name="country"
+                  className="input"
+                  defaultValue="US"
+                  onChange={(e) => {
+                    const country = e.target.value;
+                    const countryCurrencyMap: Record<string, string> = {
+                      IN: 'INR',
+                      US: 'USD',
+                      GB: 'GBP',
+                      CA: 'CAD',
+                      AU: 'AUD',
+                      DE: 'EUR',
+                      FR: 'EUR',
+                      ES: 'EUR',
+                      NL: 'EUR',
+                      IT: 'EUR',
+                      IE: 'EUR',
+                      AT: 'EUR',
+                      BE: 'EUR',
+                      PT: 'EUR',
+                      FI: 'EUR',
+                    };
+                    const mappedCurrency = countryCurrencyMap[country];
+                    if (mappedCurrency) {
+                      setCurrency(mappedCurrency, false);
+                    }
+                  }}
+                >
                   {COUNTRIES.map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.name} ({c.code})
@@ -309,7 +381,10 @@ export default function CheckoutPage() {
               ) : null}
               <button
                 className="btn btn-ghost"
-                onClick={() => setStep('address')}
+                onClick={() => {
+                  setStep('address');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 style={{ marginTop: '1rem' }}
               >
                 ← Back to shipping

@@ -4,36 +4,38 @@
 }
 
 .select {
-  background: var(--bg-card, #121212);
-  color: var(--text-primary, #ffffff);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
-  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
   padding: 4px 8px;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   outline: none;
   transition: all 0.2s ease;
+  color-scheme: dark;
 }
 
 .select:hover, .select:focus {
-  border-color: var(--accent-primary, #FF6B6B);
+  border-color: var(--accent);
 }
 
 .select option {
-  background: #181818;
-  color: #ffffff;
+  background: var(--ash, #111318);
+  color: var(--text-primary, #E8EBF0);
 }
 
 [data-theme="light"] .select {
   background: #ffffff;
   color: #0f172a;
   border-color: #cbd5e1;
+  color-scheme: light;
 }
 
 [data-theme="light"] .select:hover,
 [data-theme="light"] .select:focus {
-  border-color: var(--accent-primary, #FF6B6B);
+  border-color: var(--accent);
 }
 
 [data-theme="light"] .select option {

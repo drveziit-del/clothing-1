@@ -6,7 +6,12 @@ import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
 import type { Review } from '@/types';
 import styles from './ReviewsSection.module.css';
 
-export default function ReviewsSection() {
+interface ReviewsSectionProps {
+  productId?: string;
+  onReviewsLoaded?: (reviews: Review[]) => void;
+}
+
+export default function ReviewsSection({ productId, onReviewsLoaded }: ReviewsSectionProps) {
   const { firebaseUser, user, isAdmin } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -25,56 +30,65 @@ export default function ReviewsSection() {
 
   const fetchApiReviews = useCallback(async () => {
     try {
-      const res = await fetch('/api/reviews');
+      const url = productId ? `/api/reviews?productId=${encodeURIComponent(productId)}` : '/api/reviews';
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) {
           setReviews(data);
+          onReviewsLoaded?.(data);
         }
       }
     } catch (err) {
       console.warn('API reviews fetch error:', err);
     }
-  }, []);
+  }, [productId, onReviewsLoaded]);
 
   // Fetch reviews from API and subscribe to real-time updates
   useEffect(() => {
     fetchApiReviews();
 
-    const { collection, query, orderBy, onSnapshot, getDocs } = getFirestoreModule();
-    const db = getFirestoreDb();
+    try {
+      const db = getFirestoreDb();
+      if (!db) return;
 
-    const q = query(
-      collection(db, 'reviews')
-    );
+      const { collection, query, where, onSnapshot } = getFirestoreModule();
 
-    const unsub = onSnapshot(q, (snap: any) => {
-      const items: Review[] = snap.docs.map((doc: any) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          createdAt: data.createdAt?.toDate?.() ?? new Date(),
-          updatedAt: data.updatedAt?.toDate?.() ?? undefined,
-        } as Review;
+      const q = productId
+        ? query(collection(db, 'reviews'), where('productId', '==', productId))
+        : query(collection(db, 'reviews'));
+
+      const unsub = onSnapshot(q, (snap: any) => {
+        const items: Review[] = snap.docs.map((doc: any) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate?.() ?? new Date(),
+            updatedAt: data.updatedAt?.toDate?.() ?? undefined,
+          } as Review;
+        });
+
+        // Sort client-side to prevent missing/null serverTimestamp index drops
+        items.sort((a: any, b: any) => {
+          const tA = new Date(a.createdAt).getTime() || 0;
+          const tB = new Date(b.createdAt).getTime() || 0;
+          return tB - tA;
+        });
+
+        if (items.length > 0) {
+          setReviews(items);
+          onReviewsLoaded?.(items);
+        }
+      }, async (_err: any) => {
+        fetchApiReviews();
       });
 
-      // Sort client-side to prevent missing/null serverTimestamp index drops
-      items.sort((a: any, b: any) => {
-        const tA = new Date(a.createdAt).getTime() || 0;
-        const tB = new Date(b.createdAt).getTime() || 0;
-        return tB - tA;
-      });
-
-      if (items.length > 0) {
-        setReviews(items);
-      }
-    }, async (_err: any) => {
-      fetchApiReviews();
-    });
-
-    return () => unsub();
-  }, [fetchApiReviews]);
+      return () => unsub();
+    } catch (err) {
+      console.warn('ReviewsSection firebase error:', err);
+    }
+  }, [fetchApiReviews, productId, onReviewsLoaded]);
 
   const openAddForm = useCallback(() => {
     setEditingReview(null);
@@ -108,7 +122,9 @@ export default function ReviewsSection() {
         try {
           const idToken = await firebaseUser.getIdToken();
           headers['Authorization'] = `Bearer ${idToken}`;
-        } catch {}
+        } catch (tokenErr) {
+          console.warn('[ReviewsSection] Failed to acquire ID token for POST:', tokenErr);
+        }
       }
 
       const res = await fetch('/api/reviews', {
@@ -116,6 +132,7 @@ export default function ReviewsSection() {
         headers,
         body: JSON.stringify({
           reviewId: editingReview ? editingReview.id : undefined,
+          productId: productId || undefined,
           rating: formRating,
           text: formText.trim(),
         }),
@@ -144,7 +161,9 @@ export default function ReviewsSection() {
         try {
           const idToken = await firebaseUser.getIdToken();
           headers['Authorization'] = `Bearer ${idToken}`;
-        } catch {}
+        } catch (tokenErr) {
+          console.warn('[ReviewsSection] Failed to acquire ID token for DELETE:', tokenErr);
+        }
       }
 
       const res = await fetch(`/api/reviews?id=${reviewId}`, {

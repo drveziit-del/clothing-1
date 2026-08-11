@@ -22,7 +22,7 @@ async function getAuthenticatedUser(request: NextRequest) {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
     try {
-      const decoded = await adminAuth.verifyIdToken(token);
+      const decoded = await adminAuth.verifyIdToken(token, true);
       if (decoded) return decoded;
     } catch (err) {
       console.warn('[api/reviews] Bearer token verification failed:', err);
@@ -32,10 +32,25 @@ async function getAuthenticatedUser(request: NextRequest) {
   return null;
 }
 
-// GET: Fetch all reviews (public)
-export async function GET() {
+// GET: Fetch reviews (public, optionally filtered by productId, limited to 50 latest)
+export async function GET(request: NextRequest) {
   try {
-    const snapshot = await adminDb.collection('reviews').orderBy('createdAt', 'desc').get();
+    const { searchParams } = new URL(request.url);
+    const productId = searchParams.get('productId');
+
+    let query: FirebaseFirestore.Query = adminDb.collection('reviews');
+    if (productId) {
+      query = query.where('productId', '==', productId);
+    }
+
+    let snapshot: FirebaseFirestore.QuerySnapshot;
+    try {
+      snapshot = await query.orderBy('createdAt', 'desc').limit(50).get();
+    } catch (indexErr: any) {
+      console.warn('[api/reviews] orderBy query failed (missing index?), falling back to unordered query:', indexErr?.message || indexErr);
+      snapshot = await query.limit(50).get();
+    }
+
     const reviews = snapshot.docs.map((doc) => {
       const data = doc.data();
       return {
@@ -45,14 +60,18 @@ export async function GET() {
         updatedAt: data.updatedAt?.toDate?.() ? data.updatedAt.toDate().toISOString() : undefined,
       };
     });
+
+    // In-memory sort fallback (descending by createdAt)
+    reviews.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
     return NextResponse.json(reviews);
   } catch (err: any) {
     console.error('[api/reviews] Error fetching reviews:', err);
-    return NextResponse.json({ error: 'Failed to fetch reviews' }, { status: 500 });
+    return NextResponse.json([], { status: 200 });
   }
 }
 
-// POST: Create or Update a Review
+// POST: Create or Update a Review (scoped per product if productId is provided)
 export async function POST(request: NextRequest) {
   if (isRateLimited(request, 'reviews', { limit: 15, windowMs: 15 * 60 * 1000 })) {
     return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
@@ -66,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     const uid = decoded.uid;
     const body = await request.json();
-    const { reviewId, rating, text } = body;
+    const { reviewId, productId, rating, text } = body;
 
     if (!rating || typeof rating !== 'number' || rating < 1 || rating > 5) {
       return NextResponse.json({ error: 'Rating must be between 1 and 5 stars' }, { status: 400 });
@@ -77,6 +96,7 @@ export async function POST(request: NextRequest) {
     }
 
     const cleanText = text.trim().slice(0, 1000);
+    const targetProductId = typeof productId === 'string' && productId.trim() ? productId.trim() : null;
 
     // Fetch user details from Firebase Auth or Firestore user doc
     const userDoc = await adminDb.collection('users').doc(uid).get();
@@ -101,16 +121,21 @@ export async function POST(request: NextRequest) {
       await reviewRef.update({
         rating,
         text: cleanText,
+        productId: targetProductId,
         updatedAt: FieldValue.serverTimestamp(),
       });
 
       return NextResponse.json({ success: true, id: reviewId });
     } else {
-      // Create new review — check if user already wrote one
-      const existingSnap = await adminDb.collection('reviews')
-        .where('userId', '==', uid)
-        .limit(1)
-        .get();
+      // Create new review — check if user already wrote one for this product
+      let existingQuery: FirebaseFirestore.Query = adminDb.collection('reviews').where('userId', '==', uid);
+      if (targetProductId) {
+        existingQuery = existingQuery.where('productId', '==', targetProductId);
+      } else {
+        existingQuery = existingQuery.where('productId', '==', null);
+      }
+
+      const existingSnap = await existingQuery.limit(1).get();
 
       if (!existingSnap.empty) {
         // Update existing instead of creating duplicate
@@ -118,6 +143,7 @@ export async function POST(request: NextRequest) {
         await existingSnap.docs[0].ref.update({
           rating,
           text: cleanText,
+          productId: targetProductId,
           updatedAt: FieldValue.serverTimestamp(),
         });
         return NextResponse.json({ success: true, id: existingId });
@@ -125,6 +151,7 @@ export async function POST(request: NextRequest) {
 
       const newRef = await adminDb.collection('reviews').add({
         userId: uid,
+        productId: targetProductId,
         userName,
         userPhoto,
         rating,

@@ -316,6 +316,7 @@ export interface PayoutRequest {
 // --- Reviews ---
 export interface Review {
   id: string;
+  productId?: string;
   userId: string;
   userName: string;
   userPhoto?: string;

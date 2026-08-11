@@ -48,7 +48,7 @@ async function performSeeding(uid: string) {
   return { orderId, referralId };
 }
 
-async function handleRequest(request: NextRequest) {
+async function handleRequest(request: NextRequest, decodedAdminToken: any) {
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json({ error: 'Not allowed in production' }, { status: 403 });
   }
@@ -58,31 +58,15 @@ async function handleRequest(request: NextRequest) {
   const queryUid = searchParams.get('uid');
 
   if (queryUid) {
+    // Only verified admins can specify a custom uid to seed
     uid = queryUid;
   } else {
-    // Try to find test affiliate account
-    const usersSnap = await adminDb.collection('users')
-      .where('email', '==', 'test_affiliate@gerkink.shop')
-      .limit(1)
-      .get();
-    
-    if (!usersSnap.empty) {
-      uid = usersSnap.docs[0].id;
-    } else {
-      // Try session cookie
-      try {
-        const cookieStore = await cookies();
-        const session = cookieStore.get('session')?.value;
-        if (session) {
-          const decoded = await adminAuth.verifySessionCookie(session, true);
-          uid = decoded.uid;
-        }
-      } catch {}
-    }
+    // Default to the logged-in admin's uid
+    uid = decodedAdminToken.uid;
   }
 
   if (!uid) {
-    return NextResponse.json({ error: 'No user ID found to seed. Register or sign in first.' }, { status: 400 });
+    return NextResponse.json({ error: 'No user ID found to seed.' }, { status: 400 });
   }
 
   try {
@@ -115,9 +99,8 @@ export async function POST(request: NextRequest) {
     if (!decoded.admin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+    return handleRequest(request, decoded);
   } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
-  return handleRequest(request);
 }

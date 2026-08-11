@@ -151,8 +151,9 @@ export async function POST(request: NextRequest) {
 
   // 6. Create Razorpay order
   let rzpOrder: { id: string; amount: number; currency: string };
+  const isIndia = shippingAddress.country?.trim().toUpperCase() === 'IN';
   try {
-    rzpOrder = await createRazorpayOrder(total, receipt);
+    rzpOrder = await createRazorpayOrder(total, receipt, isIndia);
   } catch (err: any) {
     await orderRef.delete();
     const details = err?.error?.description || err?.message || 'Unknown payment gateway error';

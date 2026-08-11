@@ -28,35 +28,58 @@ let _storage: any;
 
 function ensureApp() {
   if (!_app) {
-    // Dynamic import is not used here because firebase/app itself
-    // doesn't reference `location`. It's safe to import statically
-    // but we keep it lazy to avoid any module init side-effects.
-    const { initializeApp, getApps, getApp } = require('firebase/app');
-    _app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+    try {
+      const { initializeApp, getApps, getApp } = require('firebase/app');
+      _app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+    } catch (err) {
+      console.warn('Firebase initializeApp error:', err);
+      return null;
+    }
   }
   return _app;
 }
 
 function ensureAuth() {
   if (!_auth) {
-    const { getAuth } = require('firebase/auth');
-    _auth = getAuth(ensureApp());
+    try {
+      const app = ensureApp();
+      if (!app) return null;
+      const { getAuth } = require('firebase/auth');
+      _auth = getAuth(app);
+    } catch (err) {
+      console.warn('Firebase getAuth error:', err);
+      return null;
+    }
   }
   return _auth;
 }
 
 function ensureDb() {
   if (!_db) {
-    const { getFirestore } = getFirestoreModule();
-    _db = getFirestore(ensureApp());
+    try {
+      const app = ensureApp();
+      if (!app) return null;
+      const { getFirestore } = getFirestoreModule();
+      _db = getFirestore(app);
+    } catch (err) {
+      console.warn('Firebase getFirestore error:', err);
+      return null;
+    }
   }
   return _db;
 }
 
 function ensureStorage() {
   if (!_storage) {
-    const { getStorage } = require('firebase/storage');
-    _storage = getStorage(ensureApp());
+    try {
+      const app = ensureApp();
+      if (!app) return null;
+      const { getStorage } = require('firebase/storage');
+      _storage = getStorage(app);
+    } catch (err) {
+      console.warn('Firebase getStorage error:', err);
+      return null;
+    }
   }
   return _storage;
 }

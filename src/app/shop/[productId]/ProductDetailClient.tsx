@@ -9,7 +9,7 @@ import { useRoast } from '@/hooks/useRoast';
 import { useCurrency } from '@/context/CurrencyContext';
 import { getCartRoast } from '@/lib/utils/roasts';
 import PriceTag from '@/components/ui/PriceTag';
-import type { Product, Variant } from '@/types';
+import type { Product, Variant, Review } from '@/types';
 import { sortSizes, getSmallVariant } from '@/lib/utils/sizes';
 import styles from './ProductDetailClient.module.css';
 import { useAuth } from '@/hooks/useAuth';
@@ -91,7 +91,10 @@ function UgcVideoCard({ video, isActive }: { video: typeof ugcVideos[0]; isActiv
         </div>
       )}
       <div className={styles.ugcVideoInfo}>
-        <div className={styles.ugcVideoStars}>★★★★★</div>
+        <div className={styles.ugcVideoStars}>
+          {'★'.repeat(Math.min(5, Math.max(1, video.stars || 5)))}
+          {'☆'.repeat(Math.max(0, 5 - Math.min(5, Math.max(1, video.stars || 5))))}
+        </div>
         <div className={styles.ugcVideoName}>{video.name}</div>
       </div>
     </div>
@@ -111,7 +114,10 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
   const router = useRouter();
 
   const displayUgcVideos = useMemo(() => {
-    return product.ugcVideos && product.ugcVideos.length > 0 ? product.ugcVideos : ugcVideos;
+    if (Array.isArray(product.ugcVideos)) {
+      return product.ugcVideos;
+    }
+    return ugcVideos;
   }, [product.ugcVideos]);
 
   const displayFeatures = useMemo(() => {
@@ -136,9 +142,9 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
 
   const displayFaqs = useMemo(() => {
     return product.faqsList && product.faqsList.length > 0 ? product.faqsList : [
-      { q: "WHEN WILL MY ORDER SHIP?", a: "We process and ship all orders within 24-48 business hours. You will receive an automated tracking code as soon as the shipping carrier scans the parcel." },
+      { q: "WHEN WILL MY ORDER SHIP?", a: "All items are custom-printed on demand to order. We estimate a standard delivery timeline of 21 business days. Tracking details will automatically sync to your Account Dashboard once shipped." },
       { q: "HOW SHOULD I WASH GERKINK GARMENTS?", a: "To preserve print durability and fabric weight, wash inside out with cold water on a delicate cycle. Hang dry or tumble dry low. Do not iron directly on the graphics." },
-      { q: "WHAT IS YOUR RETURN POLICY?", a: "We accept returns for store credit or refunds on all unworn, unwashed items within 14 days of delivery. Pre-booked deposits on custom orders remain non-refundable." },
+      { q: "WHAT IS YOUR RETURN POLICY?", a: "We enforce a strict No Refunds policy as items are printed on demand. If your item arrives damaged, defective, or incorrect, we provide a Free Replacement within 14 days of delivery." },
       { q: "ARE SIZES TRUE TO STREETWEAR MEASUREMENTS?", a: "All garments fit slightly oversized/relaxed off the shoulder. If you prefer a standard fitted silhouette, order one size down." }
     ];
   }, [product.faqsList]);
@@ -336,6 +342,18 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
     ];
   }, [displayedImages, product.videos]);
 
+  const [productReviews, setProductReviews] = useState<Review[]>([]);
+
+  const averageRating = useMemo(() => {
+    if (productReviews.length === 0) return 5;
+    const sum = productReviews.reduce((acc, r) => acc + r.rating, 0);
+    return Math.round(sum / productReviews.length);
+  }, [productReviews]);
+
+  const starsDisplay = useMemo(() => {
+    return '★'.repeat(averageRating) + '☆'.repeat(5 - averageRating);
+  }, [averageRating]);
+
   return (
     <div className={styles.container}>
       <div className={styles.layout}>
@@ -376,7 +394,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                     src={media[mobileImageIndex]?.url}
                     alt={`${product.title} - Slide ${mobileImageIndex + 1}`}
                     fill
-                    sizes="100vw"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     className={styles.carouselMedia}
                     priority
                   />
@@ -470,11 +488,23 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
 
             <div className={styles.titleRatingRow}>
               <h1 className={styles.title}>{product.title}</h1>
-              <div className={styles.reviewStarsSummary} onClick={() => {
-                const el = document.getElementById('reviews-section');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}>
-                ★★★★★ <span className={styles.reviewCount}>(42)</span>
+              <div
+                className={styles.reviewStarsSummary}
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  const el = document.getElementById('reviews-section');
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const el = document.getElementById('reviews-section');
+                    el?.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                {starsDisplay} <span className={styles.reviewCount}>({productReviews.length})</span>
               </div>
             </div>
 
@@ -587,7 +617,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                 onClick={() => setShowPrebookModal(true)}
                 disabled={!selectedVariant?.available}
               >
-                Pre-book Now — {formatPrice(product.prebookingPrice !== undefined && product.prebookingPrice !== null ? product.prebookingPrice : 500)}
+                Pre-book Now — {formatPrice(product.prebookingPrice ?? 500)}
               </button>
             ) : (
               <>
@@ -808,7 +838,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
           <div className={styles.ugcVideoTitleRow}>
             <h3 className={styles.ugcVideoTitle}>Real customer stories</h3>
             <div className={styles.ugcVideoSubtitle}>
-              ★★★★★ 4.65 ★ (23)
+              ★★★★★ {(displayUgcVideos.reduce((acc, v) => acc + (v.stars || 5), 0) / (displayUgcVideos.length || 1)).toFixed(2)} ★ ({displayUgcVideos.length})
             </div>
           </div>
           <div ref={ugcSliderRef} className={styles.ugcVideoSlider}>
@@ -844,7 +874,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
       {/* Reviews Integration */}
       <section id="reviews-section" className={styles.reviewsSection}>
         <h3 className={styles.sectionHeader}>CUSTOMER FEEDBACK</h3>
-        <ReviewsSection />
+        <ReviewsSection productId={product.id} onReviewsLoaded={setProductReviews} />
       </section>
 
       {/* FAQ Section */}
@@ -894,7 +924,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
             ✕
           </button>
           <div className={styles.lightboxFrame} onClick={(e) => e.stopPropagation()}>
-            <Image src={lightboxImage} alt="Full Resolution View" fill className={styles.lightboxImg} />
+            <Image src={lightboxImage!} alt="Full Resolution View" fill sizes="(max-width: 1200px) 90vw, 1200px" className={styles.lightboxImg} />
           </div>
         </div>
       )}
@@ -1026,7 +1056,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
             ) : prebookOrderData ? (
               <div className={styles.paymentContainer}>
                 <p className={styles.paymentLabel}>
-                  Pre-booking created! Complete your payment of <strong>{formatPrice(product.prebookingPrice !== undefined && product.prebookingPrice !== null ? product.prebookingPrice : 500)}</strong> to finalize.
+                  Pre-booking created! Complete your payment of <strong>{formatPrice(product.prebookingPrice ?? 500)}</strong> to finalize.
                 </p>
                 <RazorpayButton
                   razorpayOrderId={prebookOrderData.razorpayOrderId}
@@ -1036,7 +1066,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                   userEmail={prebookEmail}
                   userName={prebookName}
                   isPrebooking={true}
-                  amountUSD={product.prebookingPrice !== undefined && product.prebookingPrice !== null ? product.prebookingPrice : 500}
+                  amountUSD={product.prebookingPrice ?? 500}
                   onSuccess={() => {
                     setShowPrebookModal(false);
                     setPrebookOrderData(null);
@@ -1091,7 +1121,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                     required
                   />
                   <span>
-                    I agree that the pre-booking deposit of {formatPrice(product.prebookingPrice !== undefined && product.prebookingPrice !== null ? product.prebookingPrice : 500)} is <strong>non-refundable</strong> and will be used as credit towards the final product purchase.
+                    I agree that the pre-booking deposit of {formatPrice(product.prebookingPrice ?? 500)} is <strong>non-refundable</strong> and will be used as credit towards the final product purchase.
                   </span>
                 </label>
                 <button

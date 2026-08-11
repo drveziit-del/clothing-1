@@ -20,9 +20,16 @@ export function getRazorpay(): Razorpay {
 
 export async function createRazorpayOrder(
   amountUSD: number,
-  receiptId: string
+  receiptId: string,
+  forceINR = false
 ): Promise<{ id: string; amount: number; currency: string }> {
   const razorpay = getRazorpay();
+
+  if (forceINR) {
+    console.log('[Razorpay] Forcing INR order creation for domestic transaction');
+    return createInrOrderFallback(amountUSD, receiptId, razorpay);
+  }
+
   const amountCents = Math.round(amountUSD * 100);
 
   try {
@@ -41,40 +48,45 @@ export async function createRazorpayOrder(
   } catch (err: any) {
     const errDesc = err?.error?.description || err?.message || '';
     console.warn('[Razorpay] USD order failed, attempting INR fallback:', errDesc);
+    return createInrOrderFallback(amountUSD, receiptId, razorpay);
+  }
+}
 
-    // Fall back to INR with live exchange rate if Razorpay rejects USD currency
+async function createInrOrderFallback(
+  amountUSD: number,
+  receiptId: string,
+  razorpay: any
+): Promise<{ id: string; amount: number; currency: string }> {
+  try {
+    let liveInrRate: number;
     try {
-      let liveInrRate: number;
-      try {
-        liveInrRate = await getRateForCurrency('INR');
-      } catch (rateErr) {
-        console.warn('[Razorpay] Live rate fetch failed, using fallback rate 83.5:', rateErr);
-        liveInrRate = 83.5; // hardcoded safety net
-      }
-
-      const amountINR = Math.round(amountUSD * liveInrRate);
-      const amountPaise = amountINR * 100;
-
-      console.log(`[Razorpay] Creating INR order: $${amountUSD} × ${liveInrRate} = ₹${amountINR} (${amountPaise} paise)`);
-
-      const order = await razorpay.orders.create({
-        amount: amountPaise,
-        currency: 'INR',
-        receipt: receiptId,
-        notes: { platform: 'gerkink', currency_converted: 'USD_to_INR', rate_used: liveInrRate },
-      });
-
-      return {
-        id: order.id,
-        amount: Number(order.amount),
-        currency: order.currency,
-      };
-    } catch (inrErr: any) {
-      const inrDesc = inrErr?.error?.description || inrErr?.message || 'INR fallback also failed';
-      console.error('[Razorpay] INR fallback order also failed:', inrDesc, inrErr);
-      // Re-throw with combined context so the API route can return a useful error
-      throw new Error(`Razorpay order failed (USD: ${errDesc} | INR fallback: ${inrDesc})`);
+      liveInrRate = await getRateForCurrency('INR');
+    } catch (rateErr) {
+      console.warn('[Razorpay] Live rate fetch failed, using fallback rate 83.5:', rateErr);
+      liveInrRate = 83.5; // hardcoded safety net
     }
+
+    const amountINR = Math.round(amountUSD * liveInrRate);
+    const amountPaise = amountINR * 100;
+
+    console.log(`[Razorpay] Creating INR order: $${amountUSD} × ${liveInrRate} = ₹${amountINR} (${amountPaise} paise)`);
+
+    const order = await razorpay.orders.create({
+      amount: amountPaise,
+      currency: 'INR',
+      receipt: receiptId,
+      notes: { platform: 'gerkink', currency_converted: 'USD_to_INR', rate_used: liveInrRate },
+    });
+
+    return {
+      id: order.id,
+      amount: Number(order.amount),
+      currency: order.currency,
+    };
+  } catch (inrErr: any) {
+    const inrDesc = inrErr?.error?.description || inrErr?.message || 'INR fallback failed';
+    console.error('[Razorpay] INR fallback order failed:', inrDesc, inrErr);
+    throw new Error(`Razorpay order failed (INR fallback: ${inrDesc})`);
   }
 }
 

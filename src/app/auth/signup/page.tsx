@@ -25,9 +25,9 @@ function SignupContent() {
 
   useEffect(() => {
     if (!authLoading && firebaseUser && !loading && !googleLoading) {
-      router.replace(redirect);
+      window.location.href = redirect;
     }
-  }, [firebaseUser, authLoading, loading, googleLoading, redirect, router]);
+  }, [firebaseUser, authLoading, loading, googleLoading, redirect]);
 
   useEffect(() => {
     // Pick random roast on client only (avoids hydration mismatch)
@@ -88,7 +88,7 @@ function SignupContent() {
     setGoogleLoading(true);
     try {
       await signInWithGoogle(refCode);
-      router.replace(redirect);
+      window.location.href = redirect;
     } catch (err) {
       console.error('Google Sign-in Error:', err);
       toast('Google sign-up failed.', 'error');

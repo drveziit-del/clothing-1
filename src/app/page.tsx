@@ -32,47 +32,57 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const { doc, onSnapshot } = getFirestoreModule();
-    const db = getFirestoreDb();
-    const unsub = onSnapshot(
-      doc(db, 'settings', 'copywriting'),
-      (snap) => {
-        if (snap.exists()) {
-          const data = snap.data();
-          setCopy(prev => ({
-            heroLine1: data.heroLine1 ?? prev.heroLine1,
-            heroLine2: data.heroLine2 ?? prev.heroLine2,
-            heroAccent: data.heroAccent ?? prev.heroAccent,
-            heroSubtext: data.heroSubtext ?? prev.heroSubtext,
-            heroCta: data.heroCta ?? prev.heroCta,
-            footerTagline: data.footerTagline ?? prev.footerTagline,
-          }));
+    try {
+      const db = getFirestoreDb();
+      if (!db) return;
+      const { doc, onSnapshot } = getFirestoreModule();
+      const unsub = onSnapshot(
+        doc(db, 'settings', 'copywriting'),
+        (snap) => {
+          if (snap.exists()) {
+            const data = snap.data();
+            setCopy(prev => ({
+              heroLine1: data.heroLine1 ?? prev.heroLine1,
+              heroLine2: data.heroLine2 ?? prev.heroLine2,
+              heroAccent: data.heroAccent ?? prev.heroAccent,
+              heroSubtext: data.heroSubtext ?? prev.heroSubtext,
+              heroCta: data.heroCta ?? prev.heroCta,
+              footerTagline: data.footerTagline ?? prev.footerTagline,
+            }));
+          }
+        },
+        (error) => {
+          console.warn('Copywriting settings snapshot error:', error);
         }
-      },
-      (error) => {
-        console.warn('Copywriting settings snapshot error:', error);
-      }
-    );
-    return () => unsub();
+      );
+      return () => unsub();
+    } catch (err) {
+      console.warn('Copywriting settings effect error:', err);
+    }
   }, []);
 
   useEffect(() => {
-    const { doc, onSnapshot } = getFirestoreModule();
-    const db = getFirestoreDb();
-    const unsub = onSnapshot(
-      doc(db, 'settings', 'global'),
-      (snap) => {
-        if (snap.exists()) {
-          const data = snap.data();
-          const visits = data.siteVisits ?? 0;
-          setVisitorCount(BASE_VISITOR_COUNT + visits);
+    try {
+      const db = getFirestoreDb();
+      if (!db) return;
+      const { doc, onSnapshot } = getFirestoreModule();
+      const unsub = onSnapshot(
+        doc(db, 'settings', 'global'),
+        (snap) => {
+          if (snap.exists()) {
+            const data = snap.data();
+            const visits = data.siteVisits ?? 0;
+            setVisitorCount(BASE_VISITOR_COUNT + visits);
+          }
+        },
+        (error) => {
+          console.warn('Global settings snapshot error:', error);
         }
-      },
-      (error) => {
-        console.warn('Global settings snapshot error:', error);
-      }
-    );
-    return () => unsub();
+      );
+      return () => unsub();
+    } catch (err) {
+      console.warn('Global settings effect error:', err);
+    }
   }, []);
 
   const handleCTAShake = () => {

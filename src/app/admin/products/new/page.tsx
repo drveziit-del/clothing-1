@@ -142,9 +142,9 @@ function AddProductForm() {
     { feature: "Collar build", us: "Double-needle ribbed shape lock", them: "Single-stitch that sags after one wash" }
   ]);
   const [faqsList, setFaqsList] = useState<Array<{ q: string; a: string }>>([
-    { q: "WHEN WILL MY ORDER SHIP?", a: "We process and ship all orders within 24-48 business hours. You will receive an automated tracking code as soon as the shipping carrier scans the parcel." },
+    { q: "WHEN WILL MY ORDER SHIP?", a: "All items are custom-printed on demand to order. We estimate a standard delivery timeline of 21 business days. Tracking details will automatically sync to your Account Dashboard once shipped." },
     { q: "HOW SHOULD I WASH GERKINK GARMENTS?", a: "To preserve print durability and fabric weight, wash inside out with cold water on a delicate cycle. Hang dry or tumble dry low. Do not iron directly on the graphics." },
-    { q: "WHAT IS YOUR RETURN POLICY?", a: "We accept returns for store credit or refunds on all unworn, unwashed items within 14 days of delivery. Pre-booked deposits on custom orders remain non-refundable." },
+    { q: "WHAT IS YOUR RETURN POLICY?", a: "We enforce a strict No Refunds policy as items are printed on demand. If your item arrives damaged, defective, or incorrect, we provide a Free Replacement within 14 days of delivery." },
     { q: "ARE SIZES TRUE TO STREETWEAR MEASUREMENTS?", a: "All garments fit slightly oversized/relaxed off the shoulder. If you prefer a standard fitted silhouette, order one size down." }
   ]);
 
@@ -492,9 +492,7 @@ function AddProductForm() {
     { name: "Kiana Jacobi", stars: 5, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" }
   ], []);
 
-  const displayUgcVideos = useMemo(() => {
-    return ugcVideosList.length > 0 ? ugcVideosList : defaultUgcVideos;
-  }, [ugcVideosList, defaultUgcVideos]);
+  const displayUgcVideos = ugcVideosList;
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#ffffff' }}>
@@ -1420,34 +1418,44 @@ function AddProductForm() {
                 <div className={productStyles.ugcVideoTitleRow}>
                   <h3 className={productStyles.ugcVideoTitle}>Real customer stories</h3>
                   <div className={productStyles.ugcVideoSubtitle}>
-                    ★★★★★ 4.65 ★ (23)
+                    ★★★★★ {(displayUgcVideos.reduce((acc, v) => acc + (v.stars || 5), 0) / (displayUgcVideos.length || 1)).toFixed(2)} ★ ({displayUgcVideos.length})
                   </div>
                 </div>
 
-                <div ref={ugcSliderRef} className={productStyles.ugcVideoSlider}>
-                  {displayUgcVideos.map((video, idx) => (
-                    <div key={idx} style={{ position: 'relative' }}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (ugcVideosList.length > 0) {
+                {displayUgcVideos.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '2rem 1rem', background: '#111', borderRadius: '8px', border: '1px dashed #333' }}>
+                    <p style={{ color: '#888', fontSize: '0.85rem', marginBottom: '1rem' }}>No custom video stories added yet.</p>
+                    <button
+                      type="button"
+                      onClick={() => setUgcVideosList(defaultUgcVideos)}
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: '0.75rem' }}
+                    >
+                      + Load Sample Videos
+                    </button>
+                  </div>
+                ) : (
+                  <div ref={ugcSliderRef} className={productStyles.ugcVideoSlider}>
+                    {displayUgcVideos.map((video, idx) => (
+                      <div key={idx} style={{ position: 'relative' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
                             setUgcVideosList(prev => prev.filter((_, i) => i !== idx));
-                          } else {
-                            setUgcVideosList(defaultUgcVideos.filter((_, i) => i !== idx));
-                          }
-                        }}
-                        style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10, background: 'var(--accent)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}
-                        title="Delete story"
-                      >
-                        ✕
-                      </button>
-                      <UgcVideoCardPreview
-                        video={video}
-                        isActive={idx === activeUgcIndex}
-                      />
-                    </div>
-                  ))}
-                </div>
+                          }}
+                          style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10, background: 'var(--accent)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}
+                          title="Delete story"
+                        >
+                          ✕
+                        </button>
+                        <UgcVideoCardPreview
+                          video={video}
+                          isActive={idx === activeUgcIndex}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className={productStyles.ugcSliderControls}>
                   <button

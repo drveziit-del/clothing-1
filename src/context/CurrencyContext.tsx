@@ -22,7 +22,7 @@ interface CurrencyContextType {
   symbol: string;
   rate: number;
   rates: Record<string, number>;
-  setCurrency: (code: string) => void;
+  setCurrency: (code: string, persist?: boolean) => void;
   formatPrice: (amountInUSD: number) => string;
   convertPrice: (amountInUSD: number) => number;
 }
@@ -56,8 +56,8 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (saved && SUPPORTED_CURRENCIES[saved]) {
           setCurrencyState(saved);
-        } else if (data.detectedCurrency && SUPPORTED_CURRENCIES[data.detectedCurrency]) {
-          setCurrencyState(data.detectedCurrency);
+        } else {
+          setCurrencyState('USD');
         }
       } catch (err) {
         console.warn('Currency initialization fallback used:', err);
@@ -69,10 +69,12 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     initCurrency();
   }, []);
 
-  const setCurrency = (code: string) => {
+  const setCurrency = (code: string, persist = true) => {
     if (SUPPORTED_CURRENCIES[code]) {
       setCurrencyState(code);
-      localStorage.setItem(LOCAL_STORAGE_KEY, code);
+      if (persist) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, code);
+      }
     }
   };
 

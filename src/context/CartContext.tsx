@@ -7,8 +7,10 @@ import {
   useReducer,
   useCallback,
   useMemo,
+  useRef,
   ReactNode,
 } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import type { CartItem, Product, Variant } from '@/types';
 
 interface CartState {
@@ -136,20 +138,53 @@ const CartContext = createContext<CartContextValue>({
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, { items: [], referralCode: '' });
 
-  // Hydrate from localStorage on mount
-  useEffect(() => {
-    const saved = loadCartFromStorage();
-    if (saved.items.length > 0 || saved.referralCode) {
-      dispatch({ type: 'HYDRATE', state: saved });
-    }
-  }, []);
+  const { firebaseUser, loading: authLoading } = useAuth();
+  const loadedKeyRef = useRef<string | null>(null);
 
-  // Persist to localStorage on change
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(CART_KEY, JSON.stringify(state));
+  const cartKey = useMemo(() => {
+    if (firebaseUser) {
+      return `gerkink_cart_${firebaseUser.uid}`;
     }
-  }, [state]);
+    return 'gerkink_cart_guest';
+  }, [firebaseUser]);
+
+  // Hydrate from localStorage when the user (and thus cartKey) changes
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem(cartKey);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          dispatch({
+            type: 'HYDRATE',
+            state: {
+              items: Array.isArray(parsed?.items) ? parsed.items : [],
+              referralCode: typeof parsed?.referralCode === 'string' ? parsed.referralCode : '',
+            }
+          });
+        } else {
+          dispatch({ type: 'CLEAR' });
+        }
+        loadedKeyRef.current = cartKey;
+      } catch (err) {
+        console.error('Error loading cart from storage:', err);
+        dispatch({ type: 'CLEAR' });
+        loadedKeyRef.current = cartKey;
+      }
+    }
+  }, [cartKey, authLoading]);
+
+  // Persist to localStorage on change, but only if the key matches the loaded key
+  useEffect(() => {
+    if (authLoading) return;
+    if (loadedKeyRef.current !== cartKey) return; // Prevent overwriting with stale state
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(cartKey, JSON.stringify(state));
+    }
+  }, [state, cartKey, authLoading]);
 
   const itemCount = useMemo(
     () => state.items.reduce((sum, i) => sum + i.quantity, 0),

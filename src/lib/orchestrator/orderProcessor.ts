@@ -54,10 +54,12 @@ export async function enqueueOrderProcessing(orderId: string): Promise<string> {
   await jobRef.set(jobData, { merge: true });
   await appendOrderHistory(orderId, 'order_job_enqueued', 'system', { jobId: jobRef.id });
 
-  // Fire-and-forget background worker execution
-  processOrderJob(jobRef.id, orderId).catch((err) =>
-    console.error(`[OrderOrchestrator] Background worker error for order ${orderId}:`, err)
-  );
+  // Await background worker execution to guarantee it completes in serverless environments
+  try {
+    await processOrderJob(jobRef.id, orderId);
+  } catch (err) {
+    console.error(`[OrderOrchestrator] Background worker error for order ${orderId}:`, err);
+  }
 
   return jobRef.id;
 }
@@ -158,12 +160,9 @@ export async function processOrderJob(jobId: string, orderId: string, currentAtt
           });
           await appendOrderHistory(orderId, 'printify_submission_retry_scheduled', 'system', { attempt: currentAttempt + 1, backoffMs: backoffDelayMs });
 
-          setTimeout(() => {
-            processOrderJob(jobId, orderId, currentAttempt + 1).catch((err) =>
-              console.error(`[OrderOrchestrator] Retry attempt ${currentAttempt + 1} failed for order ${orderId}:`, err)
-            );
-          }, backoffDelayMs);
-          return;
+          // Synchronous await delay instead of setTimeout in serverless
+          await new Promise((resolve) => setTimeout(resolve, backoffDelayMs));
+          return processOrderJob(jobId, orderId, currentAttempt + 1);
         }
 
         await orderRef.update({ status: 'queued_for_printify', updatedAt: FieldValue.serverTimestamp() });

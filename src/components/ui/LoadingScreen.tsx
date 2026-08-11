@@ -16,11 +16,20 @@ export default function LoadingScreen() {
 
   useEffect(() => {
     setRoast(LOAD_ROASTS[Math.floor(Math.random() * LOAD_ROASTS.length)]);
-  }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setVisible(false), 1800);
-    return () => clearTimeout(timer);
+    // Lock body scroll while splash screen is active, preserving pre-existing value
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const timer = setTimeout(() => {
+      setVisible(false);
+      document.body.style.overflow = originalOverflow;
+    }, 1800);
+
+    return () => {
+      clearTimeout(timer);
+      document.body.style.overflow = originalOverflow;
+    };
   }, []);
 
   if (!visible) return null;

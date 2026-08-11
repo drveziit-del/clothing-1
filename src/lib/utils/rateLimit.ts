@@ -27,6 +27,9 @@ export interface RateLimitOptions {
 /**
  * Checks if the request client IP has exceeded the specified rate limit.
  * 
+ * NOTE: This rate limiter uses a local in-memory Map which is unique per container instance/serverless node.
+ * For true multi-node distributed rate limiting in production, back this state with a shared store (e.g. Redis).
+ * 
  * @param request NextRequest incoming request object to extract IP.
  * @param keyPrefix Unique string identifier for the endpoint (e.g. 'contact').
  * @param options limit (max requests) and windowMs (timeframe in milliseconds).
@@ -37,8 +40,11 @@ export function isRateLimited(
   keyPrefix: string,
   options: RateLimitOptions
 ): boolean {
-  // Extract client IP from request headers or default
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || '127.0.0.1';
+  // Extract client IP from forwarded headers or direct connection IP, falling back safely
+  const rawIp = request.headers.get('x-forwarded-for')?.split(',')[0] ||
+                request.headers.get('x-real-ip') ||
+                '127.0.0.1';
+  const ip = rawIp.trim();
   const key = `${keyPrefix}_${ip}`;
   const now = Date.now();
 

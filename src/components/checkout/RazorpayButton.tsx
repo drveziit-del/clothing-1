@@ -65,19 +65,12 @@ export default function RazorpayButton({
   const scriptLoaded = useRef(false);
 
   useEffect(() => {
-    if (scriptLoaded.current) return;
+    if (typeof window === 'undefined' || window.Razorpay || scriptLoaded.current) return;
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
     document.body.appendChild(script);
     scriptLoaded.current = true;
-    return () => {
-      if (typeof script.remove === 'function') {
-        script.remove();
-      } else if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
   }, []);
 
   const handlePay = async () => {
