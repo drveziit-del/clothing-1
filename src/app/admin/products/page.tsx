@@ -141,7 +141,30 @@ export default function AdminProductsPage() {
             {
               key: 'tier',
               label: 'Tier',
-              render: (r) => (r.tier ? `Tier ${r.tier}` : '—'),
+              render: (r) => {
+                if (!r.tier) return '—';
+                const tierNames: Record<number, string> = {
+                  1: '👑 Tier 1 (God Tier)',
+                  2: '💎 Tier 2 (Obscene)',
+                  3: '🔥 Tier 3 (Delusional)',
+                  4: '⚡ Tier 4 (Wannabe)',
+                  5: '🛡️ Tier 5 (Peasant)',
+                };
+                const isGold = r.tier === 1;
+                return (
+                  <span
+                    className="tag"
+                    style={{
+                      background: isGold ? 'rgba(255, 215, 0, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                      border: isGold ? '1px solid rgba(255, 215, 0, 0.4)' : '1px solid rgba(255, 255, 255, 0.15)',
+                      color: isGold ? '#FFD700' : 'var(--text)',
+                      fontWeight: isGold ? 800 : 600,
+                    }}
+                  >
+                    {tierNames[r.tier] || `Tier ${r.tier}`}
+                  </span>
+                );
+              },
             },
             {
               key: 'price',
@@ -164,6 +187,15 @@ export default function AdminProductsPage() {
               align: 'right',
               render: (r) => (
                 <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                  <a
+                    href={`/shop/${r.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-secondary btn-xs"
+                    title="View live product page in shop"
+                  >
+                    View ↗
+                  </a>
                   <button
                     onClick={() => openEditModal(r)}
                     className="btn btn-secondary btn-xs"

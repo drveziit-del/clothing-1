@@ -12,6 +12,7 @@ interface DashboardClientProps {
     usersCount: number;
     referralsCount: number;
     pendingOrdersCount: number;
+    prebookingCount?: number;
     recentOrders: Array<{
       id: string;
       user: string;
@@ -45,6 +46,7 @@ export default function AdminDashboardClient({ data }: DashboardClientProps) {
     usersCount,
     referralsCount,
     pendingOrdersCount,
+    prebookingCount = 0,
     recentOrders,
     topAffiliates,
     referralAnalytics,
@@ -53,6 +55,7 @@ export default function AdminDashboardClient({ data }: DashboardClientProps) {
   const metrics = [
     { label: 'Total Revenue', value: formatPrice(totalRevenue), accent: 'coral' as const },
     { label: 'Total Orders', value: totalOrdersCount.toString(), accent: 'mist' as const },
+    { label: '👑 Luxury Pre-bookings', value: prebookingCount.toString(), accent: 'coral' as const },
     { label: 'Active Users', value: usersCount.toString() },
     { label: 'Referrals Count', value: referralsCount.toString() },
     { label: 'Pending Orders', value: pendingOrdersCount.toString() },

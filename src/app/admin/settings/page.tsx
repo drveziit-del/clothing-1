@@ -62,7 +62,21 @@ const DEFAULT_COPYWRITING = {
   footerTagline: 'We are nobody.\nOur clothes speak louder.'
 };
 
-type Tab = 'roasts' | 'copywriting';
+const DEFAULT_BANK_DETAILS = {
+  bankName: 'Wise Payments Ltd / JPMorgan Chase Bank, N.A.',
+  accountHolder: 'GERKINK GLOBAL ENTERPRISES LLC',
+  accountNumber: '9876543210',
+  routingNumber: '026073150',
+  swiftBic: 'WISEUS33XXX',
+  bankCountry: 'United States',
+  currency: 'USD',
+  wiseEmail: 'treasury@gerkink.shop',
+  wiseTag: '@gerkink-treasury',
+  referenceInstructions: 'Please include your Allocation Order ID (e.g. PREBOOK-XXXXXX) in the wire reference or memo.',
+  supportNotice: 'Wire transfers and Wise payments are audited and confirmed by our treasury desk within 2 to 6 hours.',
+};
+
+type Tab = 'roasts' | 'copywriting' | 'bank';
 
 export default function AdminSettingsPage() {
   const { toast } = useRoast();
@@ -71,9 +85,17 @@ export default function AdminSettingsPage() {
   const [newRoast, setNewRoast] = useState('');
   const [savingRoasts, setSavingRoasts] = useState(false);
 
+  // Shipping config state
+  const [standardShippingFee, setStandardShippingFee] = useState(15);
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState(100);
+
   // Copywriting states
   const [copywriting, setCopywriting] = useState(DEFAULT_COPYWRITING);
   const [savingCopy, setSavingCopy] = useState(false);
+
+  // Bank & Wise state
+  const [bankDetails, setBankDetails] = useState(DEFAULT_BANK_DETAILS);
+  const [savingBank, setSavingBank] = useState(false);
 
   useEffect(() => {
     // Dynamic fetch settings
@@ -83,13 +105,21 @@ export default function AdminSettingsPage() {
     async function loadData() {
       try {
         const roastSnap = await getDoc(doc(db, 'settings', 'global'));
-        if (roastSnap.exists() && roastSnap.data().roastMessages) {
-          setRoastMessages(roastSnap.data().roastMessages);
+        if (roastSnap.exists()) {
+          const data = roastSnap.data();
+          if (data.roastMessages) setRoastMessages(data.roastMessages);
+          if (typeof data.standardShippingFee === 'number') setStandardShippingFee(data.standardShippingFee);
+          if (typeof data.freeShippingThreshold === 'number') setFreeShippingThreshold(data.freeShippingThreshold);
         }
 
         const copySnap = await getDoc(doc(db, 'settings', 'copywriting'));
         if (copySnap.exists()) {
           setCopywriting(prev => ({ ...prev, ...copySnap.data() }));
+        }
+
+        const bankSnap = await getDoc(doc(db, 'settings', 'bank_details'));
+        if (bankSnap.exists()) {
+          setBankDetails(prev => ({ ...prev, ...bankSnap.data() }));
         }
       } catch (err) {
         console.error('Error loading settings:', err);
@@ -114,7 +144,7 @@ export default function AdminSettingsPage() {
       const res = await fetch('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roastMessages }),
+        body: JSON.stringify({ roastMessages, standardShippingFee, freeShippingThreshold }),
       });
       if (!res.ok) throw new Error();
       toast('Settings saved. The roasts live on.', 'success');
@@ -139,6 +169,23 @@ export default function AdminSettingsPage() {
       toast('Save failed. Even the server dislikes your content.', 'error');
     } finally {
       setSavingCopy(false);
+    }
+  };
+
+  const handleSaveBankDetails = async () => {
+    setSavingBank(true);
+    try {
+      const res = await fetch('/api/admin/settings/bank-details', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bankDetails),
+      });
+      if (!res.ok) throw new Error();
+      toast('Wise & Bank transfer details saved successfully.', 'success');
+    } catch {
+      toast('Failed to save bank details.', 'error');
+    } finally {
+      setSavingBank(false);
     }
   };
 
@@ -201,13 +248,19 @@ export default function AdminSettingsPage() {
           onClick={() => setActiveTab('roasts')}
           className={`${styles.tabBtn} ${activeTab === 'roasts' ? styles.tabActive : ''}`}
         >
-          Roasts & General
+          Roasts &amp; General
         </button>
         <button
           onClick={() => setActiveTab('copywriting')}
           className={`${styles.tabBtn} ${activeTab === 'copywriting' ? styles.tabActive : ''}`}
         >
           Site Copywriting
+        </button>
+        <button
+          onClick={() => setActiveTab('bank')}
+          className={`${styles.tabBtn} ${activeTab === 'bank' ? styles.tabActive : ''}`}
+        >
+          🏦 Wise &amp; Bank Treasury
         </button>
       </div>
 
@@ -252,6 +305,44 @@ export default function AdminSettingsPage() {
               maxLength={200}
             />
             <button onClick={addRoast} className="btn btn-secondary btn-sm">Add</button>
+          </div>
+
+          <div className={styles.dividerLine} />
+
+          <h2 className={adminStyles.sectionTitle} style={{ marginTop: '1.5rem' }}>Shipping Configuration</h2>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+            Control the standard shipping fee and the subtotal threshold for free shipping.
+          </p>
+
+          <div className={styles.inputRow}>
+            <div>
+              <label className="input-label">Standard Shipping Fee (USD)</label>
+              <input
+                type="number"
+                className="input"
+                min={0}
+                step={0.01}
+                value={standardShippingFee}
+                onChange={(e) => setStandardShippingFee(Number(e.target.value))}
+              />
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.3rem' }}>
+                Charged when order subtotal is below the free shipping threshold.
+              </span>
+            </div>
+            <div>
+              <label className="input-label">Free Shipping Threshold (USD)</label>
+              <input
+                type="number"
+                className="input"
+                min={0}
+                step={0.01}
+                value={freeShippingThreshold}
+                onChange={(e) => setFreeShippingThreshold(Number(e.target.value))}
+              />
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.3rem' }}>
+                Orders at or above this subtotal get free shipping.
+              </span>
+            </div>
           </div>
 
           <button onClick={handleSaveRoasts} disabled={savingRoasts} className="btn btn-primary" style={{ marginTop: '1.5rem' }}>
@@ -494,6 +585,160 @@ export default function AdminSettingsPage() {
           <button onClick={handleSaveCopywriting} disabled={savingCopy} className="btn btn-primary" style={{ marginTop: '2rem' }}>
             {savingCopy ? 'Saving Copy...' : 'Save Copywriting'}
           </button>
+        </section>
+      )}
+
+      {activeTab === 'bank' && (
+        <section className={adminStyles.section}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <h2 className={adminStyles.sectionTitle}>Wise &amp; Bank Wire Treasury Details</h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.25rem 0 0' }}>
+                These bank account credentials and wire routing instructions are displayed to clients during Luxury Pre-booking checkout.
+              </p>
+            </div>
+            <button
+              onClick={handleSaveBankDetails}
+              disabled={savingBank}
+              className="btn btn-primary"
+            >
+              {savingBank ? 'Saving Treasury Details...' : 'Save Treasury Details'}
+            </button>
+          </div>
+
+          <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div className={styles.inputRow}>
+              <div>
+                <label className="input-label">Bank Name &amp; Entity</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="e.g. Wise Payments Ltd / JPMorgan Chase Bank, N.A."
+                  value={bankDetails.bankName}
+                  onChange={(e) => setBankDetails(prev => ({ ...prev, bankName: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="input-label">Account Holder Legal Name</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="e.g. GERKINK GLOBAL ENTERPRISES LLC"
+                  value={bankDetails.accountHolder}
+                  onChange={(e) => setBankDetails(prev => ({ ...prev, accountHolder: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className={styles.inputRow}>
+              <div>
+                <label className="input-label">Account Number / IBAN</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="e.g. 9876543210 or GB33WISE..."
+                  value={bankDetails.accountNumber}
+                  onChange={(e) => setBankDetails(prev => ({ ...prev, accountNumber: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="input-label">Routing / ABA / Sort Code</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="e.g. 026073150"
+                  value={bankDetails.routingNumber || ''}
+                  onChange={(e) => setBankDetails(prev => ({ ...prev, routingNumber: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className={styles.inputRow}>
+              <div>
+                <label className="input-label">SWIFT / BIC Code</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="e.g. WISEUS33XXX"
+                  value={bankDetails.swiftBic || ''}
+                  onChange={(e) => setBankDetails(prev => ({ ...prev, swiftBic: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="input-label">Bank Country &amp; Settlement Currency</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '0.75rem' }}>
+                  <input
+                    type="text"
+                    className="input"
+                    placeholder="e.g. United States"
+                    value={bankDetails.bankCountry}
+                    onChange={(e) => setBankDetails(prev => ({ ...prev, bankCountry: e.target.value }))}
+                  />
+                  <input
+                    type="text"
+                    className="input"
+                    placeholder="USD"
+                    value={bankDetails.currency}
+                    onChange={(e) => setBankDetails(prev => ({ ...prev, currency: e.target.value.toUpperCase() }))}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.inputRow}>
+              <div>
+                <label className="input-label">Wise Treasury Email</label>
+                <input
+                  type="email"
+                  className="input"
+                  placeholder="e.g. treasury@gerkink.shop"
+                  value={bankDetails.wiseEmail || ''}
+                  onChange={(e) => setBankDetails(prev => ({ ...prev, wiseEmail: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="input-label">Wise Pay Tag / Handle</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="e.g. @gerkink-treasury"
+                  value={bankDetails.wiseTag || ''}
+                  onChange={(e) => setBankDetails(prev => ({ ...prev, wiseTag: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="input-label">Wire Reference Memo Instructions (Client Prompt)</label>
+              <textarea
+                className="input"
+                style={{ minHeight: '70px', fontFamily: 'inherit' }}
+                placeholder="e.g. Please include your Allocation Order ID (e.g. PREBOOK-XXXXXX) in the wire reference or memo."
+                value={bankDetails.referenceInstructions || ''}
+                onChange={(e) => setBankDetails(prev => ({ ...prev, referenceInstructions: e.target.value }))}
+              />
+            </div>
+
+            <div>
+              <label className="input-label">Treasury Verification &amp; Support Notice</label>
+              <textarea
+                className="input"
+                style={{ minHeight: '60px', fontFamily: 'inherit' }}
+                placeholder="e.g. Wire transfers and Wise payments are audited and confirmed by our treasury desk within 2 to 6 hours."
+                value={bankDetails.supportNotice || ''}
+                onChange={(e) => setBankDetails(prev => ({ ...prev, supportNotice: e.target.value }))}
+              />
+            </div>
+
+            <button
+              onClick={handleSaveBankDetails}
+              disabled={savingBank}
+              className="btn btn-primary"
+              style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}
+            >
+              {savingBank ? 'Saving Treasury Details...' : 'Save Treasury Details'}
+            </button>
+          </div>
         </section>
       )}
     </div>

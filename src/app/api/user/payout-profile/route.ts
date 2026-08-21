@@ -4,12 +4,17 @@ import { cookies } from 'next/headers';
 import { encrypt, decrypt } from '@/lib/utils/encryption';
 import type { PayoutMethodPreferences } from '@/types';
 import { FieldValue } from 'firebase-admin/firestore';
+import { isRateLimited } from '@/lib/utils/rateLimit';
 
 /**
  * GET /api/user/payout-profile
  * Get the saved payout preference profile for the affiliate.
  */
 export async function GET(request: NextRequest) {
+  if (isRateLimited(request, 'payout_profile_get', { limit: 20, windowMs: 15 * 60 * 1000 })) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   const cookieStore = await cookies();
   const session = cookieStore.get('session')?.value;
   if (!session) {
@@ -77,6 +82,10 @@ export async function GET(request: NextRequest) {
  * Save or update the affiliate's preferred payout method.
  */
 export async function POST(request: NextRequest) {
+  if (isRateLimited(request, 'payout_profile_post', { limit: 15, windowMs: 15 * 60 * 1000 })) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   const cookieStore = await cookies();
   const session = cookieStore.get('session')?.value;
   if (!session) {

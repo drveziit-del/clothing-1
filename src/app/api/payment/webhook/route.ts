@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
         });
       } catch (err: any) {
         console.error('Razorpay Webhook transaction failed:', err);
-        return NextResponse.json({ error: 'Transaction failed: ' + err.message }, { status: 500 });
+        return NextResponse.json({ error: 'Internal webhook processing failure' }, { status: 500 });
       }
 
       if (shouldRunPostCommitSideEffects && orderObjForSideEffects) {

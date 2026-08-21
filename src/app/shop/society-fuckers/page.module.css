@@ -1,11 +1,18 @@
-.page { padding-top: 68px; min-height: 100vh; }
+.page {
+  padding-top: 68px;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
 
 .hero {
   position: relative;
-  padding: clamp(4rem, 10vw, 8rem) clamp(1rem, 4vw, 4rem) clamp(3rem, 6vw, 5rem);
-  background: var(--bg);
+  padding: clamp(2.5rem, 5vw, 4.5rem) clamp(1rem, 3vw, 3rem) clamp(2rem, 4vw, 3rem);
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
   overflow: hidden;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .heroInner {
@@ -15,37 +22,118 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 1.25rem;
-  max-width: 680px;
+  max-width: 780px;
+}
+
+.heroBadgeRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.supplyPill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
 }
 
 .title {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 900;
-  font-size: clamp(3rem, 8vw, 8rem);
-  line-height: 0.9;
-  letter-spacing: -0.04em;
-  color: var(--link);
+  font-size: clamp(2.5rem, 6vw, 4.8rem);
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.titleGold {
+  color: var(--text-primary);
+  display: inline-block;
 }
 
 .desc {
-  font-size: 1rem;
+  font-size: clamp(1rem, 2vw, 1.2rem);
   color: var(--text-secondary);
   line-height: 1.65;
-  max-width: 520px;
+  max-width: 640px;
+  margin: 0 auto;
 }
 
-.warning {
+.warningBox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.warningText {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--text-muted);
+  margin: 0;
   font-style: italic;
 }
 
 .heroAmbient {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 80% 50%, rgba(107,138,171,0.08) 0%, transparent 60%);
-  pointer-events: none;
+  display: none;
+}
+
+/* ── Light Mode Overrides ── */
+[data-theme="light"] .page {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+[data-theme="light"] .hero {
+  background: radial-gradient(ellipse at 50% 0%, rgba(217, 119, 6, 0.08) 0%, rgba(255, 255, 255, 0.95) 70%);
+  border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] .supplyPill {
+  background: rgba(217, 119, 6, 0.1);
+  border-color: rgba(217, 119, 6, 0.35);
+  color: #b45309;
+  box-shadow: 0 0 15px rgba(217, 119, 6, 0.1);
+}
+
+[data-theme="light"] .title {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light"] .titleGold {
+  background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light"] .desc {
+  color: #475569;
+}
+
+[data-theme="light"] .warningBox {
+  background: rgba(225, 29, 72, 0.06);
+  border-color: rgba(225, 29, 72, 0.2);
+}
+
+[data-theme="light"] .warningText {
+  color: #be123c;
 }

@@ -81,7 +81,7 @@ service cloud.firestore {
     // Bank account details stored in a separate restricted subcollection
     match /users/{uid}/secure_payout_details/{doc} {
       allow read:   if isAdmin();
-      allow write:  if isOwner(uid) || isAdmin();
+      allow write:  if false; // Server-only via Admin SDK with AES-256-GCM encryption
     }
 
     // ── Reviews ──────────────────────────────────────────────────────

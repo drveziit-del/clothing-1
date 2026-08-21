@@ -94,6 +94,36 @@
   color: var(--coral-200);
 }
 
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputWrap input {
+  padding-right: 2.75rem;
+}
+
+.pwToggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  transition: color 0.15s ease;
+}
+
+.pwToggle:hover {
+  color: var(--text-primary);
+}
+
 .footer {
   font-size: 0.85rem;
   color: var(--text-muted);

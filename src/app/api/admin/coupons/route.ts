@@ -20,7 +20,7 @@ export async function GET() {
   if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const snap = await adminDb.collection('coupons').get();
+    const snap = await adminDb.collection('coupons').limit(100).get();
     const coupons = snap.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),

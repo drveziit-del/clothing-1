@@ -1,28 +1,36 @@
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 2rem 1.75rem;
 }
 
 @media (max-width: 640px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    gap: 1rem 0.75rem;
   }
 }
 
 .empty {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 40vh;
   text-align: center;
+  gap: 1rem;
+  padding: 3rem 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
 }
 
 .emptyText {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 1rem;
-  font-style: italic;
-  color: var(--text-muted);
-  max-width: 400px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  max-width: 420px;
+  line-height: 1.5;
+  margin: 0;
 }

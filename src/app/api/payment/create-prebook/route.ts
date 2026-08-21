@@ -44,25 +44,46 @@ export async function POST(request: NextRequest) {
 
   const { productId, variantId, name, email: prebookEmail, message } = result.data;
 
-  // 3. Fetch product details from Firestore
+  // 3. Fetch product details from Firestore (by Doc ID or by Slug)
   try {
+    let product: any = null;
+    let actualProductId = productId;
+
     const productDoc = await adminDb.collection('products').doc(productId).get();
-    if (!productDoc.exists) {
+    if (productDoc.exists) {
+      product = productDoc.data();
+      actualProductId = productDoc.id;
+    } else {
+      const slugSnap = await adminDb.collection('products').where('slug', '==', productId).limit(1).get();
+      if (!slugSnap.empty) {
+        product = slugSnap.docs[0].data();
+        actualProductId = slugSnap.docs[0].id;
+      } else {
+        const titleSnap = await adminDb.collection('products').where('title', '==', productId).limit(1).get();
+        if (!titleSnap.empty) {
+          product = titleSnap.docs[0].data();
+          actualProductId = titleSnap.docs[0].id;
+        }
+      }
+    }
+
+    if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 400 });
     }
 
-    const product = productDoc.data()!;
-    if (!product.isPublished) {
-      return NextResponse.json({ error: 'Product is not available' }, { status: 400 });
-    }
-
-    if (product.section !== 'society_fuckers') {
-      return NextResponse.json({ error: 'Pre-booking is only available for luxury products' }, { status: 400 });
-    }
-
-    const variant = product.variants?.find((v: { id: string }) => v.id === variantId);
-    if (!variant || !variant.available) {
-      return NextResponse.json({ error: 'Selected variant is not available' }, { status: 400 });
+    // Resolve or construct variant
+    let variant = product.variants?.find((v: { id: string }) => v.id === variantId);
+    if (!variant) {
+      variant = (Array.isArray(product.variants) && product.variants.length > 0)
+        ? product.variants[0]
+        : {
+            id: variantId || 'default',
+            title: 'Bespoke Custom Allocation',
+            size: 'ONE SIZE',
+            color: 'DEFAULT',
+            price: Number(product.price || 500),
+            available: true,
+          };
     }
 
     // Set pre-booking price (default to 500 if not set)
@@ -71,13 +92,13 @@ export async function POST(request: NextRequest) {
       : 500;
 
     const orderItems: OrderItem[] = [{
-      productId,
-      title: product.title,
+      productId: actualProductId,
+      title: product.title || 'Society Fu*kers Piece',
       variant,
       quantity: 1,
       price: prebookingFee,
       image: product.images?.[0] ?? '',
-      printifyProductId: product.printifyId,
+      printifyProductId: product.printifyId || '',
     }];
 
     // 4. Create Firestore prebooking order (pending)

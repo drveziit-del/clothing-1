@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import styles from './ProductFilters.module.css';
 
 export type SortKey = 'newest' | 'price_asc' | 'price_desc';
@@ -16,8 +15,8 @@ interface ProductFiltersProps {
 
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: 'newest',     label: 'Newest' },
-  { value: 'price_asc',  label: 'Price: Low' },
-  { value: 'price_desc', label: 'Price: High' },
+  { value: 'price_asc',  label: 'Price: Low → High' },
+  { value: 'price_desc', label: 'Price: High → Low' },
 ];
 
 export default function ProductFilters({
@@ -28,30 +27,42 @@ export default function ProductFilters({
   onSort,
   resultCount,
 }: ProductFiltersProps) {
-  const allCategories = ['All', ...categories];
+  const allCategories = ['All Pieces', ...categories];
 
   return (
-    <div className={styles.filters}>
-      <div className={styles.categories}>
-        {allCategories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => onCategory(cat === 'All' ? '' : cat)}
-            className={`${styles.catBtn} ${activeCategory === (cat === 'All' ? '' : cat) ? styles.active : ''}`}
-          >
-            {cat}
-          </button>
-        ))}
+    <div className={styles.filterToolbar}>
+      {/* Category Pills */}
+      <div className={styles.categoryScroll}>
+        {allCategories.map((cat) => {
+          const isSelected = cat === 'All Pieces' ? activeCategory === '' : activeCategory === cat;
+          return (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => onCategory(cat === 'All Pieces' ? '' : cat)}
+              className={`${styles.catPill} ${isSelected ? styles.catPillActive : ''}`}
+            >
+              {isSelected && <span className={styles.activeDot} />}
+              <span>{cat}</span>
+            </button>
+          );
+        })}
       </div>
 
-      <div className={styles.right}>
-        <span className={styles.count}>{resultCount} item{resultCount !== 1 ? 's' : ''}</span>
-        <div className={styles.sort}>
+      {/* Right: Counter & Sort */}
+      <div className={styles.toolbarRight}>
+        <div className={styles.itemCountBadge}>
+          <span className={styles.pulseDot} />
+          <span>{resultCount} {resultCount === 1 ? 'Garment' : 'Garments'}</span>
+        </div>
+
+        <div className={styles.sortSegmented}>
           {SORT_OPTIONS.map((opt) => (
             <button
               key={opt.value}
+              type="button"
               onClick={() => onSort(opt.value)}
-              className={`${styles.sortBtn} ${activeSort === opt.value ? styles.active : ''}`}
+              className={`${styles.sortTab} ${activeSort === opt.value ? styles.sortTabActive : ''}`}
             >
               {opt.label}
             </button>

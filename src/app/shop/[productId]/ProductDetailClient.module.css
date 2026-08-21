@@ -338,6 +338,8 @@
 }
 
 .buyNowBtn {
+  position: relative;
+  overflow: hidden;
   height: 52px;
   background: transparent;
   border: 1px solid var(--text-primary);
@@ -350,11 +352,34 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
 }
+
 .buyNowBtn:hover {
-  background: var(--text-primary);
-  color: var(--bg);
+  border-color: var(--coral-200);
+  box-shadow: 0 0 25px rgba(255, 107, 107, 0.25);
+  color: var(--text-primary);
+}
+
+.buyNowBtn:active {
+  transform: scale(0.985);
+}
+
+.spotlightGlow {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.35), transparent 70%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.buyNowText {
+  position: relative;
+  z-index: 1;
 }
 
 /* Trust Badges Grid */
@@ -1459,4 +1484,553 @@
   .specCard {
     padding: 1.25rem;
   }
+}
+
+/* ─── Sticky Mobile Add-to-Bag Bar ──────────────────────────── */
+.mobileStickyBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  pointer-events: none;
+  display: none;
+}
+
+.mobileStickyBarOpen {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 900px) {
+  .mobileStickyBar {
+    display: block;
+  }
+}
+
+.stickyBarInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  max-width: 100%;
+}
+
+.stickyBarMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.stickyBarThumb {
+  width: 40px;
+  height: 50px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.stickyBarInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.stickyBarTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stickyBarPrice {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.stickyBarBtn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--text-primary);
+  color: var(--bg);
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease;
+}
+.stickyBarBtn:hover {
+  opacity: 0.9;
+}
+.stickyBarBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Pre-Booking Modal Window ─────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 9, 14, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 3000;
+  animation: overlayFadeIn 0.2s ease-out;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 440px;
+  padding: 1.75rem 1.5rem;
+  position: relative;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 107, 107, 0.08);
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modalClose {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--fog);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  z-index: 10;
+}
+.modalClose:hover {
+  background: var(--fog-light);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.modalHeader {
+  margin-bottom: 1.25rem;
+  padding-right: 1.5rem;
+}
+
+.modalTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.modalSubtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.modalForm input[type="text"],
+.modalForm input[type="email"],
+.modalForm textarea {
+  font-size: 0.85rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 6px;
+}
+
+.modalForm textarea {
+  min-height: 70px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  cursor: pointer;
+  margin-top: 0.15rem;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  accent-color: var(--accent);
+  margin-top: 0.15rem;
+  cursor: pointer;
+}
+
+.authNotice {
+  background: var(--fog);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+  border-radius: 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.authNoticeText {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.paymentContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.paymentLabel {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+/* ─── Tier-Specific Luxury Product Styles ─── */
+.tierBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tierBannerGold {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 165, 0, 0.2) 100%);
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+}
+
+.tierBannerPlatinum {
+  background: linear-gradient(135deg, rgba(226, 232, 240, 0.15) 0%, rgba(148, 163, 184, 0.2) 100%);
+  border: 1px solid rgba(226, 232, 240, 0.4);
+  box-shadow: 0 0 25px rgba(180, 199, 217, 0.2);
+}
+
+.tierBannerRose {
+  background: linear-gradient(135deg, rgba(255, 142, 142, 0.12) 0%, rgba(244, 63, 94, 0.18) 100%);
+  border: 1px solid rgba(255, 142, 142, 0.4);
+}
+
+.tierBannerCoral {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.12) 0%, rgba(238, 82, 83, 0.18) 100%);
+  border: 1px solid rgba(255, 107, 107, 0.4);
+}
+
+.tierBannerSteel {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.tierNameTag {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tierNameTagGold { color: #FFD700; }
+.tierNameTagPlatinum { color: #E2E8F0; }
+.tierNameTagRose { color: #FF8E8E; }
+.tierNameTagCoral { color: #FF6B6B; }
+.tierNameTagSteel { color: #94A3B8; }
+
+.mintSerialPill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Stock Counter & Live Scarcity Bar */
+.stockCounterBox {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.stockCounterHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stockStatusLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.pulseDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff4757;
+  box-shadow: 0 0 10px #ff4757;
+  animation: pulseGlow 1.5s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% { opacity: 0.4; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
+.stockCountBadge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+.stockCountBadgeGold {
+  color: #FFD700 !important;
+}
+
+.stockCountBadgePlatinum {
+  color: #E2E8F0 !important;
+}
+
+.scarcityTrack {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.scarcityFill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #ff4757 0%, #ffa502 100%);
+  transition: width 0.6s ease;
+}
+
+.scarcityFillGold {
+  background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%) !important;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.scarcityFillPlatinum {
+  background: linear-gradient(90deg, #F8FAFC 0%, #94A3B8 100%) !important;
+}
+
+/* Tier Perks Box */
+.tierPerksBox {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tierPerksTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.tierPerksList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.5rem;
+}
+
+.tierPerkItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.tierPerkItem strong {
+  color: var(--text-primary);
+}
+
+/* Tier Action Buttons */
+.tierButtonGold {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important;
+  color: #000 !important;
+  font-weight: 900 !important;
+  border: none !important;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.35) !important;
+}
+.tierButtonGold:hover {
+  box-shadow: 0 0 35px rgba(255, 215, 0, 0.55) !important;
+  transform: translateY(-2px);
+}
+
+.tierButtonPlatinum {
+  background: linear-gradient(135deg, #F8FAFC 0%, #CBD5E1 100%) !important;
+  color: #000 !important;
+  font-weight: 900 !important;
+  border: none !important;
+  box-shadow: 0 0 25px rgba(180, 199, 217, 0.3) !important;
+}
+.tierButtonPlatinum:hover {
+  box-shadow: 0 0 35px rgba(180, 199, 217, 0.5) !important;
+  transform: translateY(-2px);
+}
+
+.tierButtonCoral {
+  background: linear-gradient(135deg, #FF6B6B 0%, #EE5253 100%) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  border: none !important;
+  box-shadow: 0 0 25px rgba(255, 107, 107, 0.35) !important;
+}
+
+.conciergeBtn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  border-radius: 4px;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  transition: all 0.2s ease;
+}
+.conciergeBtn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+/* Embedded Absurdity Index */
+.absurdityCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.absurdityHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.absurdityTag {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--coral-100);
+  text-transform: uppercase;
+}
+
+.absurdityItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.absurdityLine {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.absurdityLine::before {
+  content: 'vs';
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--coral-100);
 }

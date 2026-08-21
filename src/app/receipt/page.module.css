@@ -1,0 +1,322 @@
+.page {
+  min-height: 100vh;
+  padding: 4rem 1.25rem 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 15%, #18181b 0%, #09090b 80%);
+}
+
+.container {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Machine Header */
+.brandLogoHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.logoSquare {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.brandText {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #a1a1aa;
+}
+
+.homeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #38383e;
+  color: #e4e4e7;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.homeBtn:hover {
+  background: #4b4b53;
+  color: #fff;
+}
+
+/* Screen Content */
+.screenContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.screenRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.screenPlanTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.screenPlanSub {
+  font-size: 0.8rem;
+  color: #a1a1aa;
+  margin: 0.2rem 0 0;
+}
+
+.screenTotalCol {
+  text-align: right;
+}
+
+.screenTotalLabel {
+  font-size: 0.72rem;
+  color: #71717a;
+  display: block;
+}
+
+.screenTotalValue {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* Thermal Paper Slip Styles */
+.slipWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.slipBrandCenter {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0 0.25rem;
+}
+
+.slipLogoBox {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dashedDivider {
+  height: 1px;
+  border-top: 1px dashed #d1d5db;
+  margin: 0.1rem 0;
+}
+
+.slipItemsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.slipItemRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.itemMeta {
+  display: flex;
+  flex-direction: column;
+}
+
+.itemTitle {
+  font-weight: 800;
+  color: #111827;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.itemSub {
+  font-size: 0.68rem;
+  color: #6b7280;
+  margin-top: 0.1rem;
+}
+
+.itemPrice {
+  font-weight: 700;
+  color: #111827;
+  font-size: 0.78rem;
+}
+
+.slipTotals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  color: #4b5563;
+}
+
+.grandTotalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #111827;
+  letter-spacing: 0.05em;
+}
+
+.grandTotalAmount {
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.slipMetaBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: #6b7280;
+}
+
+.metaLine {
+  display: flex;
+  justify-content: space-between;
+}
+
+.metaLine strong {
+  color: #111827;
+}
+
+/* Barcode */
+.barcodeWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding-top: 0.6rem;
+}
+
+.barcodeBars {
+  width: 100%;
+  max-width: 220px;
+  height: 38px;
+  background: repeating-linear-gradient(
+    90deg,
+    #111827 0,
+    #111827 2px,
+    transparent 2px,
+    transparent 4px,
+    #111827 4px,
+    #111827 7px,
+    transparent 7px,
+    transparent 9px,
+    #111827 9px,
+    #111827 12px,
+    transparent 12px,
+    transparent 14px,
+    #111827 14px,
+    #111827 15px,
+    transparent 15px,
+    transparent 18px
+  );
+}
+
+.barcodeText {
+  font-family: monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  color: #4b5563;
+}
+
+/* Action Buttons below machine */
+.actionsRow {
+  display: flex;
+  gap: 0.85rem;
+  width: 100%;
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.downloadReceiptBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #27272a;
+  color: #fff;
+  border: 1px solid #3f3f46;
+  padding: 0.95rem 1rem;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.downloadReceiptBtn:hover {
+  background: #3f3f46;
+  border-color: #52525b;
+  transform: translateY(-1px);
+}
+
+.continueToThankYouBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ff6b81 0%, #ff4757 100%);
+  color: #fff;
+  border: none;
+  padding: 0.95rem 1rem;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(255, 71, 87, 0.4);
+  transition: all 0.2s ease;
+}
+
+.continueToThankYouBtn:hover {
+  box-shadow: 0 6px 24px rgba(255, 71, 87, 0.6);
+  transform: translateY(-1px);
+}

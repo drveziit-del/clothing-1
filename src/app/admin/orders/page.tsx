@@ -16,12 +16,15 @@ async function getOrders() {
 
       return {
         id: doc.id,
-        customer: data.shippingAddress?.name || data.userEmail || 'Anonymous',
+        customer: data.prebookName || data.shippingAddress?.name || data.userEmail || 'Anonymous',
         items: itemsSummary,
         totalRaw: Number(data.total || 0),
         status: data.status,
         date,
         printifyOrderId: data.printifyOrderId || null,
+        isPrebooking: Boolean(data.isPrebooking),
+        prebookEmail: data.prebookEmail || null,
+        prebookMessage: data.prebookMessage || null,
       };
     });
   } catch (err) {

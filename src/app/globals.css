@@ -70,7 +70,7 @@
   --font-mono:       'JetBrains Mono', monospace;
 }
 
-/* ─── Base Reset ─── */
+/* ─── Base Reset & Scaling ─── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -78,10 +78,22 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 14.5px;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1440px) {
+  html {
+    font-size: 13.5px;
+  }
 }
 
 body {
@@ -108,23 +120,23 @@ h1, h2, h3, h4, h5, h6 {
 .text-hero {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 900;
-  font-size: clamp(4rem, 14vw, 13rem);
-  line-height: 0.9;
-  letter-spacing: -0.05em;
+  font-size: clamp(3rem, 8vw, 7.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
 }
 .text-display {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  font-size: clamp(2rem, 5vw, 5rem);
+  font-size: clamp(1.75rem, 3.5vw, 3.5rem);
   line-height: 1.05;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
 }
 .text-title {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  font-size: clamp(1.4rem, 3vw, 2.5rem);
+  font-size: clamp(1.2rem, 2vw, 2rem);
   line-height: 1.15;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 .text-label {
   font-family: 'Space Grotesk', sans-serif;
@@ -398,4 +410,17 @@ select option, option {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ─── Spotlight Glow Utility ─── */
+.spotlight-glow {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.35), transparent 70%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }

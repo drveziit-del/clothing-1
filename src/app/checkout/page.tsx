@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
@@ -23,6 +23,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { toast } = useRoast();
 
+  const orderCompletedRef = useRef(false);
   const [step, setStep]               = useState<Step>('address');
   const [address, setAddress]         = useState<Address | null>(null);
   const [orderData, setOrderData]     = useState<{ orderId: string; razorpayOrderId: string; amount: number; currency: string } | null>(null);
@@ -35,9 +36,16 @@ export default function CheckoutPage() {
   const [appliedCoupon, setAppliedCoupon]     = useState<string | null>(null);
   const [couponDiscount, setCouponDiscount]   = useState(0);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [promoOpen, setPromoOpen]             = useState(false);
 
+  // Shipping config (loaded from Firestore settings)
+  const [shippingFee, setShippingFee]                 = useState(15);
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState(100);
+
+  const isFreeShipping = subtotal >= freeShippingThreshold;
+  const shippingCharge = isFreeShipping ? 0 : shippingFee;
   const tax = subtotal * 0.08;
-  const totalBeforeDiscount = subtotal + tax;
+  const totalBeforeDiscount = subtotal + tax + shippingCharge;
   const discountAmount = Math.min(couponDiscount, totalBeforeDiscount);
   const grandTotal = Math.max(0, totalBeforeDiscount - discountAmount);
 
@@ -45,10 +53,26 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setMounted(true);
+    // Load shipping settings from Firestore
+    async function loadShippingSettings() {
+      try {
+        const { doc, getDoc } = getFirestoreModule();
+        const db = getFirestoreDb();
+        const snap = await getDoc(doc(db, 'settings', 'global'));
+        if (snap.exists()) {
+          const data = snap.data();
+          if (typeof data.standardShippingFee === 'number') setShippingFee(data.standardShippingFee);
+          if (typeof data.freeShippingThreshold === 'number') setFreeShippingThreshold(data.freeShippingThreshold);
+        }
+      } catch (err) {
+        console.error('Failed to load shipping settings:', err);
+      }
+    }
+    loadShippingSettings();
   }, []);
 
   useEffect(() => {
-    if (mounted && items.length === 0) {
+    if (mounted && items.length === 0 && !orderCompletedRef.current) {
       router.replace('/cart');
     }
   }, [mounted, items, router]);
@@ -103,6 +127,22 @@ export default function CheckoutPage() {
   }
 
   if (items.length === 0) {
+    if (orderCompletedRef.current) {
+      return (
+        <div className={styles.page}>
+          <div className={styles.processingWrapper}>
+            <div className={styles.processingCard}>
+              <div className={styles.processingSpinner} />
+              <div className={styles.processingInfo}>
+                <span className={styles.processingBadge}>PAYMENT CONFIRMED</span>
+                <h2 className={styles.processingTitle}>Securing Your Order</h2>
+                <p className={styles.processingDesc}>Preparing your official thermal receipt & ticket...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
     return null;
   }
 
@@ -133,6 +173,7 @@ export default function CheckoutPage() {
 
       setAppliedCoupon(data.code);
       setCouponDiscount(data.discountUSD);
+      setOrderData(null); // Invalidate any previous order created before coupon was applied
       toast(
         `${data.type === 'percentage' ? `${data.value}%` : formatPrice(data.discountUSD)} discount applied!`,
         'success'
@@ -148,6 +189,7 @@ export default function CheckoutPage() {
     setAppliedCoupon(null);
     setCouponDiscount(0);
     setCouponInput('');
+    setOrderData(null);
     toast('Coupon removed', 'success');
   }
 
@@ -180,8 +222,10 @@ export default function CheckoutPage() {
     const countryCode = result.data.country.trim().toUpperCase();
     const isIndia = countryCode === 'IN';
 
-    // Routing: Domestic IN (India) -> Razorpay; International non-IN -> PayPal
-    if (isIndia) {
+    const isFree = grandTotal <= 0;
+
+    // If order total is $0.00 (e.g. 100% discount applied) -> Create free order and skip payment gateways!
+    if (isFree || isIndia) {
       setUsePayPal(false);
       setLoading(true);
       try {
@@ -224,13 +268,44 @@ export default function CheckoutPage() {
   }
 
   async function handleFreeCheckout() {
-    if (!orderData) return;
     setLoading(true);
     try {
+      let currentOrderId = orderData?.orderId;
+
+      // If no order data or existing order was created with a non-zero price before coupon was applied
+      if (!currentOrderId || orderData?.razorpayOrderId !== 'free_order') {
+        if (!address) {
+          throw new Error('Please provide your shipping address');
+        }
+        const createRes = await fetch('/api/payment/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: items.map((i) => ({
+              productId: i.product.id,
+              variantId: i.variant.id,
+              quantity: i.quantity,
+            })),
+            referralCode: referralCode || undefined,
+            couponCode: appliedCoupon || undefined,
+            shippingAddress: address,
+          }),
+        });
+
+        if (!createRes.ok) {
+          const err = await createRes.json();
+          throw new Error(err.error || 'Order creation failed');
+        }
+
+        const data = await createRes.json();
+        currentOrderId = data.orderId;
+        setOrderData(data);
+      }
+
       const res = await fetch('/api/payment/verify-free', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderId: orderData.orderId }),
+        body: JSON.stringify({ orderId: currentOrderId }),
       });
 
       if (!res.ok) {
@@ -238,9 +313,10 @@ export default function CheckoutPage() {
         throw new Error(err.error || 'Free order checkout failed');
       }
 
-      toast('Order placed successfully!', 'success');
+      orderCompletedRef.current = true;
+      toast('Order placed successfully! Printing receipt...', 'success');
       clearCart();
-      router.push('/account');
+      router.push(`/receipt?orderId=${currentOrderId}`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Something went wrong';
       toast(msg, 'error');
@@ -330,19 +406,30 @@ export default function CheckoutPage() {
           {step === 'payment' && (
             <div className={styles.paymentStep}>
               <h2 className={styles.formTitle}>Payment</h2>
-              {orderData && orderData.razorpayOrderId === 'free_order' ? (
-                <>
-                  <p className={styles.paymentNote}>
-                    Your order is fully covered by your store coupon. No payment required.
-                  </p>
+              {grandTotal <= 0 || (orderData && orderData.razorpayOrderId === 'free_order') ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={{
+                    background: 'rgba(255, 71, 87, 0.08)',
+                    border: '1px solid rgba(255, 71, 87, 0.35)',
+                    borderRadius: '8px',
+                    padding: '1.25rem',
+                  }}>
+                    <p style={{ margin: 0, fontSize: '0.95rem', color: '#ff6b81', fontWeight: 800 }}>
+                      🎉 100% Discount Applied — Zero Payment Required!
+                    </p>
+                    <p style={{ margin: '0.35rem 0 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                      Your order is completely free. No payment gateway, credit card, or PayPal authorization is needed.
+                    </p>
+                  </div>
+
                   <button
                     onClick={handleFreeCheckout}
                     disabled={loading}
-                    className="btn btn-primary btn-lg btn-full"
+                    className={`btn btn-lg btn-full ${styles.freeOrderBtn}`}
                   >
-                    {loading ? 'Placing Order...' : 'Confirm Free Order →'}
+                    {loading ? 'Confirming Order & Printing...' : "🎁 It's Free — Complete Order →"}
                   </button>
-                </>
+                </div>
               ) : usePayPal ? (
                 <>
                   <p className={styles.paymentNote}>
@@ -354,7 +441,11 @@ export default function CheckoutPage() {
                     referralCode={referralCode || undefined}
                     couponCode={appliedCoupon || undefined}
                     shippingAddress={address}
-                    onSuccess={() => router.push('/account')}
+                    onSuccess={(orderId) => {
+                      orderCompletedRef.current = true;
+                      clearCart();
+                      router.push(`/receipt?orderId=${orderId || orderData?.orderId || ''}`);
+                    }}
                     onError={(msg) => toast(msg, 'error')}
                   />
                 </>
@@ -372,8 +463,9 @@ export default function CheckoutPage() {
                     userName={user?.displayName ?? undefined}
                     amountUSD={grandTotal}
                     onSuccess={() => {
+                      orderCompletedRef.current = true;
                       clearCart();
-                      router.push('/account');
+                      router.push(`/receipt?orderId=${orderData.orderId}`);
                     }}
                     onError={(msg) => toast(msg, 'error')}
                   />
@@ -406,6 +498,12 @@ export default function CheckoutPage() {
           </div>
           <div className={styles.summaryTotals}>
             <div className={styles.totalRow}><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
+            <div className={styles.totalRow}>
+              <span>Shipping</span>
+              <span className={isFreeShipping ? styles.freeShipping : ''}>
+                {isFreeShipping ? 'FREE' : formatPrice(shippingCharge)}
+              </span>
+            </div>
             <div className={styles.totalRow}><span>Tax (8%)</span><span>{formatPrice(tax)}</span></div>
             {couponDiscount > 0 && (
               <div className={styles.totalRow} style={{ color: 'var(--coral-200)' }}>
@@ -426,7 +524,7 @@ export default function CheckoutPage() {
                   <span className={styles.couponBadgeText}>Coupon Applied: <strong>{appliedCoupon}</strong></span>
                   <button onClick={handleRemoveCoupon} className={styles.removeCouponBtn}>Remove</button>
                 </div>
-              ) : (
+              ) : promoOpen ? (
                 <form onSubmit={handleApplyCoupon} className={styles.couponForm}>
                   <input
                     type="text"
@@ -444,6 +542,14 @@ export default function CheckoutPage() {
                     {validatingCoupon ? '...' : 'Apply'}
                   </button>
                 </form>
+              ) : (
+                <button
+                  type="button"
+                  className={styles.promoToggle}
+                  onClick={() => setPromoOpen(true)}
+                >
+                  Have a promo code?
+                </button>
               )}
             </div>
           )}

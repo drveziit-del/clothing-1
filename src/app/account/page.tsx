@@ -2,10 +2,13 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState, useMemo, useRef, Suspense } from 'react';
 import { getFirestoreDb, getFirestoreModule, getFirebaseStorage, getStorageModule, getFirebaseAuth } from '@/lib/firebase/config';
 import { useRoast } from '@/hooks/useRoast';
+import { BentoGrid, BentoCard } from '@/components/ui/BentoGrid';
 import styles from './page.module.css';
 import type { Coupon, Referral, Order } from '@/types';
 
@@ -49,10 +52,21 @@ function parseFirestoreDate(timestamp: any): Date {
   return isNaN(date.getTime()) ? new Date() : date;
 }
 
+export type AccountTab = 'dashboard' | 'orders' | 'payouts' | 'analytics' | 'rewards' | 'profile';
+
 export default function AccountPage() {
+  return (
+    <Suspense fallback={<div className={styles.loading}>Loading account matrix...</div>}>
+      <AccountPageContent />
+    </Suspense>
+  );
+}
+
+function AccountPageContent() {
   const { user, loading } = useAuth();
   const { formatPrice } = useCurrency();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useRoast();
   const [copied, setCopied] = useState(false);
 
@@ -61,19 +75,37 @@ export default function AccountPage() {
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
 
+  // Orders Tab Filter States
+  const [orderCollectionFilter, setOrderCollectionFilter] = useState<'all' | 'society_fuckers' | 'valueless_bitches'>('all');
+  const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | 'paid' | 'processing' | 'rejected'>('all');
+  const [orderSearchQuery, setOrderSearchQuery] = useState('');
+  const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
+
   // Claim State
   const [claiming, setClaiming] = useState(false);
   const [claimType, setClaimType] = useState<'refund' | 'coupon' | 'wise' | 'paypal' | 'bank'>('coupon');
   const [selectedOrderId, setSelectedOrderId] = useState<string>('');
   const [claimAmount, setClaimAmount] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'payouts' | 'analytics' | 'rewards' | 'profile'>('dashboard');
+  const [activeTab, setActiveTab] = useState<AccountTab>('dashboard');
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('all');
+
+  // Handle URL tab parameter
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['dashboard', 'orders', 'payouts', 'analytics', 'rewards', 'profile'].includes(tabParam)) {
+      setActiveTab(tabParam as AccountTab);
+    }
+  }, [searchParams]);
 
   // Profile Settings State
   const [profileName, setProfileName] = useState('');
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
   const [updatingProfile, setUpdatingProfile] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -156,8 +188,7 @@ export default function AccountPage() {
     const db = getFirestoreDb();
     const q = query(
       collection(db, 'orders'),
-      where('userId', '==', user.uid),
-      where('status', 'in', ['paid', 'in_production', 'shipped', 'delivered'])
+      where('userId', '==', user.uid)
     );
     const unsub = onSnapshot(
       q,
@@ -168,7 +199,7 @@ export default function AccountPage() {
         // Safely set defaults inside subscription callback to avoid layout effect cascading renders
         const validRefundable = list.filter(o => {
           const refunded = o.referralRefundedAmount ?? 0;
-          return o.total - refunded > 0;
+          return (o.total - refunded > 0) && ['paid', 'in_production', 'shipped', 'delivered'].includes(o.status);
         });
 
         if (validRefundable.length > 0) {
@@ -221,9 +252,94 @@ export default function AccountPage() {
   const refundableOrders = useMemo(() => {
     return orders.filter(o => {
       const refunded = o.referralRefundedAmount ?? 0;
-      return o.total - refunded > 0;
+      return (o.total - refunded > 0) && ['paid', 'in_production', 'shipped', 'delivered'].includes(o.status);
     });
   }, [orders]);
+
+  // Classify orders by collection and status
+  const classifiedOrders = useMemo(() => {
+    return orders.map((order) => {
+      const isSociety = order.isPrebooking || order.items?.some((i) => {
+        const itemAny = i as any;
+        return itemAny.section === 'society_fuckers' || i.productId?.includes('test') || itemAny.productTier || itemAny.tier;
+      });
+      const isValueless = (order.items?.some((i) => (i as any).section === 'valueless_bitches' || !(i as any).section)) && !order.isPrebooking;
+
+      let collectionType: 'society_fuckers' | 'valueless_bitches' | 'both' = 'valueless_bitches';
+      if (isSociety && isValueless) collectionType = 'both';
+      else if (isSociety) collectionType = 'society_fuckers';
+
+      let statusCategory: 'paid' | 'processing' | 'rejected' = 'processing';
+      if (['paid', 'completed', 'delivered', 'shipped'].includes(order.status)) {
+        statusCategory = 'paid';
+      } else if (['cancelled', 'refunded', 'rejected', 'expired', 'payment_reversed', 'chargeback', 'disputed'].includes(order.status)) {
+        statusCategory = 'rejected';
+      } else {
+        statusCategory = 'processing';
+      }
+
+      const parsedDate = parseFirestoreDate(order.createdAt);
+
+      return {
+        ...order,
+        collectionType,
+        statusCategory,
+        parsedDate,
+      };
+    }).sort((a, b) => b.parsedDate.getTime() - a.parsedDate.getTime());
+  }, [orders]);
+
+  // Filtered orders list for Orders Tab
+  const filteredOrders = useMemo(() => {
+    return classifiedOrders.filter((order) => {
+      // Collection Filter
+      if (orderCollectionFilter !== 'all') {
+        if (orderCollectionFilter === 'society_fuckers' && order.collectionType !== 'society_fuckers' && order.collectionType !== 'both') {
+          return false;
+        }
+        if (orderCollectionFilter === 'valueless_bitches' && order.collectionType !== 'valueless_bitches' && order.collectionType !== 'both') {
+          return false;
+        }
+      }
+
+      // Status Filter
+      if (orderStatusFilter !== 'all') {
+        if (order.statusCategory !== orderStatusFilter) {
+          return false;
+        }
+      }
+
+      // Search Query
+      if (orderSearchQuery.trim()) {
+        const q = orderSearchQuery.toLowerCase().trim();
+        const idMatch = order.id.toLowerCase().includes(q);
+        const itemMatch = order.items?.some(i => i.title?.toLowerCase().includes(q) || i.variant?.color?.toLowerCase().includes(q) || i.variant?.size?.toLowerCase().includes(q));
+        const prebookMatch = order.prebookName?.toLowerCase().includes(q) || order.prebookMessage?.toLowerCase().includes(q);
+        if (!idMatch && !itemMatch && !prebookMatch) return false;
+      }
+
+      return true;
+    });
+  }, [classifiedOrders, orderCollectionFilter, orderStatusFilter, orderSearchQuery]);
+
+  // Order Counts
+  const orderCounts = useMemo(() => {
+    const all = classifiedOrders.length;
+    const society = classifiedOrders.filter(o => o.collectionType === 'society_fuckers' || o.collectionType === 'both').length;
+    const valueless = classifiedOrders.filter(o => o.collectionType === 'valueless_bitches' || o.collectionType === 'both').length;
+    const paid = classifiedOrders.filter(o => o.statusCategory === 'paid').length;
+    const processing = classifiedOrders.filter(o => o.statusCategory === 'processing').length;
+    const rejected = classifiedOrders.filter(o => o.statusCategory === 'rejected').length;
+
+    return { all, society, valueless, paid, processing, rejected };
+  }, [classifiedOrders]);
+
+  const handleCopyOrderId = (id: string) => {
+    navigator.clipboard.writeText(id);
+    setCopiedOrderId(id);
+    toast(`Order #${id.slice(0, 8)} copied!`, 'success');
+    setTimeout(() => setCopiedOrderId(null), 2000);
+  };
 
   const filteredReferrals = useMemo(() => {
     if (timeRange === 'all') return referrals;
@@ -461,18 +577,40 @@ export default function AccountPage() {
     setUpdatingProfile(true);
     try {
       // 1. Update Password if entered
-      if (newPassword) {
+      if (newPassword || currentPassword) {
+        if (!currentPassword) {
+          throw new Error('Please enter your current password to update password');
+        }
+        if (!newPassword) {
+          throw new Error('Please enter a new password');
+        }
         if (newPassword !== confirmPassword) {
-          throw new Error('Passwords do not match');
+          throw new Error('New passwords do not match');
         }
         if (newPassword.length < 6) {
-          throw new Error('Password must be at least 6 characters long');
+          throw new Error('New password must be at least 6 characters long');
         }
 
-        const { updatePassword } = require('firebase/auth') as typeof import('firebase/auth');
+        const { EmailAuthProvider, reauthenticateWithCredential, updatePassword } = require('firebase/auth') as typeof import('firebase/auth');
         const auth = getFirebaseAuth();
-        if (auth.currentUser) {
+        if (auth.currentUser && auth.currentUser.email) {
+          try {
+            const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword);
+            await reauthenticateWithCredential(auth.currentUser, credential);
+          } catch (reauthErr: any) {
+            console.error('Re-authentication failed:', reauthErr);
+            if (reauthErr.code === 'auth/wrong-password' || reauthErr.code === 'auth/invalid-credential') {
+              throw new Error('Current password is incorrect');
+            }
+            throw new Error(reauthErr.message || 'Current password authentication failed');
+          }
+
           await updatePassword(auth.currentUser, newPassword);
+
+          // Refresh token and update session cookie
+          const refreshedToken = await auth.currentUser.getIdToken(true);
+          const { setSessionCookie } = require('@/lib/firebase/auth');
+          await setSessionCookie(refreshedToken);
         } else {
           throw new Error('Not logged into Firebase Auth');
         }
@@ -496,6 +634,7 @@ export default function AccountPage() {
         photoURL: profilePhotoUrl || null,
       });
 
+      setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
 
@@ -547,10 +686,16 @@ export default function AccountPage() {
         <p className={styles.subhead}>Your style is improving. Marginally.</p>
       </div>
 
-      <div className={styles.grid}>
-        {/* Stats */}
-        <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Your Stats</h2>
+      <BentoGrid columns={3}>
+        {/* Card 1: Main Referral Stats (2 Cols) */}
+        <BentoCard
+          title="Performance & Milestones"
+          description="Track your referral performance, lifetime commission earnings, and progress toward your next $100 payout."
+          badge="Affiliate Stats"
+          badgeType="mist"
+          colSpan={2}
+          variant="mist"
+        >
           <div className={styles.statsGrid}>
             <div className={styles.stat}>
               <span className={styles.statVal}>{user.referralCount}</span>
@@ -568,54 +713,77 @@ export default function AccountPage() {
 
           {/* Progress bar to next milestone */}
           <div className={styles.progressWrap}>
-            <span className={styles.progressLabel}>Progress to next commission</span>
+            <span className={styles.progressLabel}>Progress to next $100 milestone</span>
             <div className={styles.progressBar}>
               <div
                 className={styles.progressFill}
                 style={{ width: `${((10 - toNext) / 10) * 100}%` }}
               />
             </div>
-            <span className={styles.progressHint}>{user.referralCount % 10} / 10 referrals</span>
+            <span className={styles.progressHint}>{user.referralCount % 10} / 10 orders completed</span>
           </div>
-        </section>
+        </BentoCard>
 
-        {/* Referral */}
-        <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Referral Link</h2>
-          <p className={styles.cardDesc}>
-            Share this link. Every 10 people who buy after clicking it earns you $100.
-            The 100,000th customer globally earns you $100,000.
-          </p>
+        {/* Card 2: Viral Referral Link (1 Col) */}
+        <BentoCard
+          title="Your Affiliate Code"
+          description="Every 10 orders placed with this link unlocks an instant $100 commission."
+          badge="Referral"
+          badgeType="coral"
+          colSpan={1}
+          variant="coral"
+        >
           <div className={styles.referralBox}>
             <span className={styles.referralCode}>{user.referralCode}</span>
             <div className={styles.referralLink}>
-              <span>{referralLink}</span>
+              <span style={{ fontSize: '0.78rem', wordBreak: 'break-all' }}>{referralLink}</span>
               <button onClick={copyLink} className={`btn btn-secondary btn-sm ${styles.copyBtn}`}>
                 {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
           </div>
-        </section>
+        </BentoCard>
 
-        {/* Profile */}
-        <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Profile</h2>
+        {/* Card 3: Payout Method Quick Status (1 Col) */}
+        <BentoCard
+          title="Payout Destination"
+          description={payoutPrefs ? `Configured for ${payoutPrefs.method?.toUpperCase() || 'Direct Payout'}.` : 'No payout destination saved yet.'}
+          badge="Wallet"
+          badgeType="default"
+          colSpan={1}
+          ctaText={payoutPrefs ? 'Update Payouts →' : 'Setup Payouts →'}
+          onClick={() => setActiveTab('payouts')}
+        >
+          <div style={{ padding: '0.5rem 0', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Available Wallet:</span>
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent)' }}>
+              {formatPrice(availableBalance)}
+            </span>
+          </div>
+        </BentoCard>
+
+        {/* Card 4: Account Details & Role (2 Cols) */}
+        <BentoCard
+          title="Account Profile"
+          description="Your verified identity credentials on GERKINK."
+          badge={user.role === 'admin' ? 'Admin Access' : 'Verified Member'}
+          badgeType={user.role === 'admin' ? 'coral' : 'mist'}
+          colSpan={2}
+          ctaText="Edit Profile & Password →"
+          onClick={() => setActiveTab('profile')}
+        >
           <div className={styles.profileRows}>
             <div className={styles.profileRow}>
-              <span className={styles.profileKey}>Name</span>
-              <span className={styles.profileVal}>{user.displayName}</span>
+              <span className={styles.profileKey}>Display Name</span>
+              <span className={styles.profileVal}>{user.displayName || 'Anonymous Member'}</span>
             </div>
             <div className={styles.profileRow}>
               <span className={styles.profileKey}>Email</span>
               <span className={styles.profileVal}>{user.email}</span>
             </div>
-            <div className={styles.profileRow}>
-              <span className={styles.profileKey}>Role</span>
-              <span className={`tag ${user.role === 'admin' ? 'tag-mist' : ''}`}>{user.role}</span>
-            </div>
           </div>
-        </section>
-      </div>
+        </BentoCard>
+      </BentoGrid>
     </div>
   );
 
@@ -1371,28 +1539,103 @@ export default function AccountPage() {
               />
             </div>
 
+            {/* Password Section */}
+            <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
+              <label className={styles.formLabel}>Current Password (Required to change password)</label>
+              <div className={styles.inputWrap}>
+                <input
+                  type={showCurrentPw ? 'text' : 'password'}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password"
+                  className={styles.formInput}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  className={styles.pwToggle}
+                  onClick={() => setShowCurrentPw((prev) => !prev)}
+                  aria-label={showCurrentPw ? 'Hide password' : 'Show password'}
+                >
+                  {showCurrentPw ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
             {/* Password Fields */}
             <div className={styles.profileGrid}>
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>New Password (Optional)</label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="At least 6 chars"
-                  className={styles.formInput}
-                />
+                <div className={styles.inputWrap}>
+                  <input
+                    type={showNewPw ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="At least 6 chars"
+                    className={styles.formInput}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    className={styles.pwToggle}
+                    onClick={() => setShowNewPw((prev) => !prev)}
+                    aria-label={showNewPw ? 'Hide password' : 'Show password'}
+                  >
+                    {showNewPw ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Confirm Password</label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Repeat password"
-                  className={styles.formInput}
-                />
+                <div className={styles.inputWrap}>
+                  <input
+                    type={showConfirmPw ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repeat password"
+                    className={styles.formInput}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    className={styles.pwToggle}
+                    onClick={() => setShowConfirmPw((prev) => !prev)}
+                    aria-label={showConfirmPw ? 'Hide password' : 'Show password'}
+                  >
+                    {showConfirmPw ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1406,6 +1649,298 @@ export default function AccountPage() {
             </button>
           </form>
         </section>
+      </div>
+    </div>
+  );
+
+  const renderOrdersTab = () => (
+    <div className={styles.tabView}>
+      <div className={styles.ordersContainer}>
+        {/* Header */}
+        <div className={styles.ordersHeader}>
+          <h1 className="text-display">My Orders &amp; Allocations</h1>
+          <p className={styles.subhead}>
+            Track and manage your luxury pre-booking allocations and streetwear drops across GERKINK collections.
+          </p>
+        </div>
+
+        {/* Interactive Filter & Search Bar */}
+        <div className={styles.ordersFilterBar}>
+          {/* Collection Switcher */}
+          <div className={styles.collectionSegmented}>
+            <button
+              type="button"
+              className={`${styles.collectionSegmentBtn} ${orderCollectionFilter === 'all' ? styles.collectionSegmentBtnActive : ''}`}
+              onClick={() => setOrderCollectionFilter('all')}
+            >
+              ✦ All Collections ({orderCounts.all})
+            </button>
+            <button
+              type="button"
+              className={`${styles.collectionSegmentBtn} ${orderCollectionFilter === 'society_fuckers' ? styles.collectionSegmentBtnActive : ''}`}
+              onClick={() => setOrderCollectionFilter('society_fuckers')}
+            >
+              👑 Society Fu*kers ({orderCounts.society})
+            </button>
+            <button
+              type="button"
+              className={`${styles.collectionSegmentBtn} ${orderCollectionFilter === 'valueless_bitches' ? styles.collectionSegmentBtnActiveValueless : ''}`}
+              onClick={() => setOrderCollectionFilter('valueless_bitches')}
+            >
+              💀 Valueless Bitches ({orderCounts.valueless})
+            </button>
+          </div>
+
+          {/* Status Filter Row + Search */}
+          <div className={styles.filterControlsRow}>
+            <div className={styles.statusFilterRow}>
+              <button
+                type="button"
+                className={`${styles.statusFilterPill} ${orderStatusFilter === 'all' ? styles.statusFilterPillActive : ''}`}
+                onClick={() => setOrderStatusFilter('all')}
+              >
+                All ({orderCounts.all})
+              </button>
+              <button
+                type="button"
+                className={`${styles.statusFilterPill} ${orderStatusFilter === 'paid' ? styles.statusFilterPillActive : ''}`}
+                onClick={() => setOrderStatusFilter('paid')}
+              >
+                ✓ Paid ({orderCounts.paid})
+              </button>
+              <button
+                type="button"
+                className={`${styles.statusFilterPill} ${orderStatusFilter === 'processing' ? styles.statusFilterPillActive : ''}`}
+                onClick={() => setOrderStatusFilter('processing')}
+              >
+                ⏳ Processing ({orderCounts.processing})
+              </button>
+              <button
+                type="button"
+                className={`${styles.statusFilterPill} ${orderStatusFilter === 'rejected' ? styles.statusFilterPillActive : ''}`}
+                onClick={() => setOrderStatusFilter('rejected')}
+              >
+                ✕ Cancelled / Rejected ({orderCounts.rejected})
+              </button>
+            </div>
+
+            <input
+              type="text"
+              className={styles.ordersSearchInput}
+              placeholder="Search by Order ID or Product..."
+              value={orderSearchQuery}
+              onChange={(e) => setOrderSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Orders List */}
+        {filteredOrders.length === 0 ? (
+          <div className={styles.emptyOrdersState}>
+            <span className={styles.emptyOrdersIcon}>
+              {orderCollectionFilter === 'society_fuckers' ? '👑' : '📦'}
+            </span>
+            <h3 className={styles.emptyOrdersTitle}>
+              {orderSearchQuery ? 'No Matching Orders Found' : 'No Orders in this View'}
+            </h3>
+            <p className={styles.emptyOrdersSubtitle}>
+              {orderSearchQuery
+                ? `No orders matched your search query "${orderSearchQuery}". Try clearing your filters.`
+                : orderCollectionFilter === 'society_fuckers'
+                ? 'You have not submitted any Society Fu*kers luxury pre-booking applications yet. Explore the God Tier vault in our shop.'
+                : 'You have not placed any orders in this category yet. Explore the newest drops and wear your worth.'}
+            </p>
+            <Link
+              href={orderCollectionFilter === 'society_fuckers' ? '/shop/society-fuckers' : '/shop'}
+              className="btn btn-primary btn-sm"
+              style={{ marginTop: '0.5rem' }}
+            >
+              {orderCollectionFilter === 'society_fuckers' ? 'Explore Society Fu*kers Vault →' : 'Explore The Shop →'}
+            </Link>
+          </div>
+        ) : (
+          <div className={styles.ordersList}>
+            {filteredOrders.map((order) => {
+              const isSociety = order.collectionType === 'society_fuckers' || order.isPrebooking;
+              const formattedDate = formatFirestoreDate(order.createdAt);
+              const isAwaitingWire = order.status === 'awaiting_wire_confirmation';
+
+              return (
+                <div
+                  key={order.id}
+                  className={`${styles.orderCard} ${isSociety ? styles.orderCardSociety : ''}`}
+                >
+                  {/* Card Header */}
+                  <div className={styles.orderCardHeader}>
+                    <div className={styles.orderMetaLeft}>
+                      <div className={styles.orderIdBadge}>
+                        <span>#{order.id.slice(0, 10)}</span>
+                        <button
+                          type="button"
+                          className={styles.copyOrderBtn}
+                          onClick={() => handleCopyOrderId(order.id)}
+                          title="Copy Full Order ID"
+                        >
+                          {copiedOrderId === order.id ? '✓' : '📋'}
+                        </button>
+                      </div>
+                      <span suppressHydrationWarning className={styles.orderDateText}>
+                        Placed on {formattedDate}
+                      </span>
+                    </div>
+
+                    <div className={styles.orderBadgesRight}>
+                      {/* Collection Badge */}
+                      {isSociety ? (
+                        <span className={styles.collectionTagGold}>
+                          👑 Society Fu*kers {order.isPrebooking ? '• Pre-booking' : ''}
+                        </span>
+                      ) : (
+                        <span className={styles.collectionTagBrutal}>
+                          💀 Valueless Bitches
+                        </span>
+                      )}
+
+                      {/* Status Badge */}
+                      {isAwaitingWire ? (
+                        <span className={styles.statusAwaitingWireBadge}>
+                          <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#FFD700' }} />
+                          Awaiting Wire Clearance
+                        </span>
+                      ) : order.statusCategory === 'paid' ? (
+                        <span className={styles.statusPaidBadge}>
+                          ✓ {order.status === 'delivered' ? 'Delivered' : order.status === 'shipped' ? 'Shipped' : 'Paid & Confirmed'}
+                        </span>
+                      ) : order.statusCategory === 'rejected' ? (
+                        <span className={styles.statusRejectedBadge}>
+                          ✕ {order.status === 'refunded' ? 'Refunded' : 'Cancelled / Rejected'}
+                        </span>
+                      ) : (
+                        <span className={styles.statusProcessingBadge}>
+                          ⏳ {order.status === 'in_production' ? 'In Production' : 'Processing'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Order Items */}
+                  <div className={styles.orderItemsGrid}>
+                    {order.items && order.items.length > 0 ? (
+                      order.items.map((item, idx) => (
+                        <div key={idx} className={styles.orderItemRow}>
+                          <div className={styles.itemInfoLeft}>
+                            <img
+                              src={item.image || '/logo.png'}
+                              alt={item.title || 'Product Item'}
+                              className={styles.itemThumbnail}
+                            />
+                            <div className={styles.itemMeta}>
+                              <span className={styles.itemTitle}>{item.title}</span>
+                              <span className={styles.itemSpecs}>
+                                Size: {item.variant?.size || 'Standard'} • Color: {item.variant?.color || 'Default'} • Qty: {item.quantity || 1}
+                              </span>
+                            </div>
+                          </div>
+                          <div className={styles.itemPriceQty}>
+                            {formatPrice((item.price || 0) * (item.quantity || 1))}
+                          </div>
+                        </div>
+                      ))
+                    ) : order.isPrebooking ? (
+                      <div className={styles.orderItemRow}>
+                        <div className={styles.itemInfoLeft}>
+                          <div className={styles.itemThumbnail} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', background: 'rgba(255, 215, 0, 0.1)' }}>
+                            👑
+                          </div>
+                          <div className={styles.itemMeta}>
+                            <span className={styles.itemTitle}>Bespoke Allocation: {order.prebookName || 'Private Client Piece'}</span>
+                            <span className={styles.itemSpecs}>
+                              Priority Escrow Deposit Reserved • Tier Allocation
+                            </span>
+                          </div>
+                        </div>
+                        <div className={styles.itemPriceQty}>
+                          {formatPrice(order.total || 500)}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  {/* Pre-booking Special Callout */}
+                  {order.isPrebooking && (
+                    <div className={styles.prebookCallout}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <span className={styles.prebookCalloutTitle}>
+                          ✦ Bespoke Manufacturing &amp; Escrow Deposit Details
+                        </span>
+                        <span style={{ fontSize: '0.75rem', color: '#2ed573', fontWeight: 800 }}>
+                          Deposit: {formatPrice(order.total || 500)}
+                        </span>
+                      </div>
+
+                      {order.prebookMessage && (
+                        <p className={styles.prebookCalloutNotes}>
+                          Client Customization Notes: &quot;{order.prebookMessage}&quot;
+                        </p>
+                      )}
+
+                      {isAwaitingWire && (
+                        <div style={{ background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.3)', borderRadius: '4px', padding: '0.65rem 0.85rem', fontSize: '0.8rem', color: '#FFD700', marginTop: '0.25rem' }}>
+                          <strong>Submitted Wire Reference:</strong> {order.wireDetails?.senderReference || 'Submitted'}.
+                          <div style={{ marginTop: '0.25rem', color: '#ddd', fontSize: '0.75rem' }}>
+                            Our executive treasury desk is auditing settlement. Your priority allocation sequence is reserved.
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Card Footer */}
+                  <div className={styles.orderCardFooter}>
+                    <div className={styles.footerPayInfo}>
+                      <span>
+                        Payment:{' '}
+                        <strong style={{ color: '#fff' }}>
+                          {order.paymentGateway === 'wise_bank_transfer'
+                            ? '🏦 Wise / Wire'
+                            : order.paymentGateway === 'paypal'
+                            ? '🅿️ PayPal'
+                            : '💳 Card'}
+                        </strong>
+                      </span>
+                      <span>•</span>
+                      <span>
+                        Total:{' '}
+                        <span className={styles.totalAmountVal}>
+                          {formatPrice(order.total || 0)}
+                        </span>
+                      </span>
+                    </div>
+
+                    <div className={styles.footerActions}>
+                      {isAwaitingWire && (
+                        <Link
+                          href={`/contact?subject=Expedite Wire Authorization — Order ${order.id}`}
+                          className="btn btn-secondary btn-sm"
+                          style={{ borderColor: '#FFD700', color: '#FFD700', fontSize: '0.75rem' }}
+                        >
+                          👑 VIP Concierge Desk ↗
+                        </Link>
+                      )}
+                      <Link
+                        href={`/thank-you?orderId=${order.id}`}
+                        className="btn btn-secondary btn-sm"
+                        style={{ fontSize: '0.75rem' }}
+                      >
+                        Receipt &amp; Summary →
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1427,6 +1962,12 @@ export default function AccountPage() {
             className={`${styles.sidebarButton} ${activeTab === 'dashboard' ? styles.sidebarButtonActive : ''}`}
           >
             📊 Overview
+          </button>
+          <button
+            onClick={() => setActiveTab('orders')}
+            className={`${styles.sidebarButton} ${activeTab === 'orders' ? styles.sidebarButtonActive : ''}`}
+          >
+            📦 My Orders {orderCounts.all > 0 && <span className="tag" style={{ marginLeft: 'auto', fontSize: '0.7rem', padding: '0.1rem 0.4rem' }}>{orderCounts.all}</span>}
           </button>
           <button
             onClick={() => setActiveTab('payouts')}
@@ -1457,6 +1998,7 @@ export default function AccountPage() {
         {/* Content Pane */}
         <main className={styles.mainContent}>
           {activeTab === 'dashboard' && renderDashboardTab()}
+          {activeTab === 'orders' && renderOrdersTab()}
           {activeTab === 'payouts' && renderPayoutsTab()}
           {activeTab === 'analytics' && renderAnalyticsTab()}
           {activeTab === 'rewards' && renderRewardsTab()}

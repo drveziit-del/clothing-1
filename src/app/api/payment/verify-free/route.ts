@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
   batch.update(orderRef, {
     status: 'paid',
     paymentCaptured: true,
+    paymentGateway: 'free',
     updatedAt: FieldValue.serverTimestamp(),
   });
 

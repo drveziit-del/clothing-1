@@ -1,0 +1,170 @@
+.root {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  flex-direction: column;
+  align-items: center;
+}
+
+.machine {
+  position: relative;
+  z-index: 20;
+  isolation: isolate;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  border: 1px solid #333338;
+  background: linear-gradient(180deg, #2a2a2e 0%, #1e1e22 100%);
+  padding: 0.85rem 0.85rem 1.85rem;
+  box-shadow:
+    0 20px 40px -15px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.paperSlot {
+  position: absolute;
+  left: 1.5rem;
+  right: 1.5rem;
+  bottom: 0.65rem;
+  z-index: 40;
+  height: 9px;
+  border-radius: 4px;
+  border: 1px solid #141416;
+  background: #08080a;
+  box-shadow: inset 0 2px 5px #000;
+}
+
+.header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.25rem 0.6rem;
+}
+
+.screen {
+  position: relative;
+  z-index: 10;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid #18181b;
+  background: #121215;
+  padding: 1.15rem;
+  color: #fff;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.screenInner {
+  position: relative;
+  z-index: 10;
+}
+
+.statusRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.statusIndicator {
+  position: relative;
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  place-items: center;
+}
+
+.statusSuccessIcon {
+  display: grid;
+  place-items: center;
+}
+
+.statusSpinnerIcon {
+  display: grid;
+  place-items: center;
+}
+
+.spinAnimation {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.statusLabelWrap {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+}
+
+.statusLabelText {
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #d1d5db;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.outputWrapper {
+  position: relative;
+  z-index: 10;
+  margin-top: -1.25rem;
+  width: calc(100% - 2.5rem);
+  max-width: 100%;
+  overflow: hidden;
+  padding-top: 1.25rem;
+  min-height: 480px;
+}
+
+.outputBlurShadow {
+  pointer-events: none;
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  top: 1.15rem;
+  z-index: 25;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  filter: blur(4px);
+}
+
+.paperMotionContainer {
+  position: relative;
+  isolation: isolate;
+  will-change: transform, opacity;
+  box-shadow:
+    0 15px 35px -5px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.paper {
+  position: relative;
+  z-index: 10;
+  min-height: 420px;
+  background: #ffffff;
+  color: #111827;
+  padding: 1.75rem 1.5rem 2.5rem;
+  font-family: 'Space Mono', 'Courier New', Courier, monospace;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}

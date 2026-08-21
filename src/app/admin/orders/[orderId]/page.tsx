@@ -1,6 +1,7 @@
 import { adminDb } from '@/lib/firebase/admin';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import WireApprovalActions from '@/components/admin/WireApprovalActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,7 +52,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
           <h1 style={{ fontSize: '1.5rem', color: 'var(--coral-200, #ff4757)', margin: 0 }}>
             ORDER: {orderId}
           </h1>
-          <p style={{ color: '#888', margin: '0.25rem 0 0', fontSize: '0.85rem' }}>
+          <p suppressHydrationWarning style={{ color: '#888', margin: '0.25rem 0 0', fontSize: '0.85rem' }}>
             Created: {createdAt} | Last Updated: {updatedAt}
           </p>
         </div>
@@ -63,14 +64,49 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
               fontWeight: 'bold',
               textTransform: 'uppercase',
               fontSize: '0.85rem',
-              backgroundColor: data.status === 'paid' || data.status === 'in_production' ? '#2ed573' : '#ffa502',
+              backgroundColor: data.status === 'paid' || data.status === 'in_production' ? '#2ed573' : data.status === 'awaiting_wire_confirmation' ? '#ffa502' : '#747d8c',
               color: '#000',
             }}
           >
-            {data.status}
+            {data.status === 'awaiting_wire_confirmation' ? '⏳ Awaiting Wire Approval' : data.status}
           </span>
         </div>
       </div>
+
+      {/* Wire Transfer Approval Action Block (if awaiting confirmation) */}
+      <WireApprovalActions
+        orderId={orderId}
+        currentStatus={data.status}
+        wireDetails={data.wireDetails}
+      />
+
+      {/* Society Fuckers Pre-booking / Bespoke Allocation Card */}
+      {data.isPrebooking && (
+        <div style={{ background: 'linear-gradient(135deg, rgba(255,215,0,0.1), rgba(20,20,20,0.95))', padding: '1.75rem', borderRadius: '8px', border: '1px solid rgba(255,215,0,0.4)', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,215,0,0.2)', paddingBottom: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <h2 style={{ fontSize: '1.2rem', color: '#FFD700', margin: 0 }}>
+              👑 Society Fu*kers Bespoke Allocation Application
+            </h2>
+            <span style={{ background: '#FFD700', color: '#000', fontWeight: 900, padding: '0.25rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem' }}>
+              LUXURY PRE-BOOKING
+            </span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', fontSize: '0.9rem' }}>
+            <div>
+              <p style={{ margin: '0.35rem 0' }}><span style={{ color: '#aaa' }}>Client Name:</span> <strong>{data.prebookName || data.shippingAddress?.name || 'Anonymous'}</strong></p>
+              <p style={{ margin: '0.35rem 0' }}><span style={{ color: '#aaa' }}>Contact Email:</span> <a href={`mailto:${data.prebookEmail || data.userEmail}`} style={{ color: '#FFD700', textDecoration: 'underline' }}>{data.prebookEmail || data.userEmail}</a></p>
+              <p style={{ margin: '0.35rem 0' }}><span style={{ color: '#aaa' }}>Payment Method:</span> <strong style={{ color: '#FFD700' }}>{data.paymentGateway === 'wise_bank_transfer' ? '🏦 Wise / Wire Transfer' : data.paymentGateway?.toUpperCase() || 'PAYPAL'}</strong></p>
+              <p style={{ margin: '0.35rem 0' }}><span style={{ color: '#aaa' }}>Deposit Amount:</span> <strong style={{ color: '#2ed573' }}>${data.total?.toFixed(2) || '500.00'}</strong></p>
+            </div>
+            <div style={{ background: 'rgba(0,0,0,0.5)', padding: '1rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ fontSize: '0.75rem', color: '#FFD700', fontWeight: 800, marginBottom: '0.35rem' }}>CLIENT BESPOKE CUSTOMIZATION &amp; SIZING NOTES:</div>
+              <p style={{ margin: 0, color: '#eee', fontStyle: 'italic', whiteSpace: 'pre-wrap' }}>
+                {data.prebookMessage ? `"${data.prebookMessage}"` : 'No custom notes provided by client.'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Grid Layout */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
@@ -173,7 +209,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
             <div style={{ fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {history.map((ev: any, idx: number) => (
                 <div key={idx} style={{ borderLeft: '2px solid var(--coral-200, #ff4757)', paddingLeft: '0.75rem' }}>
-                  <div style={{ color: '#888' }}>{new Date(ev.timestamp).toLocaleString()} [{ev.actor}]</div>
+                  <div suppressHydrationWarning style={{ color: '#888' }}>{new Date(ev.timestamp).toLocaleString()} [{ev.actor}]</div>
                   <div style={{ color: '#fff', fontWeight: 'bold' }}>{ev.event}</div>
                   {ev.metadata && <pre style={{ background: '#000', padding: '0.25rem', borderRadius: '4px', margin: '0.25rem 0 0', overflowX: 'auto', fontSize: '0.75rem' }}>{JSON.stringify(ev.metadata, null, 2)}</pre>}
                 </div>

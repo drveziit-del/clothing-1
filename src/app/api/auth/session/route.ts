@@ -8,7 +8,7 @@ import { isRateLimited } from '@/lib/utils/rateLimit';
  * Creates an HTTP-only session cookie from a Firebase ID token.
  */
 export async function POST(request: NextRequest) {
-  if (isRateLimited(request, 'auth_session', { limit: 15, windowMs: 15 * 60 * 1000 })) {
+  if (isRateLimited(request, 'auth_session', { limit: 60, windowMs: 15 * 60 * 1000 })) {
     return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
   }
 

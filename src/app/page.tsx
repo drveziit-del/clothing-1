@@ -5,6 +5,7 @@ import Link from 'next/link';
 import EgoTicker from '@/components/ui/EgoTicker';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import ReviewsSection from '@/components/reviews/ReviewsSection';
+import { BentoGrid, BentoCard } from '@/components/ui/BentoGrid';
 import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
 import styles from './page.module.css';
 
@@ -145,33 +146,121 @@ export default function HomePage() {
       {/* ── EGO TICKER ───────────────────────────────────────── */}
       <EgoTicker />
 
-      {/* ── SECTION SPLIT ────────────────────────────────────── */}
-      <section className={styles.split} aria-label="Shop sections">
-        <Link href="/shop/society-fuckers" className={`${styles.splitPanel} ${styles.splitLeft}`}>
-          <div className={styles.splitContent}>
-            <span className="tag tag-mist">Est. for the delusional</span>
-            <h2 className={styles.splitTitle}>Society<br />Fu*kers</h2>
-            <p className={styles.splitDesc}>
-              $1,000 – $10,000,000<br />
-              For those with more money than shame.
-            </p>
-            <span className={styles.splitCta}>Enter →</span>
-          </div>
-          <div className={styles.splitOverlay} aria-hidden />
-        </Link>
+      {/* ── BENTO GRID SHOWCASE ─────────────────────────────── */}
+      <section className={styles.bentoSection} aria-label="Collections and Features">
+        <div className={styles.bentoSectionHeader}>
+          <p className="text-label" style={{ color: 'var(--mist-100)' }}>CURATED CHAOS</p>
+          <h2 className={styles.bentoHeaderTitle}>The GERKINK Ecosystem</h2>
+          <p className={styles.bentoHeaderSub}>
+            Two contrasting collections, an unapologetic referral engine, and heavyweight ethical craftsmanship.
+          </p>
+        </div>
 
-        <Link href="/shop/valueless-bitches" className={`${styles.splitPanel} ${styles.splitRight}`}>
-          <div className={styles.splitContent}>
-            <span className="tag tag-coral">For the unapologetic</span>
-            <h2 className={styles.splitTitle}>Valueless<br />Bi*ches</h2>
-            <p className={styles.splitDesc}>
-              Streetwear with a statement.<br />
-              No apologies included.
-            </p>
-            <span className={styles.splitCta}>Enter →</span>
-          </div>
-          <div className={styles.splitOverlay} aria-hidden />
-        </Link>
+        <BentoGrid columns={3}>
+          {/* Card 1: Society Fu*kers (Featured 2x2) */}
+          <BentoCard
+            title="Society Fu*kers"
+            description="Five escalating tiers of absurdist luxury streetwear. Designed for those with more capital than shame."
+            badge="Tier-Based Luxury"
+            badgeType="mist"
+            href="/shop/society-fuckers"
+            ctaText="Enter the Hierarchy →"
+            colSpan={2}
+            rowSpan={2}
+            variant="mist"
+          >
+            <div className={styles.tierPreviewList}>
+              {[
+                { name: 'Tier 1: Peasant Premium', price: '$1,000' },
+                { name: 'Tier 2: Wannabe', price: '$10,000' },
+                { name: 'Tier 3: Delusional', price: '$100,000' },
+                { name: 'Tier 4: Obscene', price: '$1,000,000' },
+                { name: 'Tier 5: God Tier', price: '$10,000,000' },
+              ].map((tier) => (
+                <div key={tier.name} className={styles.tierPreviewItem}>
+                  <span className={styles.tierPreviewName}>{tier.name}</span>
+                  <span className={styles.tierPreviewPrice}>{tier.price}</span>
+                </div>
+              ))}
+            </div>
+          </BentoCard>
+
+          {/* Card 2: Valueless Bi*ches (Tall 1x2) */}
+          <BentoCard
+            title="Valueless Bi*ches"
+            description="Heavyweight everyday streetwear. Provocative graphics, zero apologies, and instant print-on-demand fulfillment."
+            badge="Everyday Apparel"
+            badgeType="coral"
+            href="/shop/valueless-bitches"
+            ctaText="Explore Streetwear →"
+            colSpan={1}
+            rowSpan={2}
+            variant="coral"
+          >
+            <div className={styles.categoryTagList}>
+              {['Heavyweight Tees', 'Oversized Hoodies', 'Accessories', 'Limited Drops'].map((tag) => (
+                <span key={tag} className="tag tag-coral">{tag}</span>
+              ))}
+            </div>
+          </BentoCard>
+
+          {/* Card 3: $100 Referral Engine (1x1) */}
+          <BentoCard
+            title="Viral Affiliate Engine"
+            description="Earn $100 for every 10 client sales completed with your link. Reach 10,000 sales to trigger the $100,000 milestone."
+            badge="$100 / 10 Sales"
+            badgeType="coral"
+            href="/referral"
+            ctaText="Claim Your Code →"
+            colSpan={1}
+            variant="coral"
+          >
+            <div className={styles.referralStatWrap}>
+              <span className={styles.referralBigStat}>$100</span>
+              <span className={styles.referralStatLabel}>Cash Payout per 10 Sales</span>
+            </div>
+          </BentoCard>
+
+          {/* Card 4: Heavyweight Fabric Specs (1x1) */}
+          <BentoCard
+            title="240GSM Heavyweight"
+            description="Double-needle stitching at stress points, zero-crack ink injection, and WRAP-certified ethical knitwear."
+            badge="Material Craft"
+            badgeType="mist"
+            colSpan={1}
+            variant="mist"
+          >
+            <div className={styles.specBadgeList}>
+              <div className={styles.specBadgeItem}>
+                <span>WEIGHT</span>
+                <strong>240 GSM</strong>
+              </div>
+              <div className={styles.specBadgeItem}>
+                <span>COLLAR</span>
+                <strong>Ribbed Lock</strong>
+              </div>
+              <div className={styles.specBadgeItem}>
+                <span>DYE</span>
+                <strong>Zero-Fade Ink</strong>
+              </div>
+              <div className={styles.specBadgeItem}>
+                <span>ETHICS</span>
+                <strong>WRAP-Certified</strong>
+              </div>
+            </div>
+          </BentoCard>
+
+          {/* Card 5: Brand Manifesto (1x1) */}
+          <BentoCard
+            title="The Anti-Conformist Manifesto"
+            description="We sell a mirror to modern fashion vanity. No corporate jargon. No fake discounts."
+            badge="Philosophy"
+            badgeType="default"
+            href="/manifesto"
+            ctaText="Read Manifesto →"
+            colSpan={1}
+          />
+        </BentoGrid>
       </section>
 
       {/* ── SOCIAL PROOF ─────────────────────────────────────── */}

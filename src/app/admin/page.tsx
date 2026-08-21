@@ -26,6 +26,7 @@ async function getDashboardData() {
     const totalRevenue = activeOrders.reduce((sum, o) => sum + (o.total || 0), 0);
     const totalOrdersCount = activeOrders.length;
     const pendingOrdersCount = orders.filter((o) => o.status === 'pending').length;
+    const prebookingCount = orders.filter((o) => Boolean(o.isPrebooking)).length;
 
     // Referral Metrics
     const referralRevenue = activeOrders
@@ -53,9 +54,9 @@ async function getDashboardData() {
       const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : '—';
       return {
         id: doc.id,
-        user: data.shippingAddress?.name || data.userEmail || 'Anonymous',
+        user: data.prebookName || data.shippingAddress?.name || data.userEmail || 'Anonymous',
         totalRaw: Number(data.total || 0),
-        status: data.status,
+        status: data.isPrebooking ? '👑 prebooked' : data.status,
         date,
       };
     });
@@ -90,6 +91,7 @@ async function getDashboardData() {
       usersCount,
       referralsCount,
       pendingOrdersCount,
+      prebookingCount,
       recentOrders,
       topAffiliates,
       referralAnalytics: {
@@ -109,6 +111,7 @@ async function getDashboardData() {
       usersCount: 0,
       referralsCount: 0,
       pendingOrdersCount: 0,
+      prebookingCount: 0,
       recentOrders: [],
       topAffiliates: [],
       referralAnalytics: {

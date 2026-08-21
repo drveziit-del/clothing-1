@@ -16,6 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import RazorpayButton from '@/components/checkout/RazorpayButton';
 import ReviewsSection from '@/components/reviews/ReviewsSection';
 import ProductCard from '@/components/ui/ProductCard';
+import SocietyFuckersDetailSections from '@/components/shop/SocietyFuckersDetailSections';
 
 const ugcVideos = [
   {
@@ -101,6 +102,125 @@ function UgcVideoCard({ video, isActive }: { video: typeof ugcVideos[0]; isActiv
   );
 }
 
+const TIER_META: Record<number, {
+  name: string;
+  badgeClass: string;
+  nameTagClass: string;
+  btnClass: string;
+  maxSupply: string;
+  serialText: string;
+  stockBadge: string;
+  stockBadgeClass: string;
+  stockFillClass: string;
+  perks: { icon: string; title: string; desc: string }[];
+  absurdity: string[];
+}> = {
+  1: {
+    name: 'God Tier',
+    badgeClass: styles.tierBannerGold,
+    nameTagClass: styles.tierNameTagGold,
+    btnClass: styles.tierButtonGold,
+    maxSupply: '1 OF 1 GLOBAL EDITION',
+    serialText: 'MINT #001 / 001 • NFC SEAL',
+    stockBadge: '🔥 ONLY 1 LEFT WORLDWIDE',
+    stockBadgeClass: styles.stockCountBadgeGold,
+    stockFillClass: styles.scarcityFillGold,
+    perks: [
+      { icon: '🔒', title: 'Titanium Vault Case', desc: 'Encased in locked ballistic flight box' },
+      { icon: '✈️', title: 'Armed Courier Delivery', desc: 'Hand-delivered anywhere globally' },
+      { icon: '👑', title: 'Minted 1/1 Cryptographic Seal', desc: 'Embedded micro NFC tag' },
+      { icon: '📞', title: 'Direct Line to Nobody', desc: 'Private unmonitored channel' },
+    ],
+    absurdity: [
+      '1 Private Island in Central America',
+      '4 Custom 80ft Catamaran Superyachts',
+      'This single 1-of-1 GERKINK T-shirt',
+    ],
+  },
+  2: {
+    name: 'Obscene',
+    badgeClass: styles.tierBannerPlatinum,
+    nameTagClass: styles.tierNameTagPlatinum,
+    btnClass: styles.tierButtonPlatinum,
+    maxSupply: '2 PIECES WORLDWIDE',
+    serialText: 'MINT #00X / 002 • PARCHMENT',
+    stockBadge: '💎 ONLY 2 LEFT WORLDWIDE',
+    stockBadgeClass: styles.stockCountBadgePlatinum,
+    stockFillClass: styles.scarcityFillPlatinum,
+    perks: [
+      { icon: '📜', title: 'Numbered Certificate', desc: '600GSM archival cotton print' },
+      { icon: '🌐', title: 'Tracked VIP Courier', desc: 'White-glove priority transit' },
+      { icon: '💎', title: 'Bespoke Serial Plaque', desc: 'Serialized woven interior label' },
+    ],
+    absurdity: [
+      '2 Commercial Real Estate Units',
+      '3 Brand-New Ferrari SF90 Stradales',
+      'This single GERKINK Obscene Tier garment',
+    ],
+  },
+  3: {
+    name: 'Delusional',
+    badgeClass: styles.tierBannerRose,
+    nameTagClass: styles.tierNameTagRose,
+    btnClass: styles.tierButtonCoral,
+    maxSupply: '5 PIECES WORLDWIDE',
+    serialText: 'MINT #00X / 005 • MATTE VAULT',
+    stockBadge: '🔥 ONLY 5 LEFT WORLDWIDE',
+    stockBadgeClass: styles.stockCountBadge,
+    stockFillClass: styles.scarcityFill,
+    perks: [
+      { icon: '📦', title: 'Custom Vault Box', desc: 'Matte black display presentation' },
+      { icon: '🏷️', title: 'NFC Verification', desc: 'Instant authentication seal' },
+      { icon: '⚠️', title: 'Accountant Panic Tag', desc: 'Warning sticker for your CPA' },
+    ],
+    absurdity: [
+      '4-Year Full Ivy League Tuition',
+      'Down Payment on a Manhattan Loft',
+      'This single GERKINK Delusional Tier garment',
+    ],
+  },
+  4: {
+    name: 'Wannabe',
+    badgeClass: styles.tierBannerCoral,
+    nameTagClass: styles.tierNameTagCoral,
+    btnClass: styles.tierButtonCoral,
+    maxSupply: '10 PIECES WORLDWIDE',
+    serialText: 'MINT #00X / 010 • 240GSM',
+    stockBadge: '⚡ ONLY 10 LEFT WORLDWIDE',
+    stockBadgeClass: styles.stockCountBadge,
+    stockFillClass: styles.scarcityFill,
+    perks: [
+      { icon: '🛡️', title: '240GSM Heavyweight', desc: 'Double-needle structural ribbing' },
+      { icon: '🚀', title: 'Express Dispatch', desc: 'Priority tracked courier' },
+    ],
+    absurdity: [
+      'A Round-Trip First Class Ticket to Tokyo',
+      'A Rolex Submariner Pre-Owned',
+      'This single GERKINK Wannabe Tier garment',
+    ],
+  },
+  5: {
+    name: 'Peasant Premium',
+    badgeClass: styles.tierBannerSteel,
+    nameTagClass: styles.tierNameTagSteel,
+    btnClass: '',
+    maxSupply: '999 PIECES WORLDWIDE',
+    serialText: 'MINT #XXX / 999 • DTG INK',
+    stockBadge: '🛡️ 999 PIECES WORLDWIDE',
+    stockBadgeClass: styles.stockCountBadge,
+    stockFillClass: styles.scarcityFill,
+    perks: [
+      { icon: '👕', title: 'Zero-Fade Ink', desc: 'DTG pigment direct injection' },
+      { icon: '🌍', title: 'Global Dispatch', desc: 'Printify international hubs' },
+    ],
+    absurdity: [
+      '1 Month of High-End Gym Membership',
+      '3 Pairs of Designer Sneakers',
+      'This entry-level GERKINK luxury streetwear piece',
+    ],
+  },
+};
+
 interface ProductDetailClientProps {
   product: Product;
   recommendedProducts?: Product[];
@@ -148,7 +268,22 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
       { q: "ARE SIZES TRUE TO STREETWEAR MEASUREMENTS?", a: "All garments fit slightly oversized/relaxed off the shoulder. If you prefer a standard fitted silhouette, order one size down." }
     ];
   }, [product.faqsList]);
-  const initialVariant = useMemo(() => getSmallVariant(product.variants) || product.variants[0], [product.variants]);
+  const initialVariant = useMemo(() => {
+    const vars = Array.isArray(product.variants) && product.variants.length > 0
+      ? product.variants
+      : [{ id: 'default', size: 'ONE SIZE', color: 'DEFAULT', price: product.price, available: true } as Variant];
+    // Try to restore preferred size from localStorage
+    if (typeof window !== 'undefined') {
+      try {
+        const preferred = localStorage.getItem('gerkink_preferred_size');
+        if (preferred) {
+          const match = vars.find(v => v.size === preferred && v.available);
+          if (match) return match;
+        }
+      } catch {}
+    }
+    return getSmallVariant(vars) || vars[0] || ({ id: 'default', size: 'ONE SIZE', color: 'DEFAULT', price: product.price, available: true } as Variant);
+  }, [product.variants, product.price]);
   const [selectedVariant, setSelectedVariant] = useState<Variant>(initialVariant);
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -162,6 +297,8 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
   const [mobileImageIndex, setMobileImageIndex] = useState(0);
   const [activeUgcIndex, setActiveUgcIndex] = useState(2);
   const ugcSliderRef = useRef<HTMLDivElement>(null);
+  const buyNowRef = useRef<HTMLButtonElement>(null);
+  const glowRef = useRef<HTMLSpanElement>(null);
 
   const handleUgcPrev = () => {
     const nextIndex = (activeUgcIndex - 1 + displayUgcVideos.length) % displayUgcVideos.length;
@@ -235,30 +372,13 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
   const priceNum = selectedVariant?.price ?? product.price;
 
 
-  // Prebooking state
-  const [showPrebookModal, setShowPrebookModal] = useState(false);
-  const [prebookName, setPrebookName] = useState('');
-  const [prebookEmail, setPrebookEmail] = useState('');
-  const [prebookMessage, setPrebookMessage] = useState('');
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [prebookLoading, setPrebookLoading] = useState(false);
-  const [prebookOrderData, setPrebookOrderData] = useState<{
-    orderId: string;
-    razorpayOrderId: string;
-    amount: number;
-    currency: string;
-  } | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      setPrebookName(user.displayName || '');
-      setPrebookEmail(user.email || '');
-    }
-  }, [user]);
 
   const handleAdd = () => {
     if (!selectedVariant) return;
     addItem(product, selectedVariant, quantity);
+    // Persist preferred size
+    try { localStorage.setItem('gerkink_preferred_size', selectedVariant.size); } catch {}
     toast(getCartRoast(), 'success');
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
@@ -270,69 +390,41 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
     router.push('/checkout');
   };
 
-  const handlePrebookSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!prebookName || !prebookEmail) {
-      toast('Please enter your name and email.', 'error');
-      return;
-    }
-    if (!agreedToTerms) {
-      toast('You must agree to the non-refundable deposit terms.', 'error');
-      return;
-    }
-    setPrebookLoading(true);
-    try {
-      const res = await fetch('/api/payment/create-prebook', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId: product.id,
-          variantId: selectedVariant.id,
-          name: prebookName,
-          email: prebookEmail,
-          message: prebookMessage,
-        }),
-      });
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Failed to create pre-booking.');
-      }
-
-      const data = await res.json();
-      setPrebookOrderData(data);
-    } catch (err: any) {
-      toast(err.message || 'Something went wrong.', 'error');
-    } finally {
-      setPrebookLoading(false);
-    }
-  };
 
   // Group variants by color for size selection (memoized)
   const colors = useMemo(() => {
-    return [...new Set(product.variants.map((v) => v.color))];
+    const vars = Array.isArray(product.variants) ? product.variants : [];
+    return [...new Set(vars.map((v) => v.color))];
   }, [product.variants]);
 
   const sizes = useMemo(() => {
+    const vars = Array.isArray(product.variants) && product.variants.length > 0 ? product.variants : [];
     const raw = [...new Set(
-      product.variants
-        .filter((v) => v.color === selectedVariant?.color)
+      vars
+        .filter((v) => !selectedVariant?.color || v.color === selectedVariant?.color)
         .map((v) => v.size)
     )];
+    if (raw.length === 0) {
+      return ['S', 'M', 'L', 'XL', '2XL'];
+    }
     return sortSizes(raw);
   }, [product.variants, selectedVariant?.color]);
 
   const smallPrice = useMemo(() => {
-    const small = getSmallVariant(product.variants);
+    const vars = Array.isArray(product.variants) ? product.variants : [];
+    const small = getSmallVariant(vars);
     return small ? small.price : product.price;
   }, [product.variants, product.price]);
 
   const displayedImages = useMemo(() => {
-    if (!selectedVariant?.color) return product.images;
-    const activeColorVariants = product.variants.filter((v) => v.color === selectedVariant.color);
+    const imgs = Array.isArray(product.images) ? product.images : [];
+    const vars = Array.isArray(product.variants) ? product.variants : [];
+    if (!selectedVariant?.color) return imgs;
+    const activeColorVariants = vars.filter((v) => v.color === selectedVariant.color);
     const colorImageUrls = activeColorVariants.flatMap((v) => v.images || []).filter(Boolean);
     const uniqueColorUrls = [...new Set(colorImageUrls)];
-    return uniqueColorUrls.length > 0 ? uniqueColorUrls : product.images;
+    return uniqueColorUrls.length > 0 ? uniqueColorUrls : imgs;
   }, [product.images, product.variants, selectedVariant?.color]);
 
   const media = useMemo(() => {
@@ -484,7 +576,19 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
               </Link>
             </div>
 
-            <div className={styles.seasonTag}>NEW SEASON</div>
+            {/* Society Fuckers Tier Badge Banner */}
+            {product.section === 'society_fuckers' && product.tier && TIER_META[product.tier] ? (
+              <div className={`${styles.tierBanner} ${TIER_META[product.tier].badgeClass}`}>
+                <span className={`${styles.tierNameTag} ${TIER_META[product.tier].nameTagClass}`}>
+                  ✦ TIER {product.tier} • {TIER_META[product.tier].name.toUpperCase()}
+                </span>
+                <span className={styles.mintSerialPill}>
+                  {TIER_META[product.tier].serialText}
+                </span>
+              </div>
+            ) : (
+              <div className={styles.seasonTag}>NEW SEASON</div>
+            )}
 
             <div className={styles.titleRatingRow}>
               <h1 className={styles.title}>{product.title}</h1>
@@ -515,13 +619,50 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
               animate
             />
 
-            {/* Short Benefits Bullet Grid */}
-            <div className={styles.shortBenefits}>
-              <div className={styles.benefitItem}>✦ Premium Heavyweight Fabric</div>
-              <div className={styles.benefitItem}>✦ Oversized Streetwear Fit</div>
-              <div className={styles.benefitItem}>✦ Fade Resistant Print</div>
-              <div className={styles.benefitItem}>✦ Built For Everyday Wear</div>
-            </div>
+            {/* Live Global Scarcity & Allocation Counter */}
+            {product.section === 'society_fuckers' && product.tier && TIER_META[product.tier] && (
+              <div className={styles.stockCounterBox}>
+                <div className={styles.stockCounterHeader}>
+                  <span className={styles.stockStatusLabel}>
+                    <span className={styles.pulseDot} />
+                    Live Allocation Counter
+                  </span>
+                  <span className={`${styles.stockCountBadge} ${TIER_META[product.tier].stockBadgeClass}`}>
+                    {TIER_META[product.tier].stockBadge}
+                  </span>
+                </div>
+                <div className={styles.scarcityTrack}>
+                  <div
+                    className={`${styles.scarcityFill} ${TIER_META[product.tier].stockFillClass}`}
+                    style={{ width: '100%' }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Tier-Specific VIP Perks or Short Benefits */}
+            {product.section === 'society_fuckers' && product.tier && TIER_META[product.tier] ? (
+              <div className={styles.tierPerksBox}>
+                <span className={styles.tierPerksTitle}>
+                  VIP TIER {product.tier} SPECIFICATIONS &amp; PERKS
+                </span>
+                <div className={styles.tierPerksList}>
+                  {TIER_META[product.tier].perks.map((perk, i) => (
+                    <div key={i} className={styles.tierPerkItem}>
+                      <span>{perk.icon}</span>
+                      <span><strong>{perk.title}:</strong> {perk.desc}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className={styles.shortBenefits}>
+                <div className={styles.benefitItem}>✦ Premium Heavyweight Fabric</div>
+                <div className={styles.benefitItem}>✦ Oversized Streetwear Fit</div>
+                <div className={styles.benefitItem}>✦ Fade Resistant Print</div>
+                <div className={styles.benefitItem}>✦ Built For Everyday Wear</div>
+              </div>
+            )}
           </div>
 
           {/* Variant Selection */}
@@ -566,15 +707,29 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
             </div>
             <div className={styles.sizes}>
               {sizes.map((size) => {
-                const v = product.variants.find(
-                  (pv) => pv.size === size && pv.color === selectedVariant?.color
-                );
+                const v = Array.isArray(product.variants) && product.variants.length > 0
+                  ? product.variants.find((pv) => pv.size === size && (!selectedVariant?.color || pv.color === selectedVariant?.color))
+                  : undefined;
+                const isSelected = selectedVariant?.size === size || (!selectedVariant?.size && size === sizes[0]);
                 return (
                   <button
                     key={size}
-                    disabled={!v?.available}
-                    className={`${styles.sizeBtn} ${selectedVariant?.size === size ? styles.sizeBtnActive : ''}`}
-                    onClick={() => v && setSelectedVariant(v)}
+                    type="button"
+                    disabled={v ? !v.available : false}
+                    className={`${styles.sizeBtn} ${isSelected ? styles.sizeBtnActive : ''}`}
+                    onClick={() => {
+                      if (v) {
+                        setSelectedVariant(v);
+                      } else {
+                        setSelectedVariant({
+                          id: `default-${size}`,
+                          size: size,
+                          color: selectedVariant?.color || 'DEFAULT',
+                          price: product.price,
+                          available: true,
+                        } as Variant);
+                      }
+                    }}
                   >
                     {size}
                   </button>
@@ -612,13 +767,28 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
           {/* Checkout CTAs */}
           <div className={styles.actionsBlock}>
             {product.section === 'society_fuckers' ? (
-              <button
-                className={`btn btn-primary btn-lg btn-full ${styles.addBtn}`}
-                onClick={() => setShowPrebookModal(true)}
-                disabled={!selectedVariant?.available}
-              >
-                Pre-book Now — {formatPrice(product.prebookingPrice ?? 500)}
-              </button>
+              <>
+                <button
+                  type="button"
+                  className={`btn btn-primary btn-lg btn-full ${styles.addBtn} ${product.tier && TIER_META[product.tier] ? TIER_META[product.tier].btnClass : ''}`}
+                  onClick={() => {
+                    const chosenSize = selectedVariant?.size || sizes[0] || 'L';
+                    const chosenColor = selectedVariant?.color || 'Default';
+                    router.push(`/shop/${product.slug || product.id}/prebook?size=${encodeURIComponent(chosenSize)}&color=${encodeURIComponent(chosenColor)}&qty=${quantity}`);
+                  }}
+                >
+                  PRE-BOOK TIER {product.tier || 1} ALLOCATION — {formatPrice(product.prebookingPrice ?? 500)}
+                </button>
+
+                {(product.tier && product.tier <= 3) && (
+                  <Link
+                    href={`/contact?subject=VIP Concierge Request — Tier ${product.tier} (${product.title})`}
+                    className={styles.conciergeBtn}
+                  >
+                    👑 Speak With Private VIP Concierge ↗
+                  </Link>
+                )}
+              </>
             ) : (
               <>
                 <button
@@ -635,15 +805,54 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                 </button>
                 {selectedVariant?.available && (
                   <button
-                    className={`${styles.buyNowBtn}`}
+                    ref={buyNowRef}
+                    className={styles.buyNowBtn}
                     onClick={handleBuyNow}
+                    onMouseMove={(e) => {
+                      if (!buyNowRef.current || !glowRef.current) return;
+                      const rect = buyNowRef.current.getBoundingClientRect();
+                      const x = e.clientX - rect.left;
+                      const y = e.clientY - rect.top;
+                      glowRef.current.style.left = `${x}px`;
+                      glowRef.current.style.top = `${y}px`;
+                      glowRef.current.style.opacity = '1';
+                    }}
+                    onMouseLeave={() => {
+                      if (glowRef.current) {
+                        glowRef.current.style.opacity = '0';
+                      }
+                    }}
                   >
-                    BUY NOW
+                    <span
+                      ref={glowRef}
+                      className={styles.spotlightGlow}
+                      aria-hidden="true"
+                    />
+                    <span className={styles.buyNowText}>BUY NOW</span>
                   </button>
                 )}
               </>
             )}
           </div>
+
+          {/* Absurdity Reality Check for Society Fuckers */}
+          {product.section === 'society_fuckers' && product.tier && TIER_META[product.tier] && (
+            <div className={styles.absurdityCard}>
+              <div className={styles.absurdityHeader}>
+                <span className={styles.absurdityTag}>Economic Reality Check</span>
+                <span className="tag tag-coral" style={{ fontSize: '0.65rem' }}>
+                  Tier {product.tier}
+                </span>
+              </div>
+              <div className={styles.absurdityItems}>
+                {TIER_META[product.tier].absurdity.map((item, idx) => (
+                  <div key={idx} className={styles.absurdityLine}>
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Trust Badges */}
           <div className={styles.trustBadgesGrid}>
@@ -745,172 +954,182 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
       </div>
 
 
-      {/* Brand Manifesto Section */}
-      {product.showManifesto !== false && (
-        <section className={styles.manifestoSection}>
-          <div className={styles.manifestoQuote}>
-            {product.manifestoQuote || `"WE DO NOT FIT IN. WE DO NOT APOLOGIZE. WE DEFINE THE CHAOS."`}
-          </div>
-          <p className={styles.manifestoBody}>
-            {product.manifestoBody || `GERKINK was born in the shadows of fast-fashion mediocrity. Every garment is a heavy-knit canvas designed to withstand the wear of the streets and outlast fleeting trends. We produce in strictly limited runs to combat waste and preserve absolute exclusivity. You aren't just buying a piece; you're joining the resistance.`}
-          </p>
-        </section>
-      )}
-
-      {/* Editorial Lifestyle Banner */}
-      <section className={styles.lifestyleBanner}>
-        <div className={styles.lifestyleContent}>
-          <h2 className={styles.lifestyleTitle}>BUILT TO OUTLAST TRENDS</h2>
-          <p className={styles.lifestyleSub}>DESIGNED TO DISAPPEAR INTO YOUR DAILY UNIFORM.</p>
-        </div>
-      </section>
-
-      {/* "Why You'll Love It" Grid */}
-      {product.showFeatures !== false && (
-        <section className={styles.featuresSection}>
-          <h3 className={styles.sectionHeader}>WHY YOU'LL LOVE IT</h3>
-          <div className={styles.featuresGrid}>
-            {displayFeatures.map((feat, idx) => (
-              <div key={idx} className={styles.featureCard}>
-                <h4>{feat.title}</h4>
-                <p>{feat.description}</p>
+      {/* Dynamic Lower Page Sections: Society Fuckers vs Standard Streetwear */}
+      {product.section === 'society_fuckers' ? (
+        <SocietyFuckersDetailSections
+          product={product}
+          recommendedProducts={recommendedProducts}
+        />
+      ) : (
+        <>
+          {/* Brand Manifesto Section */}
+          {product.showManifesto !== false && (
+            <section className={styles.manifestoSection}>
+              <div className={styles.manifestoQuote}>
+                {product.manifestoQuote || `"WE DO NOT FIT IN. WE DO NOT APOLOGIZE. WE DEFINE THE CHAOS."`}
               </div>
-            ))}
-          </div>
-        </section>
-      )}
+              <p className={styles.manifestoBody}>
+                {product.manifestoBody || `GERKINK was born in the shadows of fast-fashion mediocrity. Every garment is a heavy-knit canvas designed to withstand the wear of the streets and outlast fleeting trends. We produce in strictly limited runs to combat waste and preserve absolute exclusivity. You aren't just buying a piece; you're joining the resistance.`}
+              </p>
+            </section>
+          )}
 
-      {/* Fabric Technical Details */}
-      {product.showSpecs !== false && (
-        <section className={styles.specsSection}>
-          <h3 className={styles.sectionHeader}>FABRIC DETAILS</h3>
-          <div className={styles.specsGrid}>
-            <div className={styles.specCard}>
-              <span className={styles.specLabel}>MATERIAL</span>
-              <span className={styles.specVal}>{product.materialSpec || "100% Airlume Combed Cotton"}</span>
+          {/* Editorial Lifestyle Banner */}
+          <section className={styles.lifestyleBanner}>
+            <div className={styles.lifestyleContent}>
+              <h2 className={styles.lifestyleTitle}>BUILT TO OUTLAST TRENDS</h2>
+              <p className={styles.lifestyleSub}>DESIGNED TO DISAPPEAR INTO YOUR DAILY UNIFORM.</p>
             </div>
-            <div className={styles.specCard}>
-              <span className={styles.specLabel}>WEIGHT</span>
-              <span className={styles.specVal}>{product.weightSpec || "240 GSM Heavyweight Knit"}</span>
-            </div>
-            <div className={styles.specCard}>
-              <span className={styles.specLabel}>FIT SILHOUETTE</span>
-              <span className={styles.specVal}>{product.fitSpec || "Double-Needle Ribbed Collar"}</span>
-            </div>
-            <div className={styles.specCard}>
-              <span className={styles.specLabel}>ORIGIN / DESIGN</span>
-              <span className={styles.specVal}>{product.originSpec || "Direct-To-Garment Ink Fusion"}</span>
-            </div>
-          </div>
-        </section>
-      )}
+          </section>
 
-      {/* Comparison Grid */}
-      {product.showComparison !== false && (
-        <section className={styles.comparisonSection}>
-          <h3 className={styles.sectionHeader}>GERKINK VS. THE REST</h3>
-          <div className={styles.tableWrapper}>
-            <table className={styles.comparisonTable}>
-              <thead>
-                <tr>
-                  <th>FEATURE</th>
-                  <th>GERKINK SPEC</th>
-                  <th>GENERIC BRAND</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayComparisonRows.map((row, idx) => (
-                  <tr key={idx}>
-                    <td>{row.feature}</td>
-                    <td>{row.us}</td>
-                    <td>{row.them}</td>
-                  </tr>
+          {/* "Why You'll Love It" Grid */}
+          {product.showFeatures !== false && (
+            <section className={styles.featuresSection}>
+              <h3 className={styles.sectionHeader}>WHY YOU'LL LOVE IT</h3>
+              <div className={styles.featuresGrid}>
+                {displayFeatures.map((feat, idx) => (
+                  <div key={idx} className={styles.featureCard}>
+                    <h4>{feat.title}</h4>
+                    <p>{feat.description}</p>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
+              </div>
+            </section>
+          )}
 
-      {/* Real Customer Stories UGC Video Section */}
-      {product.showUgc !== false && displayUgcVideos.length > 0 && (
-        <section className={styles.ugcVideoSection}>
-          <div className={styles.ugcVideoTitleRow}>
-            <h3 className={styles.ugcVideoTitle}>Real customer stories</h3>
-            <div className={styles.ugcVideoSubtitle}>
-              ★★★★★ {(displayUgcVideos.reduce((acc, v) => acc + (v.stars || 5), 0) / (displayUgcVideos.length || 1)).toFixed(2)} ★ ({displayUgcVideos.length})
-            </div>
-          </div>
-          <div ref={ugcSliderRef} className={styles.ugcVideoSlider}>
-            {displayUgcVideos.map((video, idx) => (
-              <UgcVideoCard
-                key={idx}
-                video={video}
-                isActive={idx === activeUgcIndex}
-              />
-            ))}
-          </div>
-          <div className={styles.ugcSliderControls}>
-            <button
-              type="button"
-              className={styles.ugcArrowBtn}
-              onClick={handleUgcPrev}
-              aria-label="Previous story"
-            >
-              ⟨
-            </button>
-            <button
-              type="button"
-              className={styles.ugcArrowBtn}
-              onClick={handleUgcNext}
-              aria-label="Next story"
-            >
-              ⟩
-            </button>
-          </div>
-        </section>
-      )}
-
-      {/* Reviews Integration */}
-      <section id="reviews-section" className={styles.reviewsSection}>
-        <h3 className={styles.sectionHeader}>CUSTOMER FEEDBACK</h3>
-        <ReviewsSection productId={product.id} onReviewsLoaded={setProductReviews} />
-      </section>
-
-      {/* FAQ Section */}
-      {product.showFaq !== false && (
-        <section className={styles.faqSection}>
-          <h3 className={styles.sectionHeader}>COMMON INQUIRIES</h3>
-          <div className={styles.faqContainer}>
-            {displayFaqs.map((faq, i) => (
-              <div key={i} className={styles.faqItem}>
-                <button
-                  type="button"
-                  className={styles.faqHeader}
-                  onClick={() => setFaqOpen(prev => ({ ...prev, [i]: !prev[i] }))}
-                >
-                  <span>{faq.q}</span>
-                  <span>{faqOpen[i] ? '−' : '+'}</span>
-                </button>
-                <div className={`${styles.faqBody} ${faqOpen[i] ? styles.faqBodyOpen : ''}`}>
-                  <p>{faq.a}</p>
+          {/* Fabric Technical Details */}
+          {product.showSpecs !== false && (
+            <section className={styles.specsSection}>
+              <h3 className={styles.sectionHeader}>FABRIC DETAILS</h3>
+              <div className={styles.specsGrid}>
+                <div className={styles.specCard}>
+                  <span className={styles.specLabel}>MATERIAL</span>
+                  <span className={styles.specVal}>{product.materialSpec || "100% Airlume Combed Cotton"}</span>
+                </div>
+                <div className={styles.specCard}>
+                  <span className={styles.specLabel}>WEIGHT</span>
+                  <span className={styles.specVal}>{product.weightSpec || "240 GSM Heavyweight Knit"}</span>
+                </div>
+                <div className={styles.specCard}>
+                  <span className={styles.specLabel}>FIT SILHOUETTE</span>
+                  <span className={styles.specVal}>{product.fitSpec || "Double-Needle Ribbed Collar"}</span>
+                </div>
+                <div className={styles.specCard}>
+                  <span className={styles.specLabel}>ORIGIN / DESIGN</span>
+                  <span className={styles.specVal}>{product.originSpec || "Direct-To-Garment Ink Fusion"}</span>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
-      )}
+            </section>
+          )}
 
-      {/* Sibling Products / Complete The Look */}
-      {recommendedProducts.length > 0 && (
-        <section className={styles.recommendationsSection}>
-          <h3 className={styles.sectionHeader}>COMPLETE THE LOOK</h3>
-          <div className={styles.recommendationsGrid}>
-            {recommendedProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </section>
+          {/* Comparison Grid */}
+          {product.showComparison !== false && (
+            <section className={styles.comparisonSection}>
+              <h3 className={styles.sectionHeader}>GERKINK VS. THE REST</h3>
+              <div className={styles.tableWrapper}>
+                <table className={styles.comparisonTable}>
+                  <thead>
+                    <tr>
+                      <th>FEATURE</th>
+                      <th>GERKINK SPEC</th>
+                      <th>GENERIC BRAND</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {displayComparisonRows.map((row, idx) => (
+                      <tr key={idx}>
+                        <td>{row.feature}</td>
+                        <td>{row.us}</td>
+                        <td>{row.them}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {/* Real Customer Stories UGC Video Section */}
+          {product.showUgc !== false && displayUgcVideos.length > 0 && (
+            <section className={styles.ugcVideoSection}>
+              <div className={styles.ugcVideoTitleRow}>
+                <h3 className={styles.ugcVideoTitle}>Real customer stories</h3>
+                <div className={styles.ugcVideoSubtitle}>
+                  ★★★★★ {(displayUgcVideos.reduce((acc, v) => acc + (v.stars || 5), 0) / (displayUgcVideos.length || 1)).toFixed(2)} ★ ({displayUgcVideos.length})
+                </div>
+              </div>
+              <div ref={ugcSliderRef} className={styles.ugcVideoSlider}>
+                {displayUgcVideos.map((video, idx) => (
+                  <UgcVideoCard
+                    key={idx}
+                    video={video}
+                    isActive={idx === activeUgcIndex}
+                  />
+                ))}
+              </div>
+              <div className={styles.ugcSliderControls}>
+                <button
+                  type="button"
+                  className={styles.ugcArrowBtn}
+                  onClick={handleUgcPrev}
+                  aria-label="Previous story"
+                >
+                  ⟨
+                </button>
+                <button
+                  type="button"
+                  className={styles.ugcArrowBtn}
+                  onClick={handleUgcNext}
+                  aria-label="Next story"
+                >
+                  ⟩
+                </button>
+              </div>
+            </section>
+          )}
+
+          {/* Reviews Integration */}
+          <section id="reviews-section" className={styles.reviewsSection}>
+            <h3 className={styles.sectionHeader}>CUSTOMER FEEDBACK</h3>
+            <ReviewsSection productId={product.id} onReviewsLoaded={setProductReviews} />
+          </section>
+
+          {/* FAQ Section */}
+          {product.showFaq !== false && (
+            <section className={styles.faqSection}>
+              <h3 className={styles.sectionHeader}>COMMON INQUIRIES</h3>
+              <div className={styles.faqContainer}>
+                {displayFaqs.map((faq, i) => (
+                  <div key={i} className={styles.faqItem}>
+                    <button
+                      type="button"
+                      className={styles.faqHeader}
+                      onClick={() => setFaqOpen(prev => ({ ...prev, [i]: !prev[i] }))}
+                    >
+                      <span>{faq.q}</span>
+                      <span>{faqOpen[i] ? '−' : '+'}</span>
+                    </button>
+                    <div className={`${styles.faqBody} ${faqOpen[i] ? styles.faqBodyOpen : ''}`}>
+                      <p>{faq.a}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Sibling Products / Complete The Look */}
+          {recommendedProducts.length > 0 && (
+            <section className={styles.recommendationsSection}>
+              <h3 className={styles.sectionHeader}>COMPLETE THE LOOK</h3>
+              <div className={styles.recommendationsGrid}>
+                {recommendedProducts.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
       )}
 
       {/* Image Lightbox */}
@@ -1015,127 +1234,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
         </div>
       )}
 
-      {/* Pre-booking Modal (restored/preserved) */}
-      {showPrebookModal && (
-        <div className={styles.overlay} onClick={() => {
-          if (!prebookLoading && !prebookOrderData) {
-            setShowPrebookModal(false);
-          }
-        }}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <button
-              className={styles.modalClose}
-              onClick={() => {
-                setShowPrebookModal(false);
-                setPrebookOrderData(null);
-              }}
-              disabled={prebookLoading}
-            >
-              ✕
-            </button>
-            <div className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>Apply to Pre-book</h2>
-              <p className={styles.modalSubtitle}>
-                Secure your slot for <strong>{product.title}</strong> by paying the non-refundable pre-booking fee.
-                The admin will review your inquiry and contact you to finalize the custom design.
-              </p>
-            </div>
 
-            {!firebaseUser ? (
-              <div className={styles.authNotice}>
-                <p className={styles.authNoticeText}>
-                  You must be signed in to submit a pre-booking request.
-                </p>
-                <Link
-                  href={`/auth/login?redirect=/shop/${product.slug || product.id}`}
-                  className="btn btn-primary btn-full"
-                >
-                  Sign In
-                </Link>
-              </div>
-            ) : prebookOrderData ? (
-              <div className={styles.paymentContainer}>
-                <p className={styles.paymentLabel}>
-                  Pre-booking created! Complete your payment of <strong>{formatPrice(product.prebookingPrice ?? 500)}</strong> to finalize.
-                </p>
-                <RazorpayButton
-                  razorpayOrderId={prebookOrderData.razorpayOrderId}
-                  amount={prebookOrderData.amount}
-                  currency={prebookOrderData.currency}
-                  firestoreOrderId={prebookOrderData.orderId}
-                  userEmail={prebookEmail}
-                  userName={prebookName}
-                  isPrebooking={true}
-                  amountUSD={product.prebookingPrice ?? 500}
-                  onSuccess={() => {
-                    setShowPrebookModal(false);
-                    setPrebookOrderData(null);
-                    setPrebookMessage('');
-                  }}
-                  onError={(msg) => toast(msg, 'error')}
-                />
-              </div>
-            ) : (
-              <form onSubmit={handlePrebookSubmit} className={styles.modalForm}>
-                <div>
-                  <label htmlFor="prebook-name" className="input-label">Full Name</label>
-                  <input
-                    id="prebook-name"
-                    type="text"
-                    className="input"
-                    value={prebookName}
-                    onChange={(e) => setPrebookName(e.target.value)}
-                    placeholder="e.g. Jane Smith"
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="prebook-email" className="input-label">Email Address</label>
-                  <input
-                    id="prebook-email"
-                    type="email"
-                    className="input"
-                    value={prebookEmail}
-                    onChange={(e) => setPrebookEmail(e.target.value)}
-                    placeholder="e.g. jane@example.com"
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="prebook-message" className="input-label">Inquiry / Customization Notes</label>
-                  <textarea
-                    id="prebook-message"
-                    className="input"
-                    rows={4}
-                    value={prebookMessage}
-                    onChange={(e) => setPrebookMessage(e.target.value)}
-                    placeholder="Tell us what you want to talk about regarding the product..."
-                    style={{ resize: 'vertical' }}
-                  />
-                </div>
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={agreedToTerms}
-                    onChange={(e) => setAgreedToTerms(e.target.checked)}
-                    required
-                  />
-                  <span>
-                    I agree that the pre-booking deposit of {formatPrice(product.prebookingPrice ?? 500)} is <strong>non-refundable</strong> and will be used as credit towards the final product purchase.
-                  </span>
-                </label>
-                <button
-                  type="submit"
-                  disabled={prebookLoading}
-                  className="btn btn-primary btn-lg btn-full"
-                >
-                  {prebookLoading ? 'Creating Pre-booking...' : 'Proceed to Payment →'}
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

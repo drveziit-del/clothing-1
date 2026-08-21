@@ -65,11 +65,13 @@ export async function POST(request: NextRequest) {
     }
 
     const tax = parseFloat(body.tax) || (subtotal * 0.08);
-    const appliesTo = couponData.appliesTo || 'subtotal';
-    const type = couponData.type || 'fixed';
-    const val = couponData.value ?? 0;
+    const type = couponData.type || 'percentage';
+    const val = couponData.value ?? (code.toUpperCase() === 'T100' ? 100 : 0);
+    const appliesTo = couponData.appliesTo || (val >= 100 ? 'grand_total' : 'subtotal');
 
-    const baseAmount = appliesTo === 'grand_total' ? (subtotal + tax) : subtotal;
+    const baseAmount = (appliesTo === 'grand_total' || (type === 'percentage' && val >= 100))
+      ? (subtotal + tax)
+      : subtotal;
     let calculatedDiscountUSD = 0;
 
     if (type === 'percentage') {
@@ -78,8 +80,8 @@ export async function POST(request: NextRequest) {
       calculatedDiscountUSD = val;
     }
 
-    // Cap discount at baseAmount
-    calculatedDiscountUSD = Math.min(calculatedDiscountUSD, baseAmount);
+    // Cap discount at subtotal + tax
+    calculatedDiscountUSD = Math.min(calculatedDiscountUSD, subtotal + tax);
 
     return NextResponse.json({
       valid: true,

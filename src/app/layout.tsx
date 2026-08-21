@@ -6,6 +6,7 @@ import { CartProvider } from "@/context/CartContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
 import RoastToast from "@/components/ui/RoastToast";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://gerkink.shop'),
@@ -73,6 +74,7 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
+        <GoogleAnalytics />
         <ThemeProvider>
           <AuthProvider>
             <CurrencyProvider>

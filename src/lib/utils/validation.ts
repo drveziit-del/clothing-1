@@ -158,6 +158,8 @@ export const updateSettingsSchema = z.object({
   roastMessages: z.array(z.string().min(5).max(200)).optional(),
   checkoutMessage: z.string().max(200).optional(),
   siteActive: z.boolean().optional(),
+  standardShippingFee: z.number().nonnegative().optional(),
+  freeShippingThreshold: z.number().nonnegative().optional(),
 });
 
 export type UpdateSettingsInput = z.infer<typeof updateSettingsSchema>;

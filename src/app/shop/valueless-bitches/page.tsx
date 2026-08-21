@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Product } from '@/types';
 import { ValuelessClientPage } from './ValuelessClientPage';
 import styles from './page.module.css';
@@ -82,21 +83,47 @@ export default async function ValuelessBitchesPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+
+      {/* ── LUXURY STREETWEAR EDITORIAL HERO ───────────────── */}
       <div className={styles.hero}>
-        <div className={styles.heroInner}>
-          <span className="tag tag-coral">Collection II</span>
-          <h1 className={styles.title}>
-            Valueless<br />Bi*ches
-          </h1>
-          <p className={styles.desc}>
-            Streetwear that knows what it is. T-shirts, hoodies, accessories — 
-            all priced for people who have taste and aren&#39;t afraid to show it.
-            Unlike you, before you found us.
-          </p>
+        <div className={styles.heroContainer}>
+          <div className={styles.heroLeft}>
+            <div className={styles.badgeRow}>
+              <span className={styles.collectionPill}>COLLECTION II</span>
+              <span className={styles.statusPill}>
+                <span className={styles.liveDot} />
+                AVAILABLE NOW
+              </span>
+            </div>
+
+            <h1 className={styles.title}>
+              Valueless <span className={styles.titleGradient}>Bi*ches</span>
+            </h1>
+
+            <p className={styles.desc}>
+              Provocative graphic streetwear on 240GSM heavyweight yarn. Hand-finished DTG pigment formulation,
+              oversized luxury drape, and zero corporate apologies.
+            </p>
+
+            {/* Collection Switcher Nav */}
+            <div className={styles.navSwitcher}>
+              <span className={`${styles.switchBtn} ${styles.switchBtnActive}`}>
+                🔥 Valueless Bi*ches
+              </span>
+              <Link href="/shop/society-fuckers" className={styles.switchBtn}>
+                👑 Society Fu*kers →
+              </Link>
+              <Link href="/shop" className={styles.switchBtnGhost}>
+                ✦ All Collections
+              </Link>
+            </div>
+          </div>
         </div>
-        <div className={styles.heroAmbient} aria-hidden />
+
+        <div className={styles.heroAmbientGlow} aria-hidden />
       </div>
 
+      {/* ── PRODUCTS & FILTERS BODY ───────────────────────── */}
       <div className={styles.shopBody}>
         <ValuelessClientPage products={products} />
       </div>

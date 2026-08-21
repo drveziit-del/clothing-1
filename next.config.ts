@@ -3,13 +3,17 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   compress: true,
   images: {
+    dangerouslyAllowLocalIP: true,
     remotePatterns: [
-      { protocol: "https", hostname: "images-api.printify.com" },
-      { protocol: "https", hostname: "storage.googleapis.com" },
-      { protocol: "https", hostname: "cdn.printify.com" },
-      { protocol: "https", hostname: "firebasestorage.googleapis.com" },
-      { protocol: "https", hostname: "lh3.googleusercontent.com" },
-      { protocol: "https", hostname: "*.googleusercontent.com" },
+      { protocol: "https", hostname: "firebasestorage.googleapis.com", pathname: "/**" },
+      { protocol: "https", hostname: "print-on-demand-895b7.firebasestorage.app", pathname: "/**" },
+      { protocol: "https", hostname: "*.firebasestorage.app", pathname: "/**" },
+      { protocol: "https", hostname: "storage.googleapis.com", pathname: "/**" },
+      { protocol: "https", hostname: "images-api.printify.com", pathname: "/**" },
+      { protocol: "https", hostname: "cdn.printify.com", pathname: "/**" },
+      { protocol: "https", hostname: "lh3.googleusercontent.com", pathname: "/**" },
+      { protocol: "https", hostname: "*.googleusercontent.com", pathname: "/**" },
+      { protocol: "https", hostname: "commondatastorage.googleapis.com", pathname: "/**" },
     ],
   },
   async headers() {
@@ -32,7 +36,7 @@ const nextConfig: NextConfig = {
               scriptCSP,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' data: https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https://images-api.printify.com https://storage.googleapis.com https://cdn.printify.com https://firebasestorage.googleapis.com https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.paypalobjects.com https://*.paypal.com",
+              "img-src 'self' data: blob: https://images-api.printify.com https://storage.googleapis.com https://cdn.printify.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.paypalobjects.com https://*.paypal.com",
               "media-src 'self' blob: https://firebasestorage.googleapis.com https://commondatastorage.googleapis.com",
               "connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://api.razorpay.com https://*.razorpay.com https://api.printify.com https://open.er-api.com wss://*.firebaseio.com https://*.paypal.com https://*.paypalobjects.com",
               "frame-src https://checkout.razorpay.com https://*.razorpay.com https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://gerkink.shop https://*.gerkink.shop https://*.paypal.com https://*.paypalobjects.com",

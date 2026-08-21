@@ -1,148 +1,266 @@
 .page {
-  padding-top: 68px;
+  padding-top: 80px;
   min-height: 100vh;
+  background: var(--bg);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* ── Header ── */
 .header {
-  padding: clamp(3rem, 8vw, 6rem) clamp(1rem, 4vw, 4rem) 3rem;
+  padding: 3rem clamp(1.5rem, 4vw, 4rem) 2.5rem;
   max-width: 1440px;
   margin: 0 auto;
   border-bottom: 1px solid var(--border);
 }
 
-.headerDesc {
-  margin-top: 1rem;
-  font-size: 1rem;
-  color: var(--text-secondary);
-  max-width: 480px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 80vh;
-}
-
-.card {
+.headerInner {
+  max-width: 720px;
   display: flex;
   flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-  transition: background 0.3s ease;
-  padding: clamp(2rem, 5vw, 4rem);
-  border-right: 1px solid var(--border);
-}
-.card:last-child { border-right: none; }
-
-.cardDark { background: var(--bg); }
-.cardCoral { background: var(--surface); }
-
-.cardBg {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-.cardDark  .cardBg { background: radial-gradient(ellipse at 20% 80%, rgba(107,138,171,0.14) 0%, transparent 60%); }
-.cardCoral .cardBg { background: radial-gradient(ellipse at 80% 80%, rgba(255,107,107,0.12) 0%, transparent 60%); }
-.card:hover .cardBg { opacity: 1; }
-
-.cardContent {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  height: 100%;
+  gap: 0.75rem;
 }
 
-.cardTitle {
+.categoryLabel {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.pageTitle {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 900;
-  font-size: clamp(2.5rem, 5vw, 5.5rem);
-  line-height: 0.9;
+  font-size: clamp(2.4rem, 4.5vw, 4rem);
+  line-height: 1;
   letter-spacing: -0.04em;
   color: var(--text-primary);
-  margin: 0.5rem 0;
-  transition: color 0.2s ease;
+  margin: 0;
 }
-.cardDark:hover  .cardTitle { color: var(--mist-100); }
-.cardCoral:hover .cardTitle { color: var(--coral-100); }
 
-.cardMeta { display: flex; flex-direction: column; gap: 0.5rem; }
+.pageDesc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 540px;
+  margin: 0;
+}
 
-.priceRange {
+/* ── Bento Grid ── */
+.bentoSection {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 2.5rem clamp(1.5rem, 4vw, 4rem) 6rem;
+}
+
+.bentoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+  align-items: stretch;
+}
+
+.colSpan1 { grid-column: span 1; }
+.colSpan2 { grid-column: span 2; }
+
+.bentoCard {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2.25rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  min-height: 440px;
+}
+
+.bentoCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.cardHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tagRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.tagBadge {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.6rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.tagBadgeCoral {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.6rem;
+  background: rgba(255, 71, 87, 0.08);
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  border-radius: 3px;
   color: var(--accent);
-}
-.cardDark .priceRange { color: var(--mist-100); }
-
-.cardDesc {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-  max-width: 360px;
+  text-transform: uppercase;
 }
 
-.tiers {
+.cardHeadingLarge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 3.5vw, 2.6rem);
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cardHeading {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  font-size: 1.85rem;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cardSubtext {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Tier Grid */
+.tierGrid {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  margin-top: auto;
+  margin: 1.75rem 0;
 }
 
 .tierRow {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0.4rem 0;
-  border-bottom: 1px solid var(--border);
+  justify-content: space-between;
+  padding: 0.55rem 0.85rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  transition: border-color 0.15s ease;
 }
-.tierRow:last-child { border-bottom: none; }
 
 .tierName {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .tierPrice {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--mist-100);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-primary);
 }
 
-.categories {
+/* Tag Cloud */
+.tagCloud {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: auto;
+  margin: 1.75rem 0;
 }
 
-.cardCta {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.75rem;
+.specTag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 0.75rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
   color: var(--text-secondary);
-  margin-top: 1.5rem;
-  display: inline-block;
-  transition: color 0.2s ease, transform 0.2s ease;
 }
-.cardDark:hover  .cardCta { color: var(--mist-100); transform: translateX(4px); }
-.cardCoral:hover .cardCta { color: var(--accent);   transform: translateX(4px); }
 
-@media (max-width: 768px) {
-  .grid { grid-template-columns: 1fr; }
-  .card { border-right: none; border-bottom: 1px solid var(--border); min-height: 400px; }
+/* Card Footers & CTAs */
+.cardFooter {
+  margin-top: auto;
+  padding-top: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.ctaLink,
+.ctaLinkCoral {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.ctaLinkCoral {
+  color: var(--accent);
+}
+
+.bentoCard:hover .ctaLink,
+.bentoCard:hover .ctaLinkCoral {
+  transform: translateX(4px);
+}
+
+@media (max-width: 1024px) {
+  .bentoGrid {
+    grid-template-columns: 1fr;
+  }
+  .colSpan2 {
+    grid-column: span 1;
+  }
+}
+
+/* ── Light Mode Overrides ── */
+[data-theme="light"] .bentoCard {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .bentoCard:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+}
+
+[data-theme="light"] .tierRow,
+[data-theme="light"] .specTag,
+[data-theme="light"] .tagBadge {
+  background: #f8fafc;
+  border-color: #e2e8f0;
 }

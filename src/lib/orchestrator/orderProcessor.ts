@@ -17,7 +17,7 @@ export async function appendOrderHistory(
     timestamp: new Date().toISOString(),
     event,
     actor,
-    metadata,
+    ...(metadata ? { metadata } : {}),
   };
 
   try {
@@ -54,12 +54,10 @@ export async function enqueueOrderProcessing(orderId: string): Promise<string> {
   await jobRef.set(jobData, { merge: true });
   await appendOrderHistory(orderId, 'order_job_enqueued', 'system', { jobId: jobRef.id });
 
-  // Await background worker execution to guarantee it completes in serverless environments
-  try {
-    await processOrderJob(jobRef.id, orderId);
-  } catch (err) {
+  // Run background worker execution asynchronously so the HTTP checkout response is instant
+  processOrderJob(jobRef.id, orderId).catch((err) => {
     console.error(`[OrderOrchestrator] Background worker error for order ${orderId}:`, err);
-  }
+  });
 
   return jobRef.id;
 }

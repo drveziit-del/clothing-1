@@ -78,6 +78,7 @@ export interface CartItem {
 export type OrderStatus =
   | 'pending'
   | 'authorized'
+  | 'awaiting_wire_confirmation'
   | 'paid'
   | 'queued_for_printify'
   | 'in_production'
@@ -99,6 +100,8 @@ export interface OrderItem {
   price: number;
   image: string;
   printifyProductId?: string;
+  section?: ProductSection;
+  productTier?: number;
 }
 
 export interface Address {
@@ -120,7 +123,7 @@ export interface Order {
   tax: number;
   discount?: number;
   total: number;
-  paymentGateway?: 'razorpay' | 'paypal' | 'free';
+  paymentGateway?: 'razorpay' | 'paypal' | 'wise_bank_transfer' | 'free';
   paymentCaptured?: boolean;
   razorpayOrderId?: string;
   razorpayPaymentId?: string;
@@ -137,6 +140,18 @@ export interface Order {
   prebookName?: string;
   prebookEmail?: string;
   prebookMessage?: string;
+  wireDetails?: {
+    senderReference?: string;
+    senderName?: string;
+    senderBank?: string;
+    submittedAt?: string;
+    notes?: string;
+  };
+  wireApprovedBy?: string;
+  wireApprovedAt?: Date;
+  wireRejectedBy?: string;
+  wireRejectedAt?: Date;
+  adminNote?: string;
   expiresAt?: Date;
   emailSent?: boolean;
   history?: OrderHistoryEvent[];

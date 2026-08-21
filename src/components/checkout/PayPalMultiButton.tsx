@@ -14,7 +14,7 @@ interface PayPalMultiButtonProps {
   referralCode?: string;
   couponCode?: string;
   shippingAddress: any;
-  onSuccess?: () => void;
+  onSuccess?: (orderId?: string) => void;
   onError?: (msg: string) => void;
 }
 
@@ -78,12 +78,12 @@ export default function PayPalMultiButton({
 
   const handleApprove = async (data: { orderID: string }) => {
     try {
-      const orderId = sessionStorage.getItem('pending_paypal_order_id') || '';
+      const storedOrderId = sessionStorage.getItem('pending_paypal_order_id') || '';
       const res = await fetch('/api/paypal/capture-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          orderId,
+          orderId: storedOrderId,
           paypalOrderId: data.orderID,
         }),
       });
@@ -101,10 +101,11 @@ export default function PayPalMultiButton({
         throw new Error(resData.error || 'Payment capture failed');
       }
 
+      const finalOrderId = resData.orderId || storedOrderId;
       clearCart();
       sessionStorage.removeItem('pending_paypal_order_id');
       toast("Order confirmed! Payment processed via PayPal.", 'success');
-      onSuccess?.();
+      onSuccess?.(finalOrderId);
     } catch (err: any) {
       const msg = err?.message || 'Payment verification failed';
       toast(msg, 'error');

@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import GSAPPageTransition from '@/components/animation/GSAPPageTransition';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -49,7 +50,9 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   return (
     <>
       <Navbar />
-      <main>{children}</main>
+      <main>
+        <GSAPPageTransition>{children}</GSAPPageTransition>
+      </main>
       <Footer />
     </>
   );

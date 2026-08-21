@@ -17,6 +17,9 @@ interface OrderRow {
   status: string;
   date: string;
   printifyOrderId?: string | null;
+  isPrebooking?: boolean;
+  prebookEmail?: string | null;
+  prebookMessage?: string | null;
 }
 
 interface AdminOrdersClientProps {
@@ -29,6 +32,7 @@ export default function AdminOrdersClient({ orders: initialOrders }: AdminOrders
   const { firebaseUser } = useAuth();
   const [ordersList, setOrdersList] = useState(initialOrders);
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'all' | 'standard' | 'prebook'>('all');
 
   const handleRetryPrintify = async (orderId: string) => {
     setLoadingId(orderId);
@@ -64,7 +68,16 @@ export default function AdminOrdersClient({ orders: initialOrders }: AdminOrders
     }
   };
 
-  const formattedOrders = ordersList.map((o) => ({
+  const prebookCount = ordersList.filter((o) => o.isPrebooking).length;
+  const standardCount = ordersList.filter((o) => !o.isPrebooking).length;
+
+  const filteredOrders = ordersList.filter((o) => {
+    if (activeTab === 'prebook') return o.isPrebooking;
+    if (activeTab === 'standard') return !o.isPrebooking;
+    return true;
+  });
+
+  const formattedOrders = filteredOrders.map((o) => ({
     ...o,
     total: formatPrice(o.totalRaw),
   }));
@@ -72,11 +85,39 @@ export default function AdminOrdersClient({ orders: initialOrders }: AdminOrders
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h1 className={styles.title}>Orders</h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+          <h1 className={styles.title}>Orders &amp; Allocations</h1>
           <ExportCsvButton data={formattedOrders} fileName="orders.csv" />
         </div>
-        <p className={styles.subtitle}>All orders across both collections. Status updates sync from Printify. Click any Order ID to open buyer details in a new tab.</p>
+        <p className={styles.subtitle}>
+          Manage all standard streetwear orders and Society Fu*kers luxury pre-booking allocations.
+        </p>
+
+        {/* Tab Filters */}
+        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            className={`btn btn-sm ${activeTab === 'all' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setActiveTab('all')}
+          >
+            All Orders ({ordersList.length})
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${activeTab === 'standard' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setActiveTab('standard')}
+          >
+            Standard Orders ({standardCount})
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${activeTab === 'prebook' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setActiveTab('prebook')}
+            style={activeTab === 'prebook' ? { background: '#FFD700', color: '#000', fontWeight: 800 } : {}}
+          >
+            👑 Society Fu*kers Pre-bookings ({prebookCount})
+          </button>
+        </div>
       </div>
 
       <DataTable
@@ -91,48 +132,71 @@ export default function AdminOrdersClient({ orders: initialOrders }: AdminOrders
                 rel="noopener noreferrer"
                 style={{ color: 'var(--coral-200)', textDecoration: 'underline', fontWeight: 600, fontFamily: 'monospace' }}
               >
-                {r.id} ↗
+                {r.id.slice(0, 12)}... ↗
               </Link>
             ),
           },
+          {
+            key: 'type',
+            label: 'Type',
+            render: (r) => (
+              r.isPrebooking ? (
+                <span className="tag" style={{ background: 'rgba(255, 215, 0, 0.15)', border: '1px solid rgba(255, 215, 0, 0.4)', color: '#FFD700', fontWeight: 800 }}>
+                  👑 Pre-booking
+                </span>
+              ) : (
+                <span className="tag">Standard</span>
+              )
+            ),
+          },
           { key: 'customer', label: 'Customer' },
-          { key: 'items', label: 'Items' },
-          { key: 'total', label: 'Total', align: 'right' },
+          { key: 'items', label: 'Items / Allocation' },
+          { key: 'total', label: 'Amount', align: 'right' },
           {
             key: 'status',
             label: 'Status',
             render: (r) => (
-              <span
-                className={`tag ${
-                  r.status === 'paid' || r.status === 'delivered' || r.status === 'in_production'
-                    ? 'tag-coral'
-                    : r.status === 'pending'
-                    ? ''
-                    : 'tag-mist'
-                }`}
-              >
-                {r.status}
-              </span>
+              r.status === 'awaiting_wire_confirmation' ? (
+                <span className="tag" style={{ background: 'rgba(255, 165, 0, 0.2)', border: '1px solid #ffa502', color: '#ffa502', fontWeight: 800 }}>
+                  ⏳ Wire Review
+                </span>
+              ) : (
+                <span
+                  className={`tag ${
+                    r.status === 'paid' || r.status === 'delivered' || r.status === 'in_production'
+                      ? 'tag-coral'
+                      : r.status === 'pending'
+                      ? ''
+                      : 'tag-mist'
+                  }`}
+                >
+                  {r.status}
+                </span>
+              )
             ),
           },
           { key: 'date', label: 'Date', align: 'right' },
           {
             key: 'actions',
-            label: 'Fulfillment',
+            label: 'Actions',
             align: 'right',
             render: (r) => (
-              <div style={{ textAlign: 'right' }}>
-                {r.printifyOrderId ? (
-                  <span style={{ fontSize: '0.75rem', color: 'var(--mist-200)', fontFamily: 'monospace' }}>
-                    Sent ({r.printifyOrderId.slice(-6)})
-                  </span>
-                ) : (
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                <Link
+                  href={`/admin/orders/${r.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary btn-xs"
+                >
+                  View Details
+                </Link>
+                {!r.isPrebooking && !r.printifyOrderId && (
                   <button
-                    className="btn btn-secondary btn-xs"
-                    disabled={loadingId === r.id}
                     onClick={() => handleRetryPrintify(r.id)}
+                    disabled={loadingId === r.id}
+                    className="btn btn-primary btn-xs"
                   >
-                    {loadingId === r.id ? 'Sending...' : 'Punch to Printify'}
+                    {loadingId === r.id ? 'Sending...' : 'Retry Printify'}
                   </button>
                 )}
               </div>
@@ -140,7 +204,7 @@ export default function AdminOrdersClient({ orders: initialOrders }: AdminOrders
           },
         ]}
         data={formattedOrders}
-        emptyMessage="No orders yet. The site is live — the customers aren't."
+        emptyMessage="No orders found matching this filter."
       />
     </div>
   );

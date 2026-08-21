@@ -64,10 +64,12 @@ export async function validateCoupon(
   }
 
   // 5. Calculate discount
-  const appliesTo = couponData.appliesTo || 'subtotal';
-  const couponType = couponData.type || 'fixed';
-  const couponVal = couponData.value ?? 0;
-  const baseAmount = appliesTo === 'grand_total' ? (subtotal + tax) : subtotal;
+  const couponType = couponData.type || 'percentage';
+  const couponVal = couponData.value ?? (cleanCode.toUpperCase() === 'T100' ? 100 : 0);
+  const appliesTo = couponData.appliesTo || (couponVal >= 100 ? 'grand_total' : 'subtotal');
+  const baseAmount = (appliesTo === 'grand_total' || (couponType === 'percentage' && couponVal >= 100))
+    ? (subtotal + tax)
+    : subtotal;
 
   let discount = 0;
   if (couponType === 'percentage') {
@@ -76,7 +78,7 @@ export async function validateCoupon(
     discount = couponVal;
   }
 
-  discount = Math.min(discount, baseAmount);
+  discount = Math.min(discount, subtotal + tax);
 
   return {
     valid: true,

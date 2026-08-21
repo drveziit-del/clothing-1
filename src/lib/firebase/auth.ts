@@ -149,11 +149,21 @@ export async function getIdToken(): Promise<string | null> {
 }
 
 export async function setSessionCookie(idToken: string): Promise<void> {
-  await fetch('/api/auth/session', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ idToken }),
-    keepalive: true, // Keep alive so page navigation/redirect doesn't abort it
-  });
+  if (!idToken) return;
+  try {
+    const res = await fetch('/api/auth/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+      keepalive: true, // Keep alive so page navigation/redirect doesn't abort it
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.warn('[setSessionCookie] Session response status:', res.status, err);
+    }
+  } catch (err) {
+    // Gracefully handle aborted or offline network requests
+    console.warn('[setSessionCookie] Network request could not complete:', err);
+  }
 }
 

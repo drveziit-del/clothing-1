@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
@@ -24,9 +24,17 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
   const [roastVisible, setRoastVisible] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  const smallVariant = getSmallVariant(product.variants) || product.variants[0];
-  const smallPrice = smallVariant ? smallVariant.price : product.price;
-  const defaultVariant = smallVariant || product.variants[0];
+  const safeVariants = Array.isArray(product.variants) ? product.variants : [];
+  const safeImages = Array.isArray(product.images) ? product.images : [];
+  const [imgSrc, setImgSrc] = useState(safeImages[0] || '/logo.png');
+
+  useEffect(() => {
+    setImgSrc(safeImages[0] || '/logo.png');
+  }, [safeImages]);
+
+  const smallVariant = getSmallVariant(safeVariants) || safeVariants[0];
+  const smallPrice = smallVariant ? smallVariant.price : (product.price || 0);
+  const defaultVariant = smallVariant || safeVariants[0];
 
   const handleMouseEnter = () => {
     setHoverRoast(getHoverRoast());
@@ -36,6 +44,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!defaultVariant) return;
     addItem(product, defaultVariant, 1);
     toast(getCartRoast(), 'success');
@@ -47,71 +56,95 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
     setIsWishlisted(!isWishlisted);
   };
 
-  const categoryLabel = product.category
-    ? product.category.toUpperCase()
-    : product.section === 'society_fuckers'
-    ? 'LUXURY'
-    : 'T-SHIRTS';
+  const categoryLabel = product.section === 'society_fuckers' ? 'Society Fu*kers' : 'Valueless Bi*ches';
 
   return (
-    <Link
-      href={`/shop/${product.slug || product.id}`}
+    <div
       className={styles.card}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className={styles.imageWrap}>
-        {/* Heart Wishlist Button */}
-        <button
-          type="button"
-          className={`${styles.wishlistBtn} ${isWishlisted ? styles.activeWishlist : ''}`}
-          onClick={toggleWishlist}
-          aria-label="Add to wishlist"
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill={isWishlisted ? '#ff4d4d' : 'none'} stroke={isWishlisted ? '#ff4d4d' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-          </svg>
-        </button>
-
-        {product.images[0] ? (
-          <Image
-            src={product.images[0]}
-            alt={product.title}
-            fill
-            sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
-            className={styles.image}
-            priority={priority}
-          />
-        ) : (
-          <div className={styles.imagePlaceholder}>
-            <span>GERKINK</span>
+      <Link href={`/shop/${product.slug || product.id}`} className={styles.cardLink}>
+        <div className={styles.imageWrap}>
+          {/* Top Badges */}
+          <div className={styles.topBadges}>
+            <span className={styles.tagPill}>240 GSM</span>
+            {(product.tags?.includes('featured') || product.tags?.includes('hot')) && (
+              <span className={styles.featuredPill}>HOT</span>
+            )}
           </div>
-        )}
 
-        {/* Hover roast overlay */}
-        <div className={`${styles.roastOverlay} ${roastVisible ? styles.visible : ''}`}>
-          <p className={styles.roastText}>{hoverRoast}</p>
+          {/* Heart Wishlist Button */}
+          <button
+            type="button"
+            className={`${styles.wishlistBtn} ${isWishlisted ? styles.activeWishlist : ''}`}
+            onClick={toggleWishlist}
+            aria-label="Add to wishlist"
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill={isWishlisted ? '#ff4757' : 'none'}
+              stroke={isWishlisted ? '#ff4757' : 'currentColor'}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </button>
+
+          {/* Product Image */}
+          {imgSrc ? (
+            <div className={styles.imageContainer}>
+              <Image
+                src={imgSrc}
+                alt={product.title}
+                fill
+                sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
+                className={styles.image}
+                priority={priority}
+                onError={() => setImgSrc('/logo.png')}
+              />
+            </div>
+          ) : (
+            <div className={styles.imagePlaceholder}>
+              <span>GERKINK</span>
+            </div>
+          )}
+
+          {/* Hover Roast Overlay */}
+          <div className={`${styles.roastOverlay} ${roastVisible ? styles.visible : ''}`}>
+            <p className={styles.roastText}>{hoverRoast}</p>
+          </div>
         </div>
-      </div>
 
-      <div className={styles.info}>
-        <h3 className={styles.title}>{product.title}</h3>
-        <span className={styles.category}>{categoryLabel}</span>
-        <span className={styles.price}>Starting {formatPrice(smallPrice)}</span>
+        {/* Product Information */}
+        <div className={styles.info}>
+          <div className={styles.headerInfo}>
+            <span className={styles.category}>{categoryLabel}</span>
+            <span className={styles.price}>{formatPrice(smallPrice)}</span>
+          </div>
 
-        <button
-          type="button"
-          className={styles.addBtn}
-          onClick={handleAddToCart}
-          aria-label={`Add ${product.title} to cart`}
-        >
-          <span>ADD TO CART</span>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.arrowIcon}>
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>
-        </button>
-      </div>
-    </Link>
+          <h3 className={styles.title}>{product.title}</h3>
+
+          <div className={styles.bottomRow}>
+            <button
+              type="button"
+              className={styles.addBtn}
+              onClick={handleAddToCart}
+              aria-label={`Add ${product.title} to cart`}
+            >
+              <span>ADD TO CART</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </Link>
+    </div>
   );
 }

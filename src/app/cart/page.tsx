@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
+import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
 import Link from 'next/link';
 import Image from 'next/image';
 import { EMPTY_CART_ROAST } from '@/lib/utils/roasts';
@@ -17,6 +18,26 @@ export default function CartPage() {
   const [localCode, setLocalCode] = useState('');
   const [validating, setValidating] = useState(false);
   const [isValid, setIsValid] = useState<boolean | null>(null);
+
+  // Shipping config
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState(100);
+
+  useEffect(() => {
+    async function loadShippingSettings() {
+      try {
+        const { doc, getDoc } = getFirestoreModule();
+        const db = getFirestoreDb();
+        const snap = await getDoc(doc(db, 'settings', 'global'));
+        if (snap.exists()) {
+          const data = snap.data();
+          if (typeof data.freeShippingThreshold === 'number') setFreeShippingThreshold(data.freeShippingThreshold);
+        }
+      } catch (err) {
+        console.error('Failed to load shipping settings:', err);
+      }
+    }
+    loadShippingSettings();
+  }, []);
 
   // Validate on mount only if referralCode was pre-populated
   useEffect(() => {
@@ -127,6 +148,33 @@ export default function CartPage() {
         {/* Order Summary */}
         <div className={styles.summary}>
           <h2 className={styles.summaryTitle}>Order Summary</h2>
+
+          {/* Free Shipping Progress Bar */}
+          {(() => {
+            const remaining = freeShippingThreshold - subtotal;
+            const progress = Math.min(100, (subtotal / freeShippingThreshold) * 100);
+            return (
+              <div className={styles.shippingProgress}>
+                {remaining > 0 ? (
+                  <>
+                    <p className={styles.shippingProgressText}>
+                      You&apos;re <strong>{formatPrice(remaining)}</strong> away from <span className={styles.freeTag}>FREE shipping</span>
+                    </p>
+                    <div className={styles.progressTrack}>
+                      <div
+                        className={styles.progressFill}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <p className={styles.shippingProgressText}>
+                    🎉 You qualify for <span className={styles.freeTag}>FREE shipping!</span>
+                  </p>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Referral Code */}
           <div className={styles.referralRow}>
