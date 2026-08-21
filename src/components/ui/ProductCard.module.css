@@ -305,3 +305,80 @@
   color: #ffffff;
   box-shadow: 0 4px 14px rgba(225, 29, 72, 0.3);
 }
+
+/* ── Mobile Optimization (<= 640px) ── */
+@media (max-width: 640px) {
+  .card {
+    border-radius: 8px;
+  }
+
+  .topBadges {
+    top: 6px;
+    left: 6px;
+    gap: 0.25rem;
+  }
+
+  .tagPill {
+    font-size: 0.55rem;
+    padding: 0.15rem 0.35rem;
+    letter-spacing: 0.02em;
+  }
+
+  .featuredPill {
+    font-size: 0.52rem;
+    padding: 0.15rem 0.3rem;
+  }
+
+  .wishlistBtn {
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+  }
+
+  .wishlistBtn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .info {
+    padding: 0.75rem 0.65rem 0.75rem;
+    gap: 0.35rem;
+  }
+
+  .headerInfo {
+    gap: 0.25rem;
+  }
+
+  .category {
+    font-size: 0.58rem;
+    letter-spacing: 0.04em;
+  }
+
+  .price {
+    font-size: 0.88rem;
+  }
+
+  .title {
+    font-size: 0.8rem;
+    min-height: 2.1rem;
+    line-height: 1.25;
+  }
+
+  .bottomRow {
+    padding-top: 0.25rem;
+  }
+
+  .addBtn {
+    height: 32px;
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+    gap: 0.3rem;
+    padding: 0 0.4rem;
+  }
+
+  .addBtn svg {
+    width: 11px;
+    height: 11px;
+  }
+}

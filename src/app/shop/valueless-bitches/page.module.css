@@ -162,6 +162,52 @@
   padding: 2.5rem clamp(1.5rem, 4vw, 4rem) 6rem;
 }
 
+@media (max-width: 640px) {
+  .hero {
+    padding: 2rem 1rem 1.75rem;
+  }
+
+  .title {
+    font-size: 2.2rem;
+    line-height: 1;
+  }
+
+  .desc {
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .badgeRow {
+    gap: 0.5rem;
+  }
+
+  .collectionPill,
+  .statusPill {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.55rem;
+  }
+
+  .navSwitcher {
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .switchBtn {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.78rem;
+    border-radius: 5px;
+  }
+
+  .switchBtnGhost {
+    font-size: 0.75rem;
+    padding: 0.45rem 0.5rem;
+  }
+
+  .shopBody {
+    padding: 1.25rem 0.75rem 4rem;
+  }
+}
+
 /* ── Light Mode Overrides ── */
 [data-theme="light"] .page {
   background: #f8fafc;

@@ -13,10 +13,10 @@ interface ProductFiltersProps {
   resultCount: number;
 }
 
-const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-  { value: 'newest',     label: 'Newest' },
-  { value: 'price_asc',  label: 'Price: Low → High' },
-  { value: 'price_desc', label: 'Price: High → Low' },
+const SORT_OPTIONS: { value: SortKey; label: string; mobileLabel: string }[] = [
+  { value: 'newest',     label: 'Newest',            mobileLabel: 'Newest' },
+  { value: 'price_asc',  label: 'Price: Low → High', mobileLabel: 'Low → High' },
+  { value: 'price_desc', label: 'Price: High → Low', mobileLabel: 'High → Low' },
 ];
 
 export default function ProductFilters({
@@ -64,7 +64,8 @@ export default function ProductFilters({
               onClick={() => onSort(opt.value)}
               className={`${styles.sortTab} ${activeSort === opt.value ? styles.sortTabActive : ''}`}
             >
-              {opt.label}
+              <span className={styles.desktopLabel}>{opt.label}</span>
+              <span className={styles.mobileLabel}>{opt.mobileLabel}</span>
             </button>
           ))}
         </div>
