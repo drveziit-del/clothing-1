@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     const productData = {
       ...result.data,
       slug,
-      images: result.data.images && result.data.images.length > 0 ? result.data.images : ['/placeholder-product.png'],
+      images: result.data.images && result.data.images.length > 0 ? result.data.images : ['/logo.png'],
       videos: result.data.videos || [],
       variants: result.data.variants && result.data.variants.length > 0
         ? result.data.variants

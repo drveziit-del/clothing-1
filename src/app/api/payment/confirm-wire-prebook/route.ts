@@ -65,6 +65,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    // Status guard: wire confirmation only applies to pending prebookings —
+    // prevents regressing paid/in-production/cancelled orders.
+    if (orderData.status !== 'pending' || !orderData.isPrebooking) {
+      return NextResponse.json({ error: 'Order is not eligible for wire confirmation' }, { status: 400 });
+    }
+
     const wireData = {
       senderReference: senderReference.trim(),
       senderName: senderName?.trim() || orderData.prebookName || 'Anonymous',

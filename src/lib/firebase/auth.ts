@@ -93,6 +93,14 @@ export async function signInWithGoogle(referralCode?: string): Promise<void> {
   provider.addScope('email');
   provider.addScope('profile');
 
+  // Persist the intended destination so the redirect fallback (which loses the
+  // current URL) can restore it after sign-in completes.
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('redirect');
+    if (redirect) sessionStorage.setItem('gerkink_redirect', redirect);
+  }
+
   try {
     const credential = await signInWithPopup(getFirebaseAuth(), provider);
     await createUserProfile(credential, undefined, referralCode ?? undefined);
