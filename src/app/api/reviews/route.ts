@@ -64,7 +64,12 @@ export async function GET(request: NextRequest) {
     // In-memory sort fallback (descending by createdAt)
     reviews.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    return NextResponse.json(reviews);
+    // Hide un-moderated reviews from the public feed. Legacy docs (no approved
+    // field) remain visible; new unverified submissions carry approved:false
+    // until an admin approves them.
+    const publicReviews = reviews.filter((r: any) => r.approved !== false);
+
+    return NextResponse.json(publicReviews);
   } catch (err: any) {
     console.error('[api/reviews] Error fetching reviews:', err);
     return NextResponse.json([], { status: 200 });
@@ -85,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     const uid = decoded.uid;
     const body = await request.json();
-    const { reviewId, productId, rating, text } = body;
+    const { reviewId, productId, rating, text, orderId } = body;
 
     if (!rating || typeof rating !== 'number' || rating < 1 || rating > 5) {
       return NextResponse.json({ error: 'Rating must be between 1 and 5 stars' }, { status: 400 });
@@ -97,6 +102,21 @@ export async function POST(request: NextRequest) {
 
     const cleanText = text.trim().slice(0, 1000);
     const targetProductId = typeof productId === 'string' && productId.trim() ? productId.trim() : null;
+
+    // Verified-purchase proof: an orderId owned by this user that was actually paid.
+    let verifiedPurchase = false;
+    if (typeof orderId === 'string' && orderId.trim()) {
+      const orderDoc = await adminDb.collection('orders').doc(orderId.trim()).get();
+      if (orderDoc.exists) {
+        const o = orderDoc.data()!;
+        if (o.userId === uid && (o.paymentCaptured || o.status === 'paid')) {
+          // If the review targets a product, it must exist in that order's items.
+          const items: any[] = Array.isArray(o.items) ? o.items : [];
+          const matches = !targetProductId || items.some((i) => i.productId === targetProductId);
+          if (matches) verifiedPurchase = true;
+        }
+      }
+    }
 
     // Fetch user details from Firebase Auth or Firestore user doc
     const userDoc = await adminDb.collection('users').doc(uid).get();
@@ -123,9 +143,10 @@ export async function POST(request: NextRequest) {
         text: cleanText,
         productId: targetProductId,
         updatedAt: FieldValue.serverTimestamp(),
+        ...(verifiedPurchase ? { verifiedPurchase: true, approved: true } : {}),
       });
 
-      return NextResponse.json({ success: true, id: reviewId });
+      return NextResponse.json({ success: true, id: reviewId, verifiedPurchase });
     } else {
       // Create new review — check if user already wrote one for this product
       let existingQuery: FirebaseFirestore.Query = adminDb.collection('reviews').where('userId', '==', uid);
@@ -145,8 +166,9 @@ export async function POST(request: NextRequest) {
           text: cleanText,
           productId: targetProductId,
           updatedAt: FieldValue.serverTimestamp(),
+          ...(verifiedPurchase ? { verifiedPurchase: true, approved: true } : {}),
         });
-        return NextResponse.json({ success: true, id: existingId });
+        return NextResponse.json({ success: true, id: existingId, verifiedPurchase });
       }
 
       const newRef = await adminDb.collection('reviews').add({
@@ -156,14 +178,78 @@ export async function POST(request: NextRequest) {
         userPhoto,
         rating,
         text: cleanText,
+        // Verified purchases publish instantly; unverified reviews enter the
+        // moderation queue and stay hidden until an admin approves them.
+        verifiedPurchase,
+        approved: verifiedPurchase,
         createdAt: FieldValue.serverTimestamp(),
       });
 
-      return NextResponse.json({ success: true, id: newRef.id });
+      return NextResponse.json({ success: true, id: newRef.id, verifiedPurchase });
     }
   } catch (err: any) {
     console.error('[api/reviews] Error processing review:', err);
     return NextResponse.json({ error: 'Failed to submit review' }, { status: 500 });
+  }
+}
+
+// PATCH: Admin moderation — list pending reviews (?status=pending) or approve/reject one.
+export async function PATCH(request: NextRequest) {
+  try {
+    const decoded = await getAuthenticatedUser(request);
+    if (!decoded?.admin) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+
+    if (searchParams.get('status') === 'pending') {
+      const snap = await adminDb
+        .collection('reviews')
+        .where('approved', '==', false)
+        .orderBy('createdAt', 'desc')
+        .limit(100)
+        .get();
+
+      const pending = snap.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          userName: data.userName,
+          rating: data.rating,
+          text: data.text,
+          productId: data.productId,
+          verifiedPurchase: !!data.verifiedPurchase,
+          createdAt: data.createdAt?.toDate?.()?.toISOString() ?? null,
+        };
+      });
+      return NextResponse.json(pending);
+    }
+
+    const body = await request.json();
+    const reviewId = typeof body.reviewId === 'string' ? body.reviewId : null;
+    const action = body.action;
+
+    if (!reviewId || !['approve', 'reject'].includes(action)) {
+      return NextResponse.json({ error: 'reviewId and action (approve|reject) required' }, { status: 400 });
+    }
+
+    const reviewRef = adminDb.collection('reviews').doc(reviewId);
+    const doc = await reviewRef.get();
+    if (!doc.exists) {
+      return NextResponse.json({ error: 'Review not found' }, { status: 404 });
+    }
+
+    if (action === 'approve') {
+      await reviewRef.update({ approved: true, moderatedBy: decoded.uid, updatedAt: FieldValue.serverTimestamp() });
+    } else {
+      await reviewRef.delete(); // reject = remove from the queue entirely
+    }
+
+    return NextResponse.json({ success: true, action });
+  } catch (err: any) {
+    console.error('[api/reviews] Moderation error:', err);
+    return NextResponse.json({ error: 'Moderation action failed' }, { status: 500 });
   }
 }
 

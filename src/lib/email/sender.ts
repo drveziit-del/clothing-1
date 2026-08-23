@@ -761,3 +761,98 @@ export async function sendAdminContactMessage(details: ContactMessageDetails): P
     });
   }
 }
+
+export interface PayoutStatusDetails {
+  userEmail: string;
+  userName: string;
+  amount: number;
+  method: string;
+  approved: boolean;
+  adminNote?: string;
+}
+
+/**
+ * Notifies an affiliate that their payout request was approved or rejected.
+ * Uses the same SMTP-with-Firestore-fallback pattern as other transactional mail.
+ */
+export async function sendPayoutStatusEmail(details: PayoutStatusDetails): Promise<void> {
+  const escapedName = escapeHtml(details.userName);
+  const escapedNote = details.adminNote ? escapeHtml(details.adminNote) : '';
+  const subject = details.approved
+    ? `✅ Payout Approved — $${details.amount.toFixed(2)} USD on its way`
+    : `❌ Payout Request Update — $${details.amount.toFixed(2)} USD`;
+
+  const htmlBody = `
+    <div style="font-family: 'Inter', sans-serif; background-color: #07090e; color: #f3f4f6; padding: 32px; border-radius: 12px; max-width: 600px; margin: 0 auto; border: 1px solid #1f2937;">
+      <h2 style="color: ${details.approved ? '#238636' : '#ff6b6b'}; font-size: 24px; font-weight: 700; margin-bottom: 24px; border-bottom: 1px solid #1f2937; padding-bottom: 12px;">
+        ${details.approved ? 'Payout Approved' : 'Payout Request Rejected'}
+      </h2>
+      <div style="background-color: #0d1117; padding: 20px; border-radius: 8px; border: 1px solid #21262d; margin: 24px 0;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 6px 0; font-weight: 600; color: #8b949e; width: 120px;">Affiliate:</td><td style="padding: 6px 0; color: #c9d1d9;">${escapedName}</td></tr>
+          <tr><td style="padding: 6px 0; font-weight: 600; color: #8b949e;">Amount:</td><td style="padding: 6px 0; color: #238636; font-weight: bold;">$${typeof details.amount === 'number' ? details.amount.toFixed(2) : '0.00'} USD</td></tr>
+          <tr><td style="padding: 6px 0; font-weight: 600; color: #8b949e;">Method:</td><td style="padding: 6px 0; color: #c9d1d9; text-transform: uppercase;">${escapeHtml(details.method)}</td></tr>
+        </table>
+      </div>
+      ${!details.approved && escapedNote ? `
+      <div style="background-color: #161b22; padding: 16px; border-radius: 8px; border-left: 4px solid #ff6b6b; margin-top: 16px;">
+        <p style="margin: 0; font-size: 14px; color: #c9d1d9;"><strong>Admin Note:</strong> ${escapedNote}</p>
+        <p style="margin: 12px 0 0; font-size: 14px; color: #8b949e;">The claimed amount has been returned to your available wallet balance. You may re-submit a claim with corrected payout details.</p>
+      </div>` : ''}
+      ${details.approved ? `
+      <div style="background-color: #161b22; padding: 16px; border-radius: 8px; border-left: 4px solid #238636; margin-top: 16px;">
+        <p style="margin: 0; font-size: 14px; color: #c9d1d9;">Your commission transfer is being processed manually by our treasury desk. Depending on your payout method, funds should arrive within 1–3 business days.</p>
+      </div>` : ''}
+      <p style="font-size: 12px; color: #8b949e; margin-top: 32px; text-align: center; border-top: 1px solid #1f2937; padding-top: 16px;">
+        Sent automatically by GERKINK Referral System.
+      </p>
+    </div>
+  `;
+
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASSWORD;
+
+  if (!user || !pass || !host) {
+    await adminDb.collection('system_emails').add({
+      to: details.userEmail,
+      subject,
+      html: htmlBody,
+      status: 'pending_smtp_config',
+      createdAt: FieldValue.serverTimestamp(),
+    });
+    return;
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user, pass },
+    });
+    await transporter.sendMail({
+      from: `"GERKINK Referrals" <${user}>`,
+      to: details.userEmail,
+      subject,
+      html: htmlBody,
+    });
+    await adminDb.collection('system_emails').add({
+      to: details.userEmail,
+      subject,
+      status: 'sent',
+      createdAt: FieldValue.serverTimestamp(),
+    });
+  } catch (err: any) {
+    console.error('Failed to send payout status email:', err.message);
+    await adminDb.collection('system_emails').add({
+      to: details.userEmail,
+      subject,
+      html: htmlBody,
+      status: 'failed_smtp_delivery',
+      errorMessage: err.message,
+      createdAt: FieldValue.serverTimestamp(),
+    });
+  }
+}

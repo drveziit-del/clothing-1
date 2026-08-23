@@ -3,6 +3,7 @@
 import { useCurrency } from '@/context/CurrencyContext';
 import MetricsCards from '@/components/admin/MetricsCards';
 import DataTable from '@/components/admin/DataTable';
+import ReviewModeration from '@/components/admin/ReviewModeration';
 import styles from './page.module.css';
 
 interface DashboardClientProps {
@@ -222,6 +223,10 @@ export default function AdminDashboardClient({ data }: DashboardClientProps) {
           data={formattedRecentOrders}
           emptyMessage="No orders yet. The roasts haven't worked hard enough."
         />
+      </section>
+
+      <section className={styles.section}>
+        <ReviewModeration />
       </section>
     </div>
   );

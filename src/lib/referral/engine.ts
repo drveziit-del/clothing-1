@@ -59,6 +59,9 @@ export async function processReferral(order: Order): Promise<void> {
         orderId: order.id,
         orderValue: orderValue,
         commission,
+        // Self-purchase flag — allowed by policy but surfaced for admin review
+        // during payout approvals (gateway fees make these net-negative sales).
+        isSelfReferral: order.userId === affiliateUid,
         status: commission > 0 ? 'eligible_for_claim' : 'pending',
       };
 

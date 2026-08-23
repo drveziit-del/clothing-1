@@ -52,22 +52,27 @@ export default function ReviewsSection({ productId, onReviewsLoaded }: ReviewsSe
       const db = getFirestoreDb();
       if (!db) return;
 
-      const { collection, query, where, onSnapshot } = getFirestoreModule();
+      const { collection, query, where, orderBy, limit, onSnapshot } = getFirestoreModule();
 
+      // Cap the realtime stream — an unbounded collection listener streams every
+      // review to every visitor and grows unbounded with catalog size.
       const q = productId
-        ? query(collection(db, 'reviews'), where('productId', '==', productId))
-        : query(collection(db, 'reviews'));
+        ? query(collection(db, 'reviews'), where('productId', '==', productId), limit(50))
+        : query(collection(db, 'reviews'), orderBy('createdAt', 'desc'), limit(20));
 
       const unsub = onSnapshot(q, (snap: any) => {
-        const items: Review[] = snap.docs.map((doc: any) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            ...data,
-            createdAt: data.createdAt?.toDate?.() ?? new Date(),
-            updatedAt: data.updatedAt?.toDate?.() ?? undefined,
-          } as Review;
-        });
+        const items: Review[] = snap.docs
+          .map((doc: any) => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              ...data,
+              createdAt: data.createdAt?.toDate?.() ?? new Date(),
+              updatedAt: data.updatedAt?.toDate?.() ?? undefined,
+            } as Review;
+          })
+          // Keep parity with the public API: hide un-moderated reviews.
+          .filter((r: any) => (r as any).approved !== false);
 
         // Sort client-side to prevent missing/null serverTimestamp index drops
         items.sort((a: any, b: any) => {
