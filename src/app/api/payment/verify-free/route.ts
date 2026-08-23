@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
+import type { DocumentReference } from 'firebase-admin/firestore';
 import { isRateLimited } from '@/lib/utils/rateLimit';
 import { enqueueOrderProcessing, appendOrderHistory } from '@/lib/orchestrator/orderProcessor';
 import { validateCoupon } from '@/lib/utils/couponValidator';
@@ -39,57 +40,96 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
   }
 
-  // 3. Fetch and verify order
+  // 3. Preflight: fetch and verify order
   const orderRef = adminDb.collection('orders').doc(orderId);
-  const orderDoc = await orderRef.get();
+  const preflight = await orderRef.get();
 
-  if (!orderDoc.exists) {
+  if (!preflight.exists) {
     return NextResponse.json({ error: 'Order not found' }, { status: 404 });
   }
 
-  const orderData = orderDoc.data()!;
-  if (orderData.userId !== uid) {
+  const preData = preflight.data()!;
+  if (preData.userId !== uid) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  if (orderData.razorpayOrderId !== 'free_order' || orderData.total !== 0) {
+  if (preData.razorpayOrderId !== 'free_order' || preData.total !== 0) {
     return NextResponse.json({ error: 'Order is not eligible for free checkout' }, { status: 400 });
   }
 
-  if (orderData.status !== 'pending') {
+  if (preData.status !== 'pending') {
     return NextResponse.json({ status: 'ok', orderId, message: 'Order has already been processed' });
   }
 
-  // 4. Update order status and mark coupon as used atomically
-  const batch = adminDb.batch();
-
-  batch.update(orderRef, {
-    status: 'paid',
-    paymentCaptured: true,
-    paymentGateway: 'free',
-    updatedAt: FieldValue.serverTimestamp(),
-  });
-
-  if (orderData.couponCode) {
-    const couponResult = await validateCoupon(orderData.couponCode, uid, orderData.subtotal, orderData.tax);
+  // Resolve coupon BEFORE the transaction — validateCoupon runs its own non-transactional reads.
+  let couponRef: DocumentReference | null = null;
+  let couponIsGlobal = false;
+  if (preData.couponCode) {
+    const couponResult = await validateCoupon(preData.couponCode, uid, preData.subtotal, preData.tax);
     if (couponResult.valid && couponResult.couponRef) {
-      if (couponResult.couponData.isGlobal) {
-        batch.update(couponResult.couponRef, {
-          timesUsed: FieldValue.increment(1),
-          updatedAt: FieldValue.serverTimestamp(),
-        });
-      } else {
-        batch.update(couponResult.couponRef, {
-          isUsed: true,
-          usedAt: FieldValue.serverTimestamp(),
-          orderId: orderId,
-          timesUsed: FieldValue.increment(1),
-        });
-      }
+      couponRef = couponResult.couponRef;
+      couponIsGlobal = !!couponResult.couponData.isGlobal;
     }
   }
 
-  await batch.commit();
+  // 4. Atomic commit: re-read inside a transaction to prevent double-processing races
+  let alreadyProcessed = false;
+
+  try {
+    await adminDb.runTransaction(async (transaction) => {
+      const snap = await transaction.get(orderRef);
+      if (!snap.exists) throw new Error('ORDER_MISSING');
+
+      const orderData = snap.data()!;
+      if (orderData.userId !== uid) throw new Error('ORDER_MISMATCH');
+      if (orderData.razorpayOrderId !== 'free_order' || orderData.total !== 0) throw new Error('NOT_FREE');
+
+      if (orderData.status !== 'pending') {
+        alreadyProcessed = true;
+        return;
+      }
+
+      transaction.update(orderRef, {
+        status: 'paid',
+        paymentCaptured: true,
+        paymentGateway: 'free',
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+
+      if (couponRef) {
+        if (couponIsGlobal) {
+          transaction.update(couponRef, {
+            timesUsed: FieldValue.increment(1),
+            updatedAt: FieldValue.serverTimestamp(),
+          });
+        } else {
+          transaction.update(couponRef, {
+            isUsed: true,
+            usedAt: FieldValue.serverTimestamp(),
+            orderId: orderId,
+            timesUsed: FieldValue.increment(1),
+          });
+        }
+      }
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : '';
+    if (msg === 'ORDER_MISSING') {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+    if (msg === 'ORDER_MISMATCH') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    if (msg === 'NOT_FREE') {
+      return NextResponse.json({ error: 'Order is not eligible for free checkout' }, { status: 400 });
+    }
+    throw err;
+  }
+
+  if (alreadyProcessed) {
+    return NextResponse.json({ status: 'ok', orderId, message: 'Order has already been processed' });
+  }
+
   await appendOrderHistory(orderId, 'free_checkout_verified', 'customer');
 
   // 5. Delegate background fulfillment to orchestrator

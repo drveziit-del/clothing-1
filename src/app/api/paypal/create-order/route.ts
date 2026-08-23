@@ -136,6 +136,7 @@ export async function POST(request: NextRequest) {
     tax,
     discount,
     total,
+    totalAmountUSD: total,
     paymentGateway:  'paypal',
     paymentCaptured: false,
     paypalOrderId:   '',
@@ -162,9 +163,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: err.message || 'PayPal gateway error' }, { status: 500 });
   }
 
-  // Asynchronously record timeline history without blocking response
+  // Await the paypalOrderId write — capture-order depends on this binding for its integrity guard.
+  try {
+    await orderRef.update({ paypalOrderId: paypalOrderToken.id });
+  } catch (e) {
+    console.error(`[paypal/create-order] CRITICAL: Failed to bind paypalOrderId for order ${orderRef.id}:`, e);
+  }
+  // Timeline history can remain async
   Promise.all([
-    orderRef.update({ paypalOrderId: paypalOrderToken.id }),
     appendOrderHistory(orderRef.id, 'order_created_pending', 'customer', { receipt, total }),
     appendOrderHistory(orderRef.id, 'paypal_order_token_created', 'system', { paypalOrderId: paypalOrderToken.id }),
   ]).catch((e) => console.error('Background order history update error:', e));

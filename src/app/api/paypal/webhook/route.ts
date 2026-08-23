@@ -26,7 +26,9 @@ export async function POST(request: NextRequest) {
   console.log(`[paypal/webhook] Received authoritative event ${eventType}:`, resource.id);
 
   // 2. Handle Events
-  if (eventType === 'PAYMENT.CAPTURE.COMPLETED' || eventType === 'CHECKOUT.ORDER.APPROVED') {
+  // SECURITY: Only act on PAYMENT.CAPTURE.COMPLETED — CHECKOUT.ORDER.APPROVED fires
+  // before funds are captured and must never trigger fulfillment.
+  if (eventType === 'PAYMENT.CAPTURE.COMPLETED') {
     const paypalOrderId = resource.supplementary_data?.related_ids?.order_id || resource.id;
 
     if (paypalOrderId) {

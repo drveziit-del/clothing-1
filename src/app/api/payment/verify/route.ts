@@ -3,6 +3,7 @@ import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { verifyPaymentSchema } from '@/lib/utils/validation';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
+import type { DocumentReference } from 'firebase-admin/firestore';
 import { sendAdminPrebookNotification } from '@/lib/email/sender';
 import { isRateLimited } from '@/lib/utils/rateLimit';
 import { enqueueOrderProcessing, appendOrderHistory } from '@/lib/orchestrator/orderProcessor';
@@ -70,57 +71,95 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid payment signature' }, { status: 400 });
   }
 
-  // 4. Fetch and verify Firestore order belongs to this user
+  // 4. Preflight (non-transactional): fetch order, verify ownership & binding, resolve coupon
   const orderRef = adminDb.collection('orders').doc(orderId);
-  const orderDoc = await orderRef.get();
+  const preflight = await orderRef.get();
 
-  if (!orderDoc.exists) {
+  if (!preflight.exists) {
     return NextResponse.json({ error: 'Order not found' }, { status: 404 });
   }
 
-  const orderData = orderDoc.data()!;
-  if (orderData.userId !== uid) {
+  const preData = preflight.data()!;
+  if (preData.userId !== uid) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  if (orderData.razorpayOrderId !== razorpay_order_id) {
+  if (preData.razorpayOrderId !== razorpay_order_id) {
     return NextResponse.json({ error: 'Order ID mismatch' }, { status: 400 });
   }
 
-  // Idempotency check: if order is already paid or in production, skip double processing
-  if (orderData.status === 'paid' || orderData.status === 'in_production' || orderData.paymentCaptured) {
-    return NextResponse.json({ status: 'ok', orderId, message: 'Order already verified' });
-  }
-
-  // 5. Update order status to paid and update coupon usage if applicable
-  const batch = adminDb.batch();
-  batch.update(orderRef, {
-    status:             'paid',
-    paymentCaptured:    true,
-    razorpayPaymentId:  razorpay_payment_id,
-    updatedAt:          FieldValue.serverTimestamp(),
-  });
-
-  if (orderData.couponCode) {
-    const couponResult = await validateCoupon(orderData.couponCode, uid, orderData.subtotal, orderData.tax);
+  // Resolve coupon BEFORE the transaction — validateCoupon runs its own non-transactional reads.
+  let couponRef: DocumentReference | null = null;
+  let couponIsGlobal = false;
+  if (preData.couponCode && preData.status === 'pending') {
+    const couponResult = await validateCoupon(preData.couponCode, uid, preData.subtotal, preData.tax);
     if (couponResult.valid && couponResult.couponRef) {
-      if (couponResult.couponData.isGlobal) {
-        batch.update(couponResult.couponRef, {
-          timesUsed: FieldValue.increment(1),
-          updatedAt: FieldValue.serverTimestamp(),
-        });
-      } else {
-        batch.update(couponResult.couponRef, {
-          isUsed: true,
-          usedAt: FieldValue.serverTimestamp(),
-          orderId: orderId,
-          timesUsed: FieldValue.increment(1),
-        });
-      }
+      couponRef = couponResult.couponRef;
+      couponIsGlobal = !!couponResult.couponData.isGlobal;
     }
   }
 
-  await batch.commit();
+  // 5. Atomic commit: re-read order inside a transaction, flip status, consume coupon.
+  //    Prevents TOCTOU double-processing when this route races the payment webhook.
+  let orderData: any = null;
+  let alreadyProcessed = false;
+
+  try {
+    await adminDb.runTransaction(async (transaction) => {
+      const snap = await transaction.get(orderRef);
+      if (!snap.exists) throw new Error('ORDER_MISSING');
+
+      orderData = snap.data()!;
+
+      // Authoritative re-checks inside the transaction
+      if (orderData.userId !== uid || orderData.razorpayOrderId !== razorpay_order_id) {
+        throw new Error('ORDER_MISMATCH');
+      }
+
+      // Idempotency: skip double processing
+      if (orderData.status === 'paid' || orderData.status === 'in_production' || orderData.paymentCaptured) {
+        alreadyProcessed = true;
+        return;
+      }
+
+      transaction.update(orderRef, {
+        status:             'paid',
+        paymentCaptured:    true,
+        razorpayPaymentId:  razorpay_payment_id,
+        updatedAt:          FieldValue.serverTimestamp(),
+      });
+
+      if (couponRef) {
+        if (couponIsGlobal) {
+          transaction.update(couponRef, {
+            timesUsed: FieldValue.increment(1),
+            updatedAt: FieldValue.serverTimestamp(),
+          });
+        } else {
+          transaction.update(couponRef, {
+            isUsed: true,
+            usedAt: FieldValue.serverTimestamp(),
+            orderId: orderId,
+            timesUsed: FieldValue.increment(1),
+          });
+        }
+      }
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : '';
+    if (msg === 'ORDER_MISSING') {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+    if (msg === 'ORDER_MISMATCH') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    throw err;
+  }
+
+  if (alreadyProcessed) {
+    return NextResponse.json({ status: 'ok', orderId, message: 'Order already verified' });
+  }
+
   await appendOrderHistory(orderId, 'razorpay_payment_verified', 'customer', { razorpay_payment_id });
 
   if (orderData.isPrebooking) {

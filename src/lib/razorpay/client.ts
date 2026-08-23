@@ -118,8 +118,9 @@ export async function refundRazorpayPayment(
 // ─── RazorpayX Automated Payouts ──────────────────────────────────────────
 
 async function razorpayxRequest(path: string, method: string, body: any) {
-  const keyId = process.env.RAZORPAYX_KEY_ID || process.env.RAZORPAY_KEY_ID;
-  const keySecret = process.env.RAZORPAYX_KEY_SECRET || process.env.RAZORPAY_KEY_SECRET;
+  // RazorpayX keys are distinct from the payments gateway keys — never fall back to RAZORPAY_*.
+  const keyId = process.env.RAZORPAYX_KEY_ID;
+  const keySecret = process.env.RAZORPAYX_KEY_SECRET;
 
   if (!keyId || !keySecret) {
     throw new Error('RazorpayX API credentials missing');
@@ -155,10 +156,6 @@ async function razorpayxRequest(path: string, method: string, body: any) {
  * Registers an affiliate as a contact in RazorpayX
  */
 export async function createRazorpayxContact(name: string, email: string): Promise<string> {
-  if (process.env.NODE_ENV === 'test' || !process.env.RAZORPAYX_KEY_ID) {
-    return 'cont_mock_' + Math.random().toString(36).substring(2, 10).toUpperCase();
-  }
-
   const data = await razorpayxRequest('/contacts', 'POST', {
     name,
     email,
@@ -178,10 +175,6 @@ export async function createRazorpayxFundAccount(
   accountNumber: string,
   ifscCode: string
 ): Promise<string> {
-  if (contactId.startsWith('cont_mock_') || !process.env.RAZORPAYX_KEY_ID) {
-    return 'fa_mock_' + Math.random().toString(36).substring(2, 10).toUpperCase();
-  }
-
   const data = await razorpayxRequest('/fund_accounts', 'POST', {
     contact_id: contactId,
     account_type: 'bank_account',
@@ -205,14 +198,6 @@ export async function createRazorpayxPayout(
 ): Promise<{ id: string; status: string; amountPaidINR: number }> {
   const amountINR = Math.round(amountUSD * currencyRate);
   const amountPaise = amountINR * 100;
-
-  if (fundAccountId.startsWith('fa_mock_') || !process.env.RAZORPAYX_KEY_ID) {
-    return {
-      id: 'pout_mock_' + Math.random().toString(36).substring(2, 10).toUpperCase(),
-      status: 'processed',
-      amountPaidINR: amountINR,
-    };
-  }
 
   const accountNumber = process.env.RAZORPAYX_ACCOUNT_NUMBER;
   if (!accountNumber) {

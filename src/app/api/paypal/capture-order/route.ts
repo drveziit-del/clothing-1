@@ -52,8 +52,20 @@ export async function POST(request: NextRequest) {
   }
 
   const orderData = orderDoc.data()!;
-  if (uid && orderData.userId && !orderData.userId.startsWith('guest_') && orderData.userId !== uid) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  const isGuestOrder = typeof orderData.userId === 'string' && orderData.userId.startsWith('guest_');
+  if (!isGuestOrder) {
+    if (!uid) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+    if (orderData.userId !== uid) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  }
+
+  // Binding Guard: The PayPal order must be the one created for this Firestore order
+  if (!orderData.paypalOrderId || orderData.paypalOrderId !== paypalOrderId) {
+    console.error(`[paypal/capture-order] PayPal order ID mismatch for order ${orderId}`);
+    return NextResponse.json({ error: 'PayPal order ID mismatch' }, { status: 403 });
   }
 
   // Idempotency Guard: If already captured or paid, return immediately
@@ -76,7 +88,11 @@ export async function POST(request: NextRequest) {
 
   // Amount Integrity Guard: Cross-check captured amount vs database order total
   if (typeof captureResult.amountValue === 'number') {
-    const expectedAmount = orderData.totalAmountUSD;
+    const expectedAmount = orderData.totalAmountUSD ?? orderData.total;
+    if (typeof expectedAmount !== 'number' || expectedAmount <= 0) {
+      console.error(`[paypal/capture-order] No valid expected amount found for order ${orderId}`);
+      return NextResponse.json({ error: 'Order amount not found' }, { status: 400 });
+    }
     if (Math.abs(captureResult.amountValue - expectedAmount) > 0.05) {
       console.error(`[paypal/capture-order] Captured amount mismatch for order ${orderId}: Expected $${expectedAmount}, Captured $${captureResult.amountValue}`);
       return NextResponse.json({ error: `Captured amount mismatch ($${captureResult.amountValue} vs expected $${expectedAmount})` }, { status: 400 });

@@ -58,6 +58,17 @@ export async function POST(request: NextRequest) {
     }
 
     const orderData = orderDoc.data()!;
+
+    // Ownership check: users may only initialize PayPal payments for their own orders
+    if (orderData.userId && orderData.userId !== uid) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Status guard: only pending prebookings are eligible for a PayPal payment session
+    if (orderData.status !== 'pending' || !orderData.isPrebooking) {
+      return NextResponse.json({ error: 'Order is not eligible for prebook payment' }, { status: 400 });
+    }
+
     const depositAmount = Number(orderData.total || 500);
 
     const receipt = `prebook_pp_${Date.now()}`;
