@@ -1,8 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import { isRateLimited } from '@/lib/utils/rateLimit';
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  // Throttle per IP: silent success on limit so we don't leak rate-limit internals.
+  if (isRateLimited(request, 'analytics_visit', { limit: 1, windowMs: 60 * 1000 })) {
+    return NextResponse.json({ success: true });
+  }
+
   try {
     const settingsRef = adminDb.collection('settings').doc('global');
     await settingsRef.set(
@@ -12,9 +18,8 @@ export async function POST() {
       { merge: true }
     );
     return NextResponse.json({ success: true });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Visit tracking failed';
-    console.error('Error tracking site visit:', msg);
-    return NextResponse.json({ error: msg }, { status: 500 });
+  } catch (err) {
+    console.error('Error tracking site visit:', err);
+    return NextResponse.json({ error: 'Visit tracking failed' }, { status: 500 });
   }
 }

@@ -28,7 +28,7 @@ ALWAYS prefer MCP graph tools over grep/glob/file-search for code discovery.
 
 ## 2. Non-Negotiable Security Rules
 1. **Zero Secret Exposure:** Never commit API keys, service account credentials, or secrets in source code. All secrets must be referenced via `process.env`.
-2. **Server-Only Isolation:** All modules accessing `ENCRYPTION_SECRET_KEY`, `RAZORPAY_KEY_SECRET`, `PAYPAL_CLIENT_SECRET`, `PRINTIFY_API_TOKEN`, or `FIREBASE_SERVICE_ACCOUNT` MUST include `import 'server-only';` at the top of the file.
+2. **Server-Only Isolation:** All modules accessing `ENCRYPTION_KEY`, `RAZORPAY_KEY_SECRET`, `PAYPAL_CLIENT_SECRET`, `PRINTIFY_ACCESS_TOKEN`, or `FIREBASE_SERVICE_ACCOUNT` MUST include `import 'server-only';` at the top of the file.
 3. **AES-256-GCM Encryption:** Bank details and payout credentials must always be encrypted before writing to Firestore.
 4. **Acid Transactions for Referrals:** Referral reward updates ($100 per 10 client purchases) must use `adminDb.runTransaction` to prevent race conditions or double payout counts.
 5. **Session Verification:** Every protected API endpoint must verify the `session` cookie server-side using `adminAuth.verifySessionCookie(session, true)`.

@@ -3,6 +3,7 @@ import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
 import { isRateLimited } from '@/lib/utils/rateLimit';
+import { encrypt } from '@/lib/utils/encryption';
 import z from 'zod';
 
 const bankDetailsSchema = z.object({
@@ -53,10 +54,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: result.error.issues[0]?.message || 'Invalid bank details' }, { status: 400 });
   }
 
-  // 3. Save to Firestore
+  // 3. Save to Firestore — treasury credentials encrypted at rest (AES-256-GCM)
+  //    per project security rules; the public GET route decrypts before serving.
   try {
     await adminDb.collection('settings').doc('bank_details').set({
       ...result.data,
+      accountNumber: result.data.accountNumber ? encrypt(result.data.accountNumber) : result.data.accountNumber,
+      routingNumber: result.data.routingNumber ? encrypt(result.data.routingNumber) : result.data.routingNumber,
+      swiftBic: result.data.swiftBic ? encrypt(result.data.swiftBic) : result.data.swiftBic,
       updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true });
 
