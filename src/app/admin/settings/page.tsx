@@ -117,9 +117,20 @@ export default function AdminSettingsPage() {
           setCopywriting(prev => ({ ...prev, ...copySnap.data() }));
         }
 
-        const bankSnap = await getDoc(doc(db, 'settings', 'bank_details'));
-        if (bankSnap.exists()) {
-          setBankDetails(prev => ({ ...prev, ...bankSnap.data() }));
+        // Bank details are AES-256-GCM encrypted at rest by the admin API;
+        // this public endpoint returns them decrypted for editing.
+        try {
+          const bankRes = await fetch('/api/settings/bank-details');
+          if (bankRes.ok) {
+            const bankData = await bankRes.json();
+            setBankDetails(prev => ({ ...prev, ...bankData }));
+          }
+        } catch {
+          console.warn('Falling back to direct Firestore read for bank details');
+          const bankSnap = await getDoc(doc(db, 'settings', 'bank_details'));
+          if (bankSnap.exists()) {
+            setBankDetails(prev => ({ ...prev, ...bankSnap.data() }));
+          }
         }
       } catch (err) {
         console.error('Error loading settings:', err);
