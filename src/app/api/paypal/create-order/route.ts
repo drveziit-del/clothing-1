@@ -8,6 +8,7 @@ import { isRateLimited } from '@/lib/utils/rateLimit';
 import { validateCoupon } from '@/lib/utils/couponValidator';
 import { calculateTax } from '@/lib/utils/taxCalculator';
 import { appendOrderHistory } from '@/lib/orchestrator/orderProcessor';
+import crypto from 'crypto';
 import type { OrderItem } from '@/types';
 
 export async function POST(request: NextRequest) {
@@ -128,6 +129,12 @@ export async function POST(request: NextRequest) {
   }
 
   // 5. Create Pending Firestore Order
+  // Guests get a recovery token so they can fetch their own order later
+  // (guests have no session to authenticate with).
+  const guestToken = uid.startsWith('guest_')
+    ? crypto.randomBytes(24).toString('hex')
+    : null;
+
   const baseOrderData = {
     userId:          uid,
     userEmail:       email,
@@ -144,6 +151,7 @@ export async function POST(request: NextRequest) {
     referralCode:    referralCode ?? null,
     couponCode:      couponCode ?? null,
     shippingAddress,
+    guestToken,
     expiresAt,
     emailSent:       false,
     createdAt:       FieldValue.serverTimestamp(),
@@ -182,5 +190,6 @@ export async function POST(request: NextRequest) {
     currency:      paypalOrderToken.currency,
     total,
     discount,
+    ...(guestToken ? { guestToken } : {}),
   });
 }

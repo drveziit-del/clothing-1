@@ -180,7 +180,7 @@ export default function ReceiptPrinterModal({
               .join('')}
             <div class="divider"></div>
             <div class="row"><span>SUBTOTAL:</span><span>$${subtotal.toFixed(2)}</span></div>
-            <div class="row"><span>TAX (8%):</span><span>$${tax.toFixed(2)}</span></div>
+            <div class="row"><span>TAX:</span><span>$${tax.toFixed(2)}</span></div>
             <div class="row"><span>SHIPPING:</span><span>FREE</span></div>
             <div class="row" style="color: #d63031; font-weight: bold;"><span>PROMO DISCOUNT:</span><span>-$${discount.toFixed(2)}</span></div>
             <div class="divider"></div>
@@ -328,7 +328,7 @@ export default function ReceiptPrinterModal({
                     <span>{formatPrice(subtotal)}</span>
                   </div>
                   <div className={styles.totalsRow}>
-                    <span>TAX (8%)</span>
+                    <span>TAX</span>
                     <span>{formatPrice(tax)}</span>
                   </div>
                   <div className={styles.totalsRow}>

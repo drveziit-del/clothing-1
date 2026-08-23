@@ -7,6 +7,7 @@ import { useCurrency } from '@/context/CurrencyContext';
 import { useRouter } from 'next/navigation';
 import { useRoast } from '@/hooks/useRoast';
 import { addressSchema } from '@/lib/utils/validation';
+import { calculateTax } from '@/lib/utils/taxCalculator';
 import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
 import RazorpayButton from '@/components/checkout/RazorpayButton';
 import PayPalMultiButton from '@/components/checkout/PayPalMultiButton';
@@ -42,9 +43,12 @@ export default function CheckoutPage() {
   const [shippingFee, setShippingFee]                 = useState(15);
   const [freeShippingThreshold, setFreeShippingThreshold] = useState(100);
 
+  // Selected destination drives the destination-based tax preview
+  const [selectedCountry, setSelectedCountry] = useState('US');
+
   const isFreeShipping = subtotal >= freeShippingThreshold;
   const shippingCharge = isFreeShipping ? 0 : shippingFee;
-  const tax = subtotal * 0.08;
+  const tax = calculateTax(selectedCountry, subtotal);
   const totalBeforeDiscount = subtotal + tax + shippingCharge;
   const discountAmount = Math.min(couponDiscount, totalBeforeDiscount);
   const grandTotal = Math.max(0, totalBeforeDiscount - discountAmount);
@@ -365,6 +369,7 @@ export default function CheckoutPage() {
                   defaultValue="US"
                   onChange={(e) => {
                     const country = e.target.value;
+                    setSelectedCountry(country);
                     const countryCurrencyMap: Record<string, string> = {
                       IN: 'INR',
                       US: 'USD',
@@ -504,7 +509,7 @@ export default function CheckoutPage() {
                 {isFreeShipping ? 'FREE' : formatPrice(shippingCharge)}
               </span>
             </div>
-            <div className={styles.totalRow}><span>Tax (8%)</span><span>{formatPrice(tax)}</span></div>
+            <div className={styles.totalRow}><span>Tax (destination-based)</span><span>{formatPrice(tax)}</span></div>
             {couponDiscount > 0 && (
               <div className={styles.totalRow} style={{ color: 'var(--coral-200)' }}>
                 <span>Discount</span>

@@ -1,5 +1,6 @@
 import AdminDashboardClient from './AdminDashboardClient';
 import { adminDb } from '@/lib/firebase/admin';
+import { sweepStuckJobs } from '@/lib/orchestrator/orderProcessor';
 
 export const dynamic = 'force-dynamic';
 
@@ -127,6 +128,10 @@ async function getDashboardData() {
 }
 
 export default async function AdminDashboard() {
+  // Opportunistic stuck-job sweep on every dashboard load — re-drives
+  // fulfillment jobs abandoned by serverless freezes without needing cron infra.
+  sweepStuckJobs().catch((err) => console.error('Dashboard sweep error:', err));
+
   const data = await getDashboardData();
 
   return <AdminDashboardClient data={data} />;

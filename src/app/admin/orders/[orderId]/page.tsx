@@ -161,7 +161,7 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
           </div>
           <div style={{ borderLeft: '1px solid #222', paddingLeft: '1.5rem' }}>
             <p style={{ margin: '0.4rem 0' }}><span style={{ color: '#888' }}>Subtotal:</span> ${data.subtotal?.toFixed(2) || '0.00'}</p>
-            <p style={{ margin: '0.4rem 0' }}><span style={{ color: '#888' }}>Tax (8%):</span> ${data.tax?.toFixed(2) || '0.00'}</p>
+            <p style={{ margin: '0.4rem 0' }}><span style={{ color: '#888' }}>Tax:</span> ${data.tax?.toFixed(2) || '0.00'}</p>
             <p style={{ margin: '0.4rem 0' }}><span style={{ color: '#888' }}>Discount:</span> -${data.discount?.toFixed(2) || '0.00'}</p>
             <hr style={{ borderColor: '#222', margin: '0.5rem 0' }} />
             <p style={{ margin: '0.4rem 0', fontSize: '1.1rem', color: '#2ed573' }}><span style={{ color: '#888' }}>Grand Total Paid:</span> <strong>${data.total?.toFixed(2) || '0.00'}</strong></p>

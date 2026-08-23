@@ -32,19 +32,48 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  // Auth check
+  // Auth: session cookie OR guest recovery token (?token= issued at order creation)
+  const token = request.nextUrl.searchParams.get('token');
   const cookieStore = await cookies();
   const session = cookieStore.get('session')?.value;
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  let uid: string | null = null;
+  if (session) {
+    try {
+      const decoded = await adminAuth.verifySessionCookie(session, true);
+      uid = decoded.uid;
+    } catch {
+      uid = null;
+    }
   }
 
-  let uid: string;
-  try {
-    const decoded = await adminAuth.verifySessionCookie(session, true);
-    uid = decoded.uid;
-  } catch {
-    return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+  if (!session || !uid) {
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Guest path: token must match the one stored on the order document.
+    const guestOrderDoc = await adminDb.collection('orders').doc(orderId).get();
+    if (!guestOrderDoc.exists) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+    const g = guestOrderDoc.data()!;
+    if (!g.guestToken || typeof token !== 'string' || token.length < 20 ||
+        g.guestToken !== token) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    return NextResponse.json({
+      id: guestOrderDoc.id,
+      items: g.items || [],
+      subtotal: g.subtotal ?? 0,
+      tax: g.tax ?? 0,
+      discount: g.discount ?? 0,
+      total: g.total ?? 0,
+      status: g.status,
+      shippingAddress: g.shippingAddress || null,
+      paymentGateway: g.paymentGateway || null,
+      createdAt: g.createdAt?.toDate?.()?.toISOString?.() || null,
+    });
   }
 
   // Fetch order

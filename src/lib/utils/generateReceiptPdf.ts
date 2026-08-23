@@ -127,7 +127,7 @@ export function generateAndDownloadReceiptPdf(options: ReceiptPdfOptions) {
   doc.text(`$${subtotal.toFixed(2)}`, pageWidth - 6, y, { align: 'right' });
 
   y += 4.5;
-  doc.text('TAX (8%):', 6, y);
+  doc.text('TAX:', 6, y);
   doc.text(`$${tax.toFixed(2)}`, pageWidth - 6, y, { align: 'right' });
 
   y += 4.5;

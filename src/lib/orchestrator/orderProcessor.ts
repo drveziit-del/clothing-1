@@ -5,7 +5,7 @@ import { createOrder as createPrintifyOrder } from '@/lib/printify/client';
 import { sendOrderConfirmationEmailsOnce } from '@/lib/email/sender';
 import { normalizeCountryCode, normalizeRegionCode } from '@/lib/utils/isoCodes';
 import type { Order } from '@/types';
-import type { OrderJob, OrderHistoryEvent } from '@/lib/payment/types';
+import type { OrderHistoryEvent } from '@/lib/payment/types';
 
 export async function appendOrderHistory(
   orderId: string,
@@ -177,4 +177,70 @@ export async function processOrderJob(jobId: string, orderId: string, currentAtt
   }
 
   await jobRef.update({ status: 'completed', updatedAt: FieldValue.serverTimestamp() });
+}
+
+/**
+ * Re-drives fulfillment jobs abandoned by serverless freezes (fire-and-forget
+ * work dying with the invocation). Called opportunistically from the admin
+ * dashboard load — a zero-infrastructure stand-in for a scheduled sweeper.
+ *
+ * Stuck = pending/retrying/processing with updatedAt older than 10 minutes.
+ */
+export async function sweepStuckJobs(maxAgeMs: number = 10 * 60 * 1000): Promise<number> {
+  const cutoff = new Date(Date.now() - maxAgeMs);
+  let requeued = 0;
+
+  try {
+    const snap = await adminDb
+      .collection('order_jobs')
+      .where('status', 'in', ['pending', 'retrying', 'processing'])
+      .where('updatedAt', '<', cutoff)
+      .limit(10)
+      .get();
+
+    for (const doc of snap.docs) {
+      const job = doc.data();
+      const orderId = String(job.orderId || doc.id);
+      const jobRef = adminDb.collection('order_jobs').doc(doc.id);
+      const orderRef = adminDb.collection('orders').doc(orderId);
+
+      const orderDoc = await orderRef.get();
+      if (!orderDoc.exists) {
+        await jobRef.update({ status: 'failed', lastError: 'Order document missing (sweep)', updatedAt: FieldValue.serverTimestamp() });
+        continue;
+      }
+
+      const orderData = orderDoc.data()!;
+
+      // Already fulfilled elsewhere — close the job instead of double-submitting.
+      if (orderData.printifyOrderId || orderData.status === 'in_production' || orderData.status === 'delivered') {
+        await jobRef.update({ status: 'completed', updatedAt: FieldValue.serverTimestamp() });
+        continue;
+      }
+
+      // Only paid orders should ever be fulfilled.
+      if (!orderData.paymentCaptured && !['paid', 'queued_for_printify'].includes(orderData.status)) {
+        await jobRef.update({ status: 'failed', lastError: 'Order not paid (sweep)', updatedAt: FieldValue.serverTimestamp() });
+        continue;
+      }
+
+      const nextAttempt = Number(job.attemptCount ?? 0) + 1;
+      await jobRef.update({
+        attemptCount: nextAttempt,
+        status: 'pending',
+        lastError: `swept_after_stall_${new Date().toISOString()}`,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      await appendOrderHistory(orderId, 'order_job_swept_requeued', 'system', { attempt: nextAttempt });
+
+      processOrderJob(doc.id, orderId, nextAttempt).catch((err) => {
+        console.error(`[OrderOrchestrator] Swept job re-run failed for order ${orderId}:`, err);
+      });
+      requeued += 1;
+    }
+  } catch (err) {
+    console.error('[OrderOrchestrator] Stuck-job sweep failed:', err);
+  }
+
+  return requeued;
 }

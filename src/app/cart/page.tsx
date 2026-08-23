@@ -223,7 +223,7 @@ export default function CartPage() {
               <span className="text-price">{formatPrice(subtotal)}</span>
             </div>
             <div className={styles.totalRow}>
-              <span>Tax (est. 8%)</span>
+              <span>Est. Tax</span>
               <span className="text-price">{formatPrice(tax)}</span>
             </div>
             <div className={styles.divider} />

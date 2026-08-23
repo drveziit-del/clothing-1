@@ -6,9 +6,9 @@ import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
 import { isRateLimited } from '@/lib/utils/rateLimit';
 import { validateCoupon } from '@/lib/utils/couponValidator';
+import { calculateTax } from '@/lib/utils/taxCalculator';
+import crypto from 'crypto';
 import type { OrderItem } from '@/types';
-
-const TAX_RATE = 0.08;
 
 export async function POST(request: NextRequest) {
   if (isRateLimited(request, 'create_order', { limit: 10, windowMs: 15 * 60 * 1000 })) {
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const tax = subtotal * TAX_RATE;
+  const tax = calculateTax(shippingAddress.country, subtotal);
   let total = subtotal + tax;
   let discount = 0;
 
@@ -118,6 +118,11 @@ export async function POST(request: NextRequest) {
   const receipt = `gkink_${Date.now()}`;
   const orderRef = adminDb.collection('orders').doc();
 
+  // Guests get a recovery token so they can fetch their own order later.
+  const guestToken = uid.startsWith('guest_')
+    ? crypto.randomBytes(24).toString('hex')
+    : null;
+
   const baseOrderData = {
     userId:          uid,
     userEmail:       email,
@@ -131,6 +136,7 @@ export async function POST(request: NextRequest) {
     referralCode:    referralCode ?? null,
     couponCode:      couponCode ?? null,
     shippingAddress,
+    guestToken,
     createdAt:       FieldValue.serverTimestamp(),
   };
 
@@ -146,6 +152,7 @@ export async function POST(request: NextRequest) {
       currency:        'USD',
       total:           0,
       discount,
+      ...(guestToken ? { guestToken } : {}),
     });
   }
 
@@ -175,5 +182,6 @@ export async function POST(request: NextRequest) {
     currency:        rzpOrder.currency,
     total,
     discount,
+    ...(guestToken ? { guestToken } : {}),
   });
 }
