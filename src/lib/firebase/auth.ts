@@ -4,14 +4,34 @@ import type { User } from '@/types';
 // Type-only imports — erased at compile time
 import type { UserCredential } from 'firebase/auth';
 
-function generateReferralCode(uid: string): string {
+// Generates a cryptographically random referral code and verifies uniqueness
+// against Firestore before returning it (prevents commission misattribution
+// when two users would otherwise collide on the same code).
+async function generateUniqueReferralCode(uid: string): Promise<string> {
+  const { collection, query, where, getDocs, limit } = getFirestoreModule();
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const hash = uid.slice(0, 4).toUpperCase();
-  let suffix = '';
-  for (let i = 0; i < 6; i++) {
-    suffix += chars[Math.floor(Math.random() * chars.length)];
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const arr = new Uint8Array(6);
+    crypto.getRandomValues(arr);
+    let suffix = '';
+    for (let i = 0; i < 6; i++) {
+      suffix += chars[arr[i] % chars.length];
+    }
+    const code = `GERK-${hash}${suffix}`;
+
+    try {
+      const q = query(collection(getFirestoreDb(), 'users'), where('referralCode', '==', code), limit(1));
+      const snap = await getDocs(q);
+      if (snap.empty) return code;
+    } catch {
+      // Uniqueness check is best-effort; fall through to retry with a new code.
+    }
   }
-  return `GERK-${hash}${suffix}`;
+
+  // Fallback: deterministic uid-derived code (practically collision-free).
+  return `GERK-${uid.slice(0, 10).toUpperCase()}`;
 }
 
 async function createUserProfile(
@@ -26,7 +46,7 @@ async function createUserProfile(
   const existing = await getDoc(userRef);
 
   if (!existing.exists()) {
-    const referralCode = generateReferralCode(uid);
+    const referralCode = await generateUniqueReferralCode(uid);
     await setDoc(userRef, {
       uid,
       email,

@@ -3,7 +3,7 @@ import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
 import { FieldValue } from 'firebase-admin/firestore';
 import { isRateLimited } from '@/lib/utils/rateLimit';
-import { appendOrderHistory } from '@/lib/orchestrator/orderProcessor';
+import { appendOrderHistory, enqueueOrderProcessing } from '@/lib/orchestrator/orderProcessor';
 import z from 'zod';
 
 const approveWireSchema = z.object({
@@ -61,6 +61,11 @@ export async function POST(request: NextRequest) {
 
     const orderData = orderDoc.data()!;
 
+    // Status precondition: prevent resurrecting cancelled/shipped orders or double-approval
+    if (action === 'approve' && !['awaiting_wire_confirmation', 'pending'].includes(orderData.status)) {
+      return NextResponse.json({ error: `Cannot approve order with status: ${orderData.status}` }, { status: 409 });
+    }
+
     if (action === 'approve') {
       await orderRef.update({
         status: 'paid',
@@ -76,6 +81,10 @@ export async function POST(request: NextRequest) {
         adminNote,
         approvedAt: new Date().toISOString(),
       });
+
+      // Enqueue fulfillment (Printify submission, confirmation emails, referral engine).
+      // Without this, wire-approved orders never reached production.
+      await enqueueOrderProcessing(orderId);
 
       return NextResponse.json({
         success: true,

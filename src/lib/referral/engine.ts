@@ -39,6 +39,11 @@ export async function processReferral(order: Order): Promise<void> {
       const freshAffiliateDoc = await transaction.get(affiliateDoc.ref);
       const globalSettingsDoc = await transaction.get(settingsRef);
 
+      // Pre-read the milestone doc (must happen before any writes — Firestore
+      // transactions require all reads to precede all writes).
+      const milestoneRef = adminDb.collection('milestones').doc(`milestone_${MILESTONE_CUSTOMER}`);
+      const existingMilestone = await transaction.get(milestoneRef);
+
       // Calculations
       const currentCount: number = freshAffiliateDoc.data()?.referralCount ?? 0;
       const newCount = currentCount + 1;
@@ -80,9 +85,10 @@ export async function processReferral(order: Order): Promise<void> {
         { merge: true }
       );
 
-      // 4. Check for 100,000th customer milestone reward
-      if (newGlobalCount === MILESTONE_CUSTOMER) {
-        const milestoneRef = adminDb.collection('milestones').doc(`milestone_${MILESTONE_CUSTOMER}`);
+      // 4. Check for 100,000th customer milestone reward.
+      // >= (not ===) + existence guard keeps this correct even if the global
+      // counter ever drifts (manual edits, retried writes).
+      if (newGlobalCount >= MILESTONE_CUSTOMER && !existingMilestone.exists) {
         transaction.set(milestoneRef, {
           affiliateUid,
           orderId: order.id,

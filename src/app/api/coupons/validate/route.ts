@@ -1,12 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase/admin';
+import { adminAuth, adminDb } from '@/lib/firebase/admin';
+import { cookies } from 'next/headers';
+import { isRateLimited } from '@/lib/utils/rateLimit';
 
 export async function POST(request: NextRequest) {
+  // Anti-enumeration: throttle code guessing (in-memory, per-instance)
+  if (isRateLimited(request, 'coupon_validate', { limit: 15, windowMs: 15 * 60 * 1000 })) {
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const code = (body.code || '').trim().toUpperCase();
     const subtotal = parseFloat(body.subtotal) || 0;
-    const uid = body.userId || null;
+
+    // Resolve uid from the verified session cookie — never trust a client-supplied userId.
+    let uid: string | null = null;
+    const cookieStore = await cookies();
+    const session = cookieStore.get('session')?.value;
+    if (session) {
+      try {
+        const decoded = await adminAuth.verifySessionCookie(session, true);
+        uid = decoded.uid;
+      } catch {
+        uid = null;
+      }
+    }
 
     if (!code) {
       return NextResponse.json({ error: 'Please enter a coupon code.' }, { status: 400 });
@@ -66,7 +85,22 @@ export async function POST(request: NextRequest) {
 
     const tax = parseFloat(body.tax) || (subtotal * 0.08);
     const type = couponData.type || 'percentage';
-    const val = couponData.value ?? (code.toUpperCase() === 'T100' ? 100 : 0);
+
+    // Expiry check (supports Firestore Timestamp and string dates)
+    if (couponData.expiresAt) {
+      const expiryDate = typeof couponData.expiresAt?.toDate === 'function'
+        ? couponData.expiresAt.toDate()
+        : new Date(couponData.expiresAt);
+      if (!Number.isNaN(expiryDate.getTime()) && expiryDate < new Date()) {
+        return NextResponse.json({ error: 'This coupon has expired.' }, { status: 400 });
+      }
+    }
+
+    // No magic-value fallbacks — coupons must have an explicit value configured.
+    const val = couponData.value ?? 0;
+    if (val <= 0) {
+      return NextResponse.json({ error: 'Coupon has no value configured.' }, { status: 400 });
+    }
     const appliesTo = couponData.appliesTo || (val >= 100 ? 'grand_total' : 'subtotal');
 
     const baseAmount = (appliesTo === 'grand_total' || (type === 'percentage' && val >= 100))

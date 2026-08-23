@@ -82,7 +82,7 @@ export async function sendAdminPayoutAlert(details: PayoutAlertDetails): Promise
 
       <div style="background-color: #161b22; padding: 16px; border-radius: 8px; border-left: 4px solid #d29922; margin-top: 32px;">
         <p style="margin: 0; font-size: 14px; color: #c9d1d9;">
-          <strong>Action Required:</strong> Log in to your <strong>Wise Business account</strong>, choose send money, select email or bank transfer, and process a transfer of exactly <strong>$100.00 USD</strong> using the details above. Under the user agreement, the transfer fees will be deducted from this balance.
+          <strong>Action Required:</strong> Log in to your <strong>Wise Business account</strong>, choose send money, select email or bank transfer, and process a transfer of exactly <strong>$${typeof details.amount === 'number' ? details.amount.toFixed(2) : '0.00'} USD</strong> using the details above. Under the user agreement, the transfer fees will be deducted from this balance.
         </p>
       </div>
       

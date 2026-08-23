@@ -53,7 +53,17 @@ export async function validateCoupon(
     }
   }
 
-  // 4. Check min spend subtotal
+  // 4. Expiry check (supports Firestore Timestamp and ISO/string dates)
+  if (couponData.expiresAt) {
+    const expiryDate = typeof couponData.expiresAt?.toDate === 'function'
+      ? couponData.expiresAt.toDate()
+      : new Date(couponData.expiresAt);
+    if (!Number.isNaN(expiryDate.getTime()) && expiryDate < new Date()) {
+      return { valid: false, discount: 0, error: 'This coupon has expired.' };
+    }
+  }
+
+  // 5. Check min spend subtotal
   const minSpend = couponData.minSubtotal ?? 0;
   if (minSpend > 0 && subtotal < minSpend) {
     return {
@@ -63,9 +73,12 @@ export async function validateCoupon(
     };
   }
 
-  // 5. Calculate discount
+  // 6. Calculate discount — no magic-value fallbacks; coupons must have an explicit value.
   const couponType = couponData.type || 'percentage';
-  const couponVal = couponData.value ?? (cleanCode.toUpperCase() === 'T100' ? 100 : 0);
+  const couponVal = couponData.value ?? 0;
+  if (couponVal <= 0) {
+    return { valid: false, discount: 0, error: 'Coupon has no value configured.' };
+  }
   const appliesTo = couponData.appliesTo || (couponVal >= 100 ? 'grand_total' : 'subtotal');
   const baseAmount = (appliesTo === 'grand_total' || (couponType === 'percentage' && couponVal >= 100))
     ? (subtotal + tax)

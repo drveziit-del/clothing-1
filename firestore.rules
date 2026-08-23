@@ -19,7 +19,13 @@ service cloud.firestore {
     // ── Users ───────────────────────────────────────────────────────
     match /users/{uid} {
       allow read:   if isOwner(uid) || isAdmin();
-      allow create: if isOwner(uid);
+      // Signup creates the profile with safe defaults only — sensitive counters
+      // (referralCount/totalEarnings/milestone rewards) are server-managed.
+      allow create: if isOwner(uid)
+        && request.resource.data.role == 'user'
+        && request.resource.data.referralCount == 0
+        && request.resource.data.totalEarnings == 0
+        && !request.resource.data.keys().hasAny(['milestoneReward', 'milestoneAchieved']);
       // Users can update their own non-sensitive fields only
       allow update: if (isOwner(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'referralCount', 'totalEarnings'])) || isAdmin();
       allow delete: if isAdmin();

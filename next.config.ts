@@ -17,7 +17,9 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
-    const scriptCSP = "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://checkout.razorpay.com https://*.razorpay.com https://apis.google.com https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com";
+    // 'unsafe-eval' is required by the Next.js dev overlay but must never ship to production.
+    const unsafeEval = process.env.NODE_ENV !== 'production' ? "'unsafe-eval' " : '';
+    const scriptCSP = `script-src 'self' ${unsafeEval}'unsafe-inline' https://checkout.razorpay.com https://*.razorpay.com https://apis.google.com https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com`;
 
     return [
       {
@@ -40,6 +42,10 @@ const nextConfig: NextConfig = {
               "media-src 'self' blob: https://firebasestorage.googleapis.com https://commondatastorage.googleapis.com",
               "connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://api.razorpay.com https://*.razorpay.com https://api.printify.com https://open.er-api.com wss://*.firebaseio.com https://*.paypal.com https://*.paypalobjects.com",
               "frame-src https://checkout.razorpay.com https://*.razorpay.com https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://gerkink.shop https://*.gerkink.shop https://*.paypal.com https://*.paypalobjects.com",
+              "base-uri 'self'",
+              "form-action 'self' https://api.razorpay.com https://www.paypal.com",
+              "frame-ancestors 'none'",
+              "object-src 'none'",
             ].join("; "),
           },
         ],
