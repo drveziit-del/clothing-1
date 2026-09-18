@@ -148,9 +148,17 @@ const TIER_META: Record<number, {
 interface ProductDetailClientProps {
   product: Product;
   recommendedProducts?: Product[];
+  initialReviewSummary?: {
+    averageRating: number;
+    totalReviews: number;
+  };
 }
 
-export function ProductDetailClient({ product, recommendedProducts = [] }: ProductDetailClientProps) {
+export function ProductDetailClient({
+  product,
+  recommendedProducts = [],
+  initialReviewSummary,
+}: ProductDetailClientProps) {
   const { addItem } = useCart();
   const { toast } = useRoast();
   const { formatPrice } = useCurrency();
@@ -365,7 +373,42 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
   }, [displayedImages, product.videos]);
 
   const [productReviews, setProductReviews] = useState<Review[]>([]);
-  const [reviewSummary, setReviewSummary] = useState<ProductReviewSummary | null>(null);
+  const [reviewSummary, setReviewSummary] = useState<ProductReviewSummary | null>(() => {
+    if (initialReviewSummary) {
+      return {
+        averageRating: initialReviewSummary.averageRating,
+        totalReviews: initialReviewSummary.totalReviews,
+        verifiedReviewsCount: 0,
+        ratingDistribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+        fitDistribution: { runs_small: 0, true_to_size: 0, runs_large: 0 },
+        mediaCount: 0,
+      };
+    }
+    return null;
+  });
+
+  const [loadReviews, setLoadReviews] = useState(false);
+  const reviewsTriggerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (loadReviews) return;
+    const el = reviewsTriggerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setLoadReviews(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setLoadReviews(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '600px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadReviews]);
 
   const handleReviewsLoaded = useCallback((loadedReviews: Review[], summary?: ProductReviewSummary) => {
     setProductReviews((prev) => {
@@ -444,7 +487,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                     src={media[mobileImageIndex]?.url}
                     alt={`${product.title} - Slide ${mobileImageIndex + 1}`}
                     fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 480px) calc(100vw - 2rem), (max-width: 768px) calc(100vw - 4rem), 50vw"
                     className={styles.carouselMedia}
                     priority
                     fetchPriority="high"
@@ -513,9 +556,9 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                       src={item.url}
                       alt={`${product.title} - View ${index + 1}`}
                       fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
+                      sizes="(max-width: 480px) calc(100vw - 2rem), (max-width: 768px) calc(100vw - 4rem), 50vw"
                       className={styles.galleryMedia}
-                      priority={index === 0}
+                      priority={false}
                     />
                   )}
                 </div>
@@ -556,12 +599,14 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                 role="button"
                 tabIndex={0}
                 onClick={() => {
+                  setLoadReviews(true);
                   const el = document.getElementById('reviews-section');
                   el?.scrollIntoView({ behavior: 'smooth' });
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
+                    setLoadReviews(true);
                     const el = document.getElementById('reviews-section');
                     el?.scrollIntoView({ behavior: 'smooth' });
                   }
@@ -1030,12 +1075,20 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
           )}
 
           {/* Real Customer Reviews & UGC Media */}
-          <section id="reviews-section" className={styles.reviewsSection}>
-            <ProductReviewsSection
-              productId={product.id}
-              productTitle={product.title}
-              onReviewsLoaded={handleReviewsLoaded}
-            />
+          <section id="reviews-section" className={styles.reviewsSection} ref={reviewsTriggerRef}>
+            {loadReviews ? (
+              <ProductReviewsSection
+                productId={product.id}
+                productTitle={product.title}
+                onReviewsLoaded={handleReviewsLoaded}
+              />
+            ) : (
+              <div style={{ minHeight: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', letterSpacing: '0.05em' }}>
+                  SCROLL TO LOAD VERIFIED REVIEWS &amp; UGC MEDIA
+                </span>
+              </div>
+            )}
           </section>
 
           {/* FAQ Section */}

@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   compress: true,
+  serverExternalPackages: ['firebase-admin'],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
+  },
   images: {
     dangerouslyAllowLocalIP: true,
     remotePatterns: [
@@ -39,7 +45,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' data: https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://images-api.printify.com https://storage.googleapis.com https://cdn.printify.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.paypalobjects.com https://*.paypal.com",
-              "media-src 'self' blob: https://firebasestorage.googleapis.com https://commondatastorage.googleapis.com",
+              "media-src 'self' data: blob: https://storage.googleapis.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://commondatastorage.googleapis.com",
               "connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://api.razorpay.com https://*.razorpay.com https://api.printify.com https://open.er-api.com wss://*.firebaseio.com https://*.paypal.com https://*.paypalobjects.com",
               "frame-src https://checkout.razorpay.com https://*.razorpay.com https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://gerkink.shop https://*.gerkink.shop https://*.paypal.com https://*.paypalobjects.com",
               "base-uri 'self'",

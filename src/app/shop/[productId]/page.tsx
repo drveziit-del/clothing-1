@@ -125,6 +125,50 @@ export default async function ProductDetailPage({ params }: Props) {
 
   const recommended = await getRecommendedProducts(product.section, product.id);
 
+  // Fetch approved product reviews for Schema.org JSON-LD
+  let aggregateRatingSchema: any = null;
+  let reviewSchemas: any[] = [];
+  try {
+    const revSnap = await adminDb
+      .collection('reviews')
+      .where('productId', '==', product.id)
+      .where('status', '==', 'approved')
+      .limit(10)
+      .get();
+
+    if (!revSnap.empty) {
+      let totalRating = 0;
+      reviewSchemas = revSnap.docs.map((d) => {
+        const rData = d.data();
+        totalRating += rData.rating || 5;
+        return {
+          "@type": "Review",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": rData.rating,
+            "bestRating": "5"
+          },
+          "author": {
+            "@type": "Person",
+            "name": rData.userName || "Customer"
+          },
+          "datePublished": rData.createdAt?.toDate ? rData.createdAt.toDate().toISOString() : undefined,
+          "reviewBody": rData.text || ""
+        };
+      });
+
+      aggregateRatingSchema = {
+        "@type": "AggregateRating",
+        "ratingValue": (totalRating / revSnap.docs.length).toFixed(1),
+        "reviewCount": revSnap.docs.length,
+        "bestRating": "5",
+        "worstRating": "1"
+      };
+    }
+  } catch (err) {
+    console.warn('[ProductPage] Failed to fetch review schema:', err);
+  }
+
   // Generate Schemas
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://gerkink.shop';
   const pageUrl = `${baseUrl}/shop/${product.slug || product.id}`;
@@ -146,6 +190,8 @@ export default async function ProductDetailPage({ params }: Props) {
       "@type": "Brand",
       "name": "GERKINK"
     },
+    ...(aggregateRatingSchema ? { "aggregateRating": aggregateRatingSchema } : {}),
+    ...(reviewSchemas.length ? { "review": reviewSchemas } : {}),
     "offers": {
       "@type": "AggregateOffer",
       "priceCurrency": "USD",
@@ -256,7 +302,18 @@ export default async function ProductDetailPage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema).replace(/</g, '\\u003c') }}
         />
       )}
-      <ProductDetailClient product={product} recommendedProducts={recommended} />
+      <ProductDetailClient
+        product={product}
+        recommendedProducts={recommended}
+        initialReviewSummary={
+          aggregateRatingSchema
+            ? {
+                averageRating: parseFloat(aggregateRatingSchema.ratingValue) || 5,
+                totalReviews: aggregateRatingSchema.reviewCount || 0,
+              }
+            : undefined
+        }
+      />
     </div>
   );
 }

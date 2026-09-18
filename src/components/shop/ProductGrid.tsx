@@ -22,7 +22,7 @@ export default function ProductGrid({
   return (
     <div className={styles.grid}>
       {products.map((product, index) => (
-        <ProductCard key={product.id} product={product} priority={index < 4} />
+        <ProductCard key={product.id} product={product} priority={index < 2} />
       ))}
     </div>
   );
