@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
   useRef,
+  useMemo,
   ReactNode,
 } from 'react';
 import { getFirebaseAuth, getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
@@ -133,8 +134,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [firebaseUser]);
 
+  const value = useMemo(
+    () => ({ firebaseUser, user, loading, isAdmin }),
+    [firebaseUser, user, loading, isAdmin]
+  );
+
   return (
-    <AuthContext.Provider value={{ firebaseUser, user, loading, isAdmin }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

@@ -19,24 +19,40 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Track site visit once per session
+    // Track site visit once per session (deferred to idle time to avoid hydration bandwidth contention)
     if (!sessionStorage.getItem('gk_visited')) {
       sessionStorage.setItem('gk_visited', 'true');
-      fetch('/api/analytics/visit', { method: 'POST' }).catch((err) =>
-        console.error('Visit tracking error:', err)
-      );
+      const trackVisit = () => {
+        fetch('/api/analytics/visit', { method: 'POST' }).catch((err) =>
+          console.error('Visit tracking error:', err)
+        );
+      };
+      if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+        (window as unknown as { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback(trackVisit, { timeout: 3000 });
+      } else {
+        setTimeout(trackVisit, 2000);
+      }
     }
 
     const params = new URLSearchParams(window.location.search);
-    const ref = params.get('ref');
-    if (ref) {
-      const formattedRef = ref.trim().toUpperCase();
-      setReferralCode(formattedRef);
+    const refParam = params.get('ref');
+    const cookieMatch = document.cookie.match(/(?:^|;\s*)referral=([^;]+)/);
+    const cookieRef = cookieMatch ? decodeURIComponent(cookieMatch[1]).trim().toUpperCase() : null;
+    const ref = refParam ? refParam.trim().toUpperCase() : cookieRef;
 
-      const key = `gk_clk_${formattedRef}`;
+    if (ref) {
+      setReferralCode(ref);
+
+      // If arrived via ?ref= URL param, ensure 30-day attribution cookie is also persisted
+      if (refParam) {
+        const exp = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+        document.cookie = `referral=${encodeURIComponent(ref)}; expires=${exp}; path=/; SameSite=Lax`;
+      }
+
+      const key = `gk_clk_${ref}`;
       if (!localStorage.getItem(key)) {
         localStorage.setItem(key, 'true');
-        fetch(`/api/referral/click?code=${formattedRef}`, { method: 'POST' }).catch((err) =>
+        fetch(`/api/referral/click?code=${ref}`, { method: 'POST' }).catch((err) =>
           console.error('Click tracking error:', err)
         );
       }
@@ -49,8 +65,11 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
   return (
     <>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <Navbar />
-      <main>
+      <main id="main-content" className="site-main" tabIndex={-1}>
         <GSAPPageTransition>{children}</GSAPPageTransition>
       </main>
       <Footer />

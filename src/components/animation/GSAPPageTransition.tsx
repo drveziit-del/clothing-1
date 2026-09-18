@@ -18,12 +18,7 @@ export default function GSAPPageTransition({ children }: GSAPPageTransitionProps
 
     if (firstRender.current) {
       firstRender.current = false;
-      // Initial page load smooth fade in
-      gsap.fromTo(
-        containerRef.current,
-        { opacity: 0, y: 8 },
-        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
-      );
+      // Preserve immediate SSR content visibility; avoid opacity: 0 suppression on initial mount
       return;
     }
 

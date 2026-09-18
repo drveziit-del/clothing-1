@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 
 export interface CurrencyConfig {
   code: string;
@@ -42,7 +42,7 @@ const LOCAL_STORAGE_KEY = 'gkink_user_currency';
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const [currency, setCurrencyState] = useState<string>('USD');
   const [rates, setRates] = useState<Record<string, number>>({ USD: 1, INR: 83.5 });
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [_isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     async function initCurrency() {
@@ -69,45 +69,57 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     initCurrency();
   }, []);
 
-  const setCurrency = (code: string, persist = true) => {
+  const setCurrency = useCallback((code: string, persist = true) => {
     if (SUPPORTED_CURRENCIES[code]) {
       setCurrencyState(code);
       if (persist) {
         localStorage.setItem(LOCAL_STORAGE_KEY, code);
       }
     }
-  };
+  }, []);
 
   const currentRate = rates[currency] ?? 1;
   const currentSymbol = SUPPORTED_CURRENCIES[currency]?.symbol ?? '$';
 
-  const convertPrice = (amountUSD: number): number => {
-    return amountUSD * currentRate;
-  };
+  const convertPrice = useCallback(
+    (amountUSD: number): number => {
+      const rate = rates[currency] ?? 1;
+      return amountUSD * rate;
+    },
+    [rates, currency]
+  );
 
-  const formatPrice = (amountUSD: number): string => {
-    const converted = convertPrice(amountUSD);
-    if (currency === 'INR') {
-      return `${currentSymbol}${Math.round(converted).toLocaleString('en-IN')}`;
-    }
-    return `${currentSymbol}${converted.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  };
+  const formatPrice = useCallback(
+    (amountUSD: number): string => {
+      const rate = rates[currency] ?? 1;
+      const symbol = SUPPORTED_CURRENCIES[currency]?.symbol ?? '$';
+      const converted = amountUSD * rate;
+      if (currency === 'INR') {
+        return `${symbol}${Math.round(converted).toLocaleString('en-IN')}`;
+      }
+      return `${symbol}${converted.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`;
+    },
+    [rates, currency]
+  );
+
+  const value = useMemo(
+    () => ({
+      currency,
+      symbol: currentSymbol,
+      rate: currentRate,
+      rates,
+      setCurrency,
+      formatPrice,
+      convertPrice,
+    }),
+    [currency, currentSymbol, currentRate, rates, setCurrency, formatPrice, convertPrice]
+  );
 
   return (
-    <CurrencyContext.Provider
-      value={{
-        currency,
-        symbol: currentSymbol,
-        rate: currentRate,
-        rates,
-        setCurrency,
-        formatPrice,
-        convertPrice,
-      }}
-    >
+    <CurrencyContext.Provider value={value}>
       {children}
     </CurrencyContext.Provider>
   );
