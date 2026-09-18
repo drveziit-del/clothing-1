@@ -134,14 +134,10 @@ export function NetworkStatusProvider({ children }: { children: React.ReactNode 
     window.addEventListener('focus', checkConnection);
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Initial check on mount: if offline immediately handle; if online defer health probe by 2.5s to prevent hydration contention
-    let initialProbeTimeout: NodeJS.Timeout | null = null;
+    // If browser is initially offline on mount, update state immediately.
+    // If online, do NOT fire a redundant health check probe during hydration.
     if (!navigator.onLine) {
       handleOffline();
-    } else {
-      initialProbeTimeout = setTimeout(() => {
-        checkConnection();
-      }, 2500);
     }
 
     // Periodic heartbeat check every 45 seconds
@@ -152,7 +148,6 @@ export function NetworkStatusProvider({ children }: { children: React.ReactNode 
     }, 45000);
 
     return () => {
-      if (initialProbeTimeout) clearTimeout(initialProbeTimeout);
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('focus', checkConnection);

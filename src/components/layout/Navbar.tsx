@@ -43,7 +43,6 @@ export default function Navbar() {
     if (!el) return;
 
     const updateHeaderHeight = () => {
-      // Measure the announcement bar and navbar inner row (excluding temporary mobile menu dropdown)
       const announcementEl = el.querySelector('[role="region"]') as HTMLElement | null;
       const innerEl = el.querySelector(`.${styles.inner}`) as HTMLElement | null;
 
@@ -53,14 +52,25 @@ export default function Navbar() {
       const totalBaseHeight = Math.round(announcementHeight + innerHeight);
       const finalHeight = totalBaseHeight > 0 ? totalBaseHeight : Math.round(el.offsetHeight || 82);
 
-      document.documentElement.style.setProperty('--site-header-height', `${finalHeight}px`);
-      document.documentElement.style.setProperty('--header-height', `${finalHeight}px`);
+      // Only mutate documentElement style if measured height deviates from current property
+      const currentProp = document.documentElement.style.getPropertyValue('--site-header-height');
+      const targetProp = `${finalHeight}px`;
+      if (currentProp !== targetProp) {
+        document.documentElement.style.setProperty('--site-header-height', targetProp);
+        document.documentElement.style.setProperty('--header-height', targetProp);
+      }
     };
 
-    // Defer initial measurement after paint to eliminate synchronous hydration reflow
-    const rafId = requestAnimationFrame(() => {
-      updateHeaderHeight();
-    });
+    // Defer initial calibration to idle time to avoid style invalidation during FCP / initial paint
+    let idleId: number | null = null;
+    let timerId: NodeJS.Timeout | null = null;
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        idleId = (window as Window).requestIdleCallback(updateHeaderHeight, { timeout: 2000 });
+      } else {
+        timerId = setTimeout(updateHeaderHeight, 1000);
+      }
+    }
 
     const resizeObserver = new ResizeObserver(() => {
       updateHeaderHeight();
@@ -70,7 +80,12 @@ export default function Navbar() {
     window.addEventListener('resize', updateHeaderHeight, { passive: true });
 
     return () => {
-      cancelAnimationFrame(rafId);
+      if (idleId !== null && 'cancelIdleCallback' in window) {
+        (window as Window).cancelIdleCallback(idleId);
+      }
+      if (timerId !== null) {
+        clearTimeout(timerId);
+      }
       resizeObserver.disconnect();
       window.removeEventListener('resize', updateHeaderHeight);
     };

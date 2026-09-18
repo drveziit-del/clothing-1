@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { notFound, useRouter } from 'next/navigation';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
@@ -9,98 +9,12 @@ import { useRoast } from '@/hooks/useRoast';
 import { useCurrency } from '@/context/CurrencyContext';
 import { getCartRoast } from '@/lib/utils/roasts';
 import PriceTag from '@/components/ui/PriceTag';
-import type { Product, Variant, Review } from '@/types';
+import type { Product, Variant, Review, ProductReviewSummary } from '@/types';
 import { sortSizes, getSmallVariant } from '@/lib/utils/sizes';
 import styles from './ProductDetailClient.module.css';
-import { useAuth } from '@/hooks/useAuth';
-import RazorpayButton from '@/components/checkout/RazorpayButton';
-import ReviewsSection from '@/components/reviews/ReviewsSection';
+import ProductReviewsSection from '@/components/reviews/ProductReviewsSection';
 import ProductCard from '@/components/ui/ProductCard';
 import SocietyFuckersDetailSections from '@/components/shop/SocietyFuckersDetailSections';
-
-const ugcVideos = [
-  {
-    name: "Doria Von",
-    stars: 5,
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-  },
-  {
-    name: "Terrance O'Hara",
-    stars: 5,
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-  },
-  {
-    name: "Kiana Jacobi",
-    stars: 5,
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-  },
-  {
-    name: "Sheron Kub",
-    stars: 5,
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-  }
-];
-
-function UgcVideoCard({ video, isActive }: { video: typeof ugcVideos[0]; isActive: boolean }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  useEffect(() => {
-    if (!videoRef.current) return;
-    if (isActive) {
-      videoRef.current.play().then(() => {
-        setIsPlaying(true);
-      }).catch(() => {
-        setIsPlaying(false);
-      });
-    } else {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    }
-  }, [isActive]);
-
-  const handleTogglePlay = () => {
-    if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      videoRef.current.play().then(() => {
-        setIsPlaying(true);
-      }).catch(() => {
-        setIsPlaying(false);
-      });
-    }
-  };
-
-  return (
-    <div 
-      className={`${styles.ugcVideoCard} ${isActive ? styles.ugcVideoCardActive : ''}`}
-      onClick={handleTogglePlay}
-    >
-      <video
-        ref={videoRef}
-        src={video.videoUrl}
-        loop
-        muted
-        playsInline
-        className={styles.ugcVideoElement}
-      />
-      {!isPlaying && (
-        <div className={styles.ugcPlayOverlay}>
-          <div className={styles.ugcPlayIcon}>▶</div>
-        </div>
-      )}
-      <div className={styles.ugcVideoInfo}>
-        <div className={styles.ugcVideoStars}>
-          {'★'.repeat(Math.min(5, Math.max(1, video.stars || 5)))}
-          {'☆'.repeat(Math.max(0, 5 - Math.min(5, Math.max(1, video.stars || 5))))}
-        </div>
-        <div className={styles.ugcVideoName}>{video.name}</div>
-      </div>
-    </div>
-  );
-}
 
 const TIER_META: Record<number, {
   name: string;
@@ -229,16 +143,8 @@ interface ProductDetailClientProps {
 export function ProductDetailClient({ product, recommendedProducts = [] }: ProductDetailClientProps) {
   const { addItem } = useCart();
   const { toast } = useRoast();
-  const { user, firebaseUser } = useAuth();
   const { formatPrice } = useCurrency();
   const router = useRouter();
-
-  const displayUgcVideos = useMemo(() => {
-    if (Array.isArray(product.ugcVideos)) {
-      return product.ugcVideos;
-    }
-    return ugcVideos;
-  }, [product.ugcVideos]);
 
   const displayFeatures = useMemo(() => {
     return product.featuresList && product.featuresList.length > 0 ? product.featuresList : [
@@ -272,19 +178,30 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
     const vars = Array.isArray(product.variants) && product.variants.length > 0
       ? product.variants
       : [{ id: 'default', size: 'ONE SIZE', color: 'DEFAULT', price: product.price, available: true } as Variant];
-    // Try to restore preferred size from localStorage
-    if (typeof window !== 'undefined') {
-      try {
-        const preferred = localStorage.getItem('gerkink_preferred_size');
-        if (preferred) {
-          const match = vars.find(v => v.size === preferred && v.available);
-          if (match) return match;
-        }
-      } catch {}
-    }
     return getSmallVariant(vars) || vars[0] || ({ id: 'default', size: 'ONE SIZE', color: 'DEFAULT', price: product.price, available: true } as Variant);
   }, [product.variants, product.price]);
+
   const [selectedVariant, setSelectedVariant] = useState<Variant>(initialVariant);
+  const [hasExplicitSize, setHasExplicitSize] = useState<boolean>(() => {
+    const vars = Array.isArray(product.variants) ? product.variants : [];
+    return vars.length <= 1 || (vars.length > 0 && vars[0].size === 'ONE SIZE');
+  });
+
+  // Restore preferred size from localStorage asynchronously after mount
+  useEffect(() => {
+    try {
+      const preferred = localStorage.getItem('gerkink_preferred_size');
+      if (preferred) {
+        const vars = Array.isArray(product.variants) ? product.variants : [];
+        const match = vars.find((v) => v.size === preferred && v.available);
+        if (match) {
+          setSelectedVariant(match);
+          setHasExplicitSize(true);
+        }
+      }
+    } catch {}
+  }, [product.variants]);
+
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
@@ -295,44 +212,17 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
   const [faqOpen, setFaqOpen] = useState<Record<number, boolean>>({});
 
   const [mobileImageIndex, setMobileImageIndex] = useState(0);
-  const [activeUgcIndex, setActiveUgcIndex] = useState(2);
-  const ugcSliderRef = useRef<HTMLDivElement>(null);
   const buyNowRef = useRef<HTMLButtonElement>(null);
   const glowRef = useRef<HTMLSpanElement>(null);
-
-  const handleUgcPrev = () => {
-    const nextIndex = (activeUgcIndex - 1 + displayUgcVideos.length) % displayUgcVideos.length;
-    setActiveUgcIndex(nextIndex);
-    const container = ugcSliderRef.current;
-    if (container && container.children[nextIndex]) {
-      (container.children[nextIndex] as HTMLElement).scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'center',
-      });
-    }
-  };
-
-  const handleUgcNext = () => {
-    const nextIndex = (activeUgcIndex + 1) % displayUgcVideos.length;
-    setActiveUgcIndex(nextIndex);
-    const container = ugcSliderRef.current;
-    if (container && container.children[nextIndex]) {
-      (container.children[nextIndex] as HTMLElement).scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'center',
-      });
-    }
-  };
 
   // Accordion state
   const [descOpen, setDescOpen] = useState(true);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [commitmentOpen, setCommitmentOpen] = useState(false);
 
-  // Buy trigger reference for scroll tracking
+  // References for scroll tracking and accessible size focus
   const buySectionRef = useRef<HTMLDivElement>(null);
+  const sizeGroupRef = useRef<HTMLDivElement>(null);
 
   // Scroll handler for sticky mobile CTA
   useEffect(() => {
@@ -345,6 +235,24 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Keyboard Escape and scroll lock for modals/lightboxes
+  useEffect(() => {
+    if (!lightboxImage && !showSizeGuide) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setLightboxImage(null);
+        setShowSizeGuide(false);
+      }
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [lightboxImage, showSizeGuide]);
 
   // Description text split parser
   const descriptionText = useMemo(() => {
@@ -369,13 +277,21 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
       .filter(line => line.length > 0 && !line.includes('<br'));
   }, [product.description]);
 
-  const priceNum = selectedVariant?.price ?? product.price;
-
-
-
+  const scrollToSizeSelector = () => {
+    if (sizeGroupRef.current) {
+      sizeGroupRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const firstAvailableBtn = sizeGroupRef.current.querySelector<HTMLButtonElement>('button:not([disabled])');
+      firstAvailableBtn?.focus();
+    }
+    toast('Please select a size first', 'error');
+  };
 
   const handleAdd = () => {
     if (!selectedVariant) return;
+    if (!hasExplicitSize) {
+      scrollToSizeSelector();
+      return;
+    }
     addItem(product, selectedVariant, quantity);
     // Persist preferred size
     try { localStorage.setItem('gerkink_preferred_size', selectedVariant.size); } catch {}
@@ -386,6 +302,10 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
 
   const handleBuyNow = () => {
     if (!selectedVariant) return;
+    if (!hasExplicitSize) {
+      scrollToSizeSelector();
+      return;
+    }
     addItem(product, selectedVariant, quantity);
     router.push('/checkout');
   };
@@ -425,7 +345,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
     const colorImageUrls = activeColorVariants.flatMap((v) => v.images || []).filter(Boolean);
     const uniqueColorUrls = [...new Set(colorImageUrls)];
     return uniqueColorUrls.length > 0 ? uniqueColorUrls : imgs;
-  }, [product.images, product.variants, selectedVariant?.color]);
+  }, [product.images, product.variants, selectedVariant]);
 
   const media = useMemo(() => {
     return [
@@ -435,12 +355,40 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
   }, [displayedImages, product.videos]);
 
   const [productReviews, setProductReviews] = useState<Review[]>([]);
+  const [reviewSummary, setReviewSummary] = useState<ProductReviewSummary | null>(null);
+
+  const handleReviewsLoaded = useCallback((loadedReviews: Review[], summary?: ProductReviewSummary) => {
+    setProductReviews((prev) => {
+      if (prev.length === loadedReviews.length && prev.every((r, i) => r.id === loadedReviews[i]?.id)) {
+        return prev;
+      }
+      return loadedReviews;
+    });
+    if (summary) {
+      setReviewSummary((prev) => {
+        if (
+          prev &&
+          prev.totalReviews === summary.totalReviews &&
+          prev.averageRating === summary.averageRating &&
+          prev.verifiedReviewsCount === summary.verifiedReviewsCount
+        ) {
+          return prev;
+        }
+        return summary;
+      });
+    }
+  }, []);
 
   const averageRating = useMemo(() => {
+    if (reviewSummary && reviewSummary.totalReviews > 0) {
+      return Math.round(reviewSummary.averageRating);
+    }
     if (productReviews.length === 0) return 5;
     const sum = productReviews.reduce((acc, r) => acc + r.rating, 0);
     return Math.round(sum / productReviews.length);
-  }, [productReviews]);
+  }, [reviewSummary, productReviews]);
+
+  const totalReviewsCount = reviewSummary ? reviewSummary.totalReviews : productReviews.length;
 
   const starsDisplay = useMemo(() => {
     return '★'.repeat(averageRating) + '☆'.repeat(5 - averageRating);
@@ -489,6 +437,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className={styles.carouselMedia}
                     priority
+                    fetchPriority="high"
                   />
                 )}
               </div>
@@ -608,7 +557,7 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                   }
                 }}
               >
-                {starsDisplay} <span className={styles.reviewCount}>({productReviews.length})</span>
+                {starsDisplay} <span className={styles.reviewCount}>({totalReviewsCount})</span>
               </div>
             </div>
 
@@ -668,15 +617,17 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
           {/* Variant Selection */}
           {colors.length > 1 && (
             <div className={styles.variantGroup}>
-              <label className="input-label">Color — {selectedVariant?.color}</label>
-              <div className={styles.colorSwatches}>
+              <label className="input-label" id="pdp-color-label">Color — {selectedVariant?.color}</label>
+              <div className={styles.colorSwatches} role="group" aria-labelledby="pdp-color-label">
                 {colors.map((color) => {
                   const v = product.variants.find((variant) => variant.color === color);
                   if (!v) return null;
+                  const isSelected = selectedVariant?.color === color;
                   return (
                     <button
                       key={color}
-                      className={`${styles.swatch} ${selectedVariant?.color === color ? styles.swatchActive : ''}`}
+                      type="button"
+                      className={`${styles.swatch} ${isSelected ? styles.swatchActive : ''}`}
                       onClick={() => {
                         const matching = product.variants.find(
                           (pv) => pv.color === color && pv.size === selectedVariant?.size
@@ -685,7 +636,8 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                         setMobileImageIndex(0);
                       }}
                       style={{ background: v.colorHex ?? 'var(--fog)' }}
-                      aria-label={`Color: ${color}`}
+                      aria-label={`Color: ${color}${isSelected ? ' (selected)' : ''}`}
+                      aria-pressed={isSelected}
                       title={color}
                     />
                   );
@@ -694,9 +646,11 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
             </div>
           )}
 
-          <div className={styles.variantGroup}>
+          <div className={styles.variantGroup} ref={sizeGroupRef}>
             <div className={styles.sizeHeaderRow}>
-              <label className="input-label">Size — {selectedVariant?.size}</label>
+              <label className="input-label" id="pdp-size-label">
+                Size — {hasExplicitSize ? selectedVariant?.size : <span style={{ color: 'var(--accent)' }}>PLEASE SELECT</span>}
+              </label>
               <button
                 type="button"
                 className={styles.sizeGuideLink}
@@ -705,19 +659,22 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                 Size Guide
               </button>
             </div>
-            <div className={styles.sizes}>
+            <div className={styles.sizes} role="group" aria-labelledby="pdp-size-label">
               {sizes.map((size) => {
                 const v = Array.isArray(product.variants) && product.variants.length > 0
                   ? product.variants.find((pv) => pv.size === size && (!selectedVariant?.color || pv.color === selectedVariant?.color))
                   : undefined;
-                const isSelected = selectedVariant?.size === size || (!selectedVariant?.size && size === sizes[0]);
+                const isSelected = hasExplicitSize && (selectedVariant?.size === size);
                 return (
                   <button
                     key={size}
                     type="button"
                     disabled={v ? !v.available : false}
+                    aria-pressed={isSelected}
+                    aria-label={`Size ${size}${isSelected ? ' (selected)' : ''}${v && !v.available ? ' (sold out)' : ''}`}
                     className={`${styles.sizeBtn} ${isSelected ? styles.sizeBtnActive : ''}`}
                     onClick={() => {
+                      setHasExplicitSize(true);
                       if (v) {
                         setSelectedVariant(v);
                       } else {
@@ -744,20 +701,22 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
 
           {/* Quantity Selector */}
           <div className={styles.variantGroup}>
-            <label className="input-label">Quantity</label>
-            <div className={styles.qtySelector}>
+            <label className="input-label" id="pdp-qty-label">Quantity</label>
+            <div className={styles.qtySelector} role="group" aria-labelledby="pdp-qty-label">
               <button
                 type="button"
                 className={styles.qtyBtn}
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                aria-label="Decrease quantity"
               >
                 −
               </button>
-              <span className={styles.qtyVal}>{quantity}</span>
+              <span className={styles.qtyVal} aria-live="polite" aria-atomic="true">{quantity}</span>
               <button
                 type="button"
                 className={styles.qtyBtn}
                 onClick={() => setQuantity((q) => q + 1)}
+                aria-label="Increase quantity"
               >
                 +
               </button>
@@ -794,13 +753,24 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
                 <button
                   className={`btn btn-primary btn-lg btn-full ${styles.addBtn}`}
                   onClick={handleAdd}
-                  disabled={!selectedVariant?.available}
+                  disabled={hasExplicitSize && !selectedVariant?.available}
+                  aria-label={
+                    !hasExplicitSize
+                      ? 'Select size and add to bag'
+                      : added
+                      ? 'Added to bag'
+                      : selectedVariant?.available
+                      ? `Add size ${selectedVariant.size} to bag`
+                      : 'Out of stock'
+                  }
                 >
                   <span style={{ marginRight: '0.5rem' }}>🛍️</span>
                   {added
                     ? 'Added to Bag'
+                    : !hasExplicitSize
+                    ? 'SELECT SIZE & ADD'
                     : selectedVariant?.available
-                    ? 'ADD TO BAG'
+                    ? `ADD TO BAG • SIZE ${selectedVariant.size}`
                     : 'Out of Stock'}
                 </button>
                 {selectedVariant?.available && (
@@ -1049,49 +1019,13 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
             </section>
           )}
 
-          {/* Real Customer Stories UGC Video Section */}
-          {product.showUgc !== false && displayUgcVideos.length > 0 && (
-            <section className={styles.ugcVideoSection}>
-              <div className={styles.ugcVideoTitleRow}>
-                <h3 className={styles.ugcVideoTitle}>Real customer stories</h3>
-                <div className={styles.ugcVideoSubtitle}>
-                  ★★★★★ {(displayUgcVideos.reduce((acc, v) => acc + (v.stars || 5), 0) / (displayUgcVideos.length || 1)).toFixed(2)} ★ ({displayUgcVideos.length})
-                </div>
-              </div>
-              <div ref={ugcSliderRef} className={styles.ugcVideoSlider}>
-                {displayUgcVideos.map((video, idx) => (
-                  <UgcVideoCard
-                    key={idx}
-                    video={video}
-                    isActive={idx === activeUgcIndex}
-                  />
-                ))}
-              </div>
-              <div className={styles.ugcSliderControls}>
-                <button
-                  type="button"
-                  className={styles.ugcArrowBtn}
-                  onClick={handleUgcPrev}
-                  aria-label="Previous story"
-                >
-                  ⟨
-                </button>
-                <button
-                  type="button"
-                  className={styles.ugcArrowBtn}
-                  onClick={handleUgcNext}
-                  aria-label="Next story"
-                >
-                  ⟩
-                </button>
-              </div>
-            </section>
-          )}
-
-          {/* Reviews Integration */}
+          {/* Real Customer Reviews & UGC Media */}
           <section id="reviews-section" className={styles.reviewsSection}>
-            <h3 className={styles.sectionHeader}>CUSTOMER FEEDBACK</h3>
-            <ReviewsSection productId={product.id} onReviewsLoaded={setProductReviews} />
+            <ProductReviewsSection
+              productId={product.id}
+              productTitle={product.title}
+              onReviewsLoaded={handleReviewsLoaded}
+            />
           </section>
 
           {/* FAQ Section */}
@@ -1134,11 +1068,18 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
 
       {/* Image Lightbox */}
       {lightboxImage && (
-        <div className={styles.lightboxOverlay} onClick={() => setLightboxImage(null)}>
+        <div
+          className={styles.lightboxOverlay}
+          onClick={() => setLightboxImage(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Enlarged product image preview"
+        >
           <button
             type="button"
             className={styles.lightboxClose}
             onClick={() => setLightboxImage(null)}
+            aria-label="Close image preview"
           >
             ✕
           </button>
@@ -1150,16 +1091,23 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
 
       {/* Size Guide Modal */}
       {showSizeGuide && (
-        <div className={styles.sizeGuideOverlay} onClick={() => setShowSizeGuide(false)}>
+        <div
+          className={styles.sizeGuideOverlay}
+          onClick={() => setShowSizeGuide(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pdp-size-guide-title"
+        >
           <div className={styles.sizeGuideModal} onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
               className={styles.sizeGuideClose}
               onClick={() => setShowSizeGuide(false)}
+              aria-label="Close size guide"
             >
               ✕
             </button>
-            <h3 className={styles.sizeGuideTitle}>GERKINK SIZE GUIDE</h3>
+            <h3 className={styles.sizeGuideTitle} id="pdp-size-guide-title">GERKINK SIZE GUIDE</h3>
             <p className={styles.sizeGuideSub}>Streetwear relaxed fit. All dimensions shown in inches.</p>
             <table className={styles.sizeGuideTable}>
               <thead>
@@ -1219,16 +1167,32 @@ export function ProductDetailClient({ product, recommendedProducts = [] }: Produ
               )}
               <div className={styles.stickyBarInfo}>
                 <span className={styles.stickyBarTitle}>{product.title}</span>
-                <span className={styles.stickyBarPrice}>{formatPrice(selectedVariant?.price ?? product.price)}</span>
+                <div className={styles.stickyBarSub}>
+                  <span className={styles.stickyBarPrice}>{formatPrice(selectedVariant?.price ?? product.price)}</span>
+                  {hasExplicitSize && selectedVariant?.size && (
+                    <span className={styles.stickyBarSizeBadge}>SIZE: {selectedVariant.size}</span>
+                  )}
+                </div>
               </div>
             </div>
             <button
               type="button"
-              className={styles.stickyBarBtn}
+              className={`${styles.stickyBarBtn} ${!hasExplicitSize ? styles.stickyBarBtnSelect : ''}`}
               onClick={handleAdd}
-              disabled={!selectedVariant?.available}
+              disabled={hasExplicitSize && !selectedVariant?.available}
+              aria-label={
+                !hasExplicitSize
+                  ? 'Select size before adding to bag'
+                  : selectedVariant?.available
+                  ? `Add size ${selectedVariant.size} to bag — ${formatPrice(selectedVariant?.price ?? product.price)}`
+                  : 'Out of stock'
+              }
             >
-              ADD TO BAG
+              {hasExplicitSize
+                ? selectedVariant?.available
+                  ? 'ADD TO BAG'
+                  : 'SOLD OUT'
+                : 'CHOOSE SIZE'}
             </button>
           </div>
         </div>
