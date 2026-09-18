@@ -1,13 +1,15 @@
 .footer {
   background: var(--surface);
-  border-top: 1px solid var(--border);
+  border-top: none;
   margin-top: auto;
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 500px;
 }
 
 .inner {
-  max-width: 1440px;
+  max-width: var(--container-max-width, 1140px);
   margin: 0 auto;
-  padding: 4rem clamp(1rem, 4vw, 4rem) 2rem;
+  padding: 4rem clamp(1rem, 4vw, 3rem) 2rem;
 }
 
 .top {

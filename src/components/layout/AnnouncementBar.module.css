@@ -1,0 +1,307 @@
+/* ============================================================
+   GERKINK ANNOUNCEMENT SECTION & LIQUID GLASS CAPSULE
+   Precision editorial typography × Seamless marquee × Liquid Glass
+   ============================================================ */
+
+.announcementViewport {
+  position: relative;
+  width: 100%;
+  max-width: 100vw;
+  height: 34px;
+  background-color: #07090E;
+  color: #FFFFFF;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: none;
+  user-select: none;
+  z-index: 10001;
+  contain: layout paint;
+}
+
+/* ─── 1. Large Background/Midground "LOOK AT ME FOLKS" Typography ─── */
+.giantTypographyLayer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.24;
+  white-space: nowrap;
+  contain: strict;
+}
+
+.giantWord {
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: clamp(2rem, 5.5vw, 3.8rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  color: var(--coral-200, #FF6B6B);
+  text-shadow: 0 0 20px rgba(255, 107, 107, 0.2);
+  line-height: 1;
+}
+
+.desktopOnlyWord {
+  display: inline-block;
+}
+
+/* ─── 2. Moving Marquee Track Layer ─── */
+.marqueeContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.marqueeTrack {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+  animation: marqueeLinear 48s linear infinite;
+  transform: translate3d(0, 0, 0);
+}
+
+.marqueeContainer:hover .marqueeTrack {
+  animation-play-state: paused;
+}
+
+:global(body[data-review-modal-open="true"]) .marqueeTrack {
+  animation-play-state: paused !important;
+}
+
+:global(body[data-review-modal-open="true"]) .announcementViewport {
+  opacity: 0.35 !important;
+  transition: opacity 0.25s ease;
+}
+
+@keyframes marqueeLinear {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marqueeItem {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  padding: 0;
+}
+
+.marqueeSep {
+  display: inline-block;
+  color: var(--coral-200, #FF6B6B);
+  opacity: 0.85;
+  margin: 0 1.4rem;
+  font-size: 0.65rem;
+}
+
+/* ─── 3. Centered Liquid-Glass Capsule ─── */
+.glassCapsuleWrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: calc(100vw - 2rem);
+}
+
+.glassCapsule {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.95rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  
+  /* Liquid Glass Material Stack */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(7, 9, 14, 0.42) 50%,
+    rgba(7, 9, 14, 0.58) 100%
+  );
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  
+  /* Subtle Specular Border */
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  
+  /* Multilayer Liquid Depth (Inner Specular Highlight + Ambient Underglow) */
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.35),
+    0 6px 20px -2px rgba(0, 0, 0, 0.3),
+    0 2px 6px 0 rgba(0, 0, 0, 0.15);
+    
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s ease,
+              border-color 0.2s ease;
+  cursor: pointer;
+}
+
+/* Upper Specular Arc Reflection */
+.glassCapsule::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    transparent 100%
+  );
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.glassCapsule:hover {
+  transform: scale(1.025);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4),
+    0 8px 26px -2px rgba(0, 0, 0, 0.4),
+    0 0 14px rgba(255, 255, 255, 0.2);
+}
+
+.glassCapsule:active {
+  transform: scale(0.98);
+}
+
+/* ─── Glass Capsule Typography & Elements ─── */
+.glassTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono, 'Space Grotesk', monospace);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.glassDot {
+  width: 5px;
+  height: 5px;
+  background-color: var(--coral-200, #FF6B6B);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--coral-200, #FF6B6B);
+  flex-shrink: 0;
+}
+
+.glassDivider {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.65rem;
+  margin: 0 0.1rem;
+}
+
+.glassMessage {
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.glassArrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--coral-200, #FF6B6B);
+  transition: transform 0.15s ease;
+  margin-left: 0.15rem;
+}
+
+.glassCapsule:hover .glassArrow {
+  transform: translateX(2px);
+}
+
+/* ─── Reduced Motion Support (A11y) ─── */
+@media (prefers-reduced-motion: reduce) {
+  .marqueeTrack {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* ─── Responsive Breakpoints ─── */
+@media (max-width: 1024px) {
+  .announcementViewport {
+    height: 44px;
+  }
+  .marqueeItem {
+    font-size: 0.7rem;
+  }
+  .glassCapsule {
+    padding: 0.32rem 0.95rem;
+  }
+}
+
+/* Mobile: Remove button & display single giant word */
+@media (max-width: 768px) {
+  .glassCapsuleWrapper {
+    display: none !important;
+  }
+
+  .desktopOnlyWord {
+    display: none !important;
+  }
+
+  .giantTypographyLayer {
+    justify-content: center;
+    opacity: 0.28;
+  }
+
+  .giantWord {
+    font-size: clamp(1.5rem, 6vw, 2.2rem);
+    letter-spacing: -0.02em;
+  }
+
+  .announcementViewport {
+    height: 40px;
+  }
+
+  .marqueeItem {
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+  }
+  
+  .marqueeSep {
+    margin: 0 0.9rem;
+    font-size: 0.55rem;
+  }
+}

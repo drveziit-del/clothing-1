@@ -24,6 +24,25 @@
   height: 100%;
 }
 
+.imageLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+
+.titleLink {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.titleLink:hover {
+  color: var(--accent);
+}
+
 .imageWrap {
   position: relative;
   width: 100%;
@@ -182,6 +201,7 @@
 
 .price {
   font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
   font-size: 1rem;
   font-weight: 800;
   color: var(--accent);

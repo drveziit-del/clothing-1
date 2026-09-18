@@ -6,16 +6,22 @@ import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
 import styles from './AnnouncementBar.module.css';
 
 const DEFAULT_ANNOUNCEMENTS = [
-  "POV: YOU FINALLY MADE A GOOD DECISION",
-  "YOUR FRIENDS LIED TO YOU. WE WON'T.",
-  "FASHION DIED. GERKINK IS THE AUTOPSY.",
-  "BASIC IS A CHOICE. A BAD ONE.",
-  "SOCIETY F*CKERS COLLECTION — BECAUSE MEDIOCRITY IS EXPENSIVE",
-  "YOUR CLOSET LOOKS LIKE A GOODWILL REJECT PILE",
-  "VALUELESS BITCHES — FOR PEOPLE WHO KNOW THEIR WORTH",
-  "OUR OWNERS ARE ANONYMOUS. OUR WEAR ISN'T.",
-  "LIMITED 250 UNITS WORLDWIDE · 240GSM ULTRA-DENSE YARN",
-  "EARN $100 CASH FOR EVERY 10 COMPLETED CLIENT REFERRALS",
+  "Your outfit screams 'I gave up in 2019'",
+  "We sell a $10,000,000 t-shirt. No, you can't afford it.",
+  "Society Fuckers Collection — because mediocrity is expensive",
+  "Your closet looks like a Goodwill reject pile",
+  "Valueless Bitches — for people who know their worth",
+  "Our owners are anonymous. Our wearers are unforgettable.",
+  "You're reading this instead of fixing your wardrobe",
+  "The cheapest shirt here costs more than your monthly rent",
+  "We don't do sales. Your dignity isn't on discount.",
+  "POV: you finally made a good decision",
+  "Your friends lied to you. We won't.",
+  "Fashion died. GERKINK is the autopsy.",
+  "Basic is a choice. A bad one.",
+  "You dress like your personality — which explains a lot.",
+  "Every cheap shirt you own is a personal failure",
+  "✦ LIMITED DROP: PEASANT PREMIUM 2.0 CAPSULE IS LIVE",
 ];
 
 interface AnnouncementBarProps {
@@ -26,8 +32,8 @@ export default function AnnouncementBar({
   speed = 46,
 }: AnnouncementBarProps) {
   const [messages, setMessages] = useState<string[]>(DEFAULT_ANNOUNCEMENTS);
-  const [giantText, setGiantText] = useState<string>('LOOK AT ME');
-  const [capsuleTag, setCapsuleTag] = useState<string>('LOOK AT ME');
+  const [giantText, setGiantText] = useState<string>('LOOK AT ME FOLKS');
+  const [capsuleTag, setCapsuleTag] = useState<string>('LOOK AT ME FOLKS');
   const [capsuleMessage, setCapsuleMessage] = useState<string>('NEW DROP JUST LANDED');
   const [capsuleLink, setCapsuleLink] = useState<string>('/shop');
   const [enabled, setEnabled] = useState<boolean>(true);
