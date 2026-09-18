@@ -2,12 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import EgoTicker from '@/components/ui/EgoTicker';
 import LoadingScreen from '@/components/ui/LoadingScreen';
-import ReviewsSection from '@/components/reviews/ReviewsSection';
 import { BentoGrid, BentoCard } from '@/components/ui/BentoGrid';
 import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
 import styles from './page.module.css';
+
+// Dynamically import below-the-fold reviews section to reduce critical initial bundle
+const ReviewsSection = dynamic(() => import('@/components/reviews/ReviewsSection'), {
+  ssr: false,
+});
 
 const BASE_VISITOR_COUNT = 100;
 
@@ -17,7 +22,7 @@ export default function HomePage() {
   const [visitorCount, setVisitorCount] = useState(BASE_VISITOR_COUNT);
   const heroRef = useRef<HTMLDivElement>(null);
 
-  // Site Copy State
+  // Site Copy State with authoritative defaults
   const [copy, setCopy] = useState({
     heroLine1: 'YOU DRESS LIKE',
     heroLine2: 'YOUR PERSONALITY—',
@@ -28,62 +33,123 @@ export default function HomePage() {
   });
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoaded(true), 300);
-    return () => clearTimeout(timer);
+    setLoaded(true);
   }, []);
 
+  // Defer copywriting snapshot to idle time and guard against redundant re-renders
   useEffect(() => {
-    try {
-      const db = getFirestoreDb();
-      if (!db) return;
-      const { doc, onSnapshot } = getFirestoreModule();
-      const unsub = onSnapshot(
-        doc(db, 'settings', 'copywriting'),
-        (snap) => {
-          if (snap.exists()) {
-            const data = snap.data();
-            setCopy(prev => ({
-              heroLine1: data.heroLine1 ?? prev.heroLine1,
-              heroLine2: data.heroLine2 ?? prev.heroLine2,
-              heroAccent: data.heroAccent ?? prev.heroAccent,
-              heroSubtext: data.heroSubtext ?? prev.heroSubtext,
-              heroCta: data.heroCta ?? prev.heroCta,
-              footerTagline: data.footerTagline ?? prev.footerTagline,
-            }));
+    let unsub: (() => void) | null = null;
+    let idleId: number | null = null;
+    let timerId: NodeJS.Timeout | null = null;
+
+    const setupListener = () => {
+      try {
+        const db = getFirestoreDb();
+        if (!db) return;
+        const { doc, onSnapshot } = getFirestoreModule();
+        unsub = onSnapshot(
+          doc(db, 'settings', 'copywriting'),
+          (snap) => {
+            if (snap.exists()) {
+              const data = snap.data();
+              setCopy((prev) => {
+                const next = {
+                  heroLine1: data.heroLine1 ?? prev.heroLine1,
+                  heroLine2: data.heroLine2 ?? prev.heroLine2,
+                  heroAccent: data.heroAccent ?? prev.heroAccent,
+                  heroSubtext: data.heroSubtext ?? prev.heroSubtext,
+                  heroCta: data.heroCta ?? prev.heroCta,
+                  footerTagline: data.footerTagline ?? prev.footerTagline,
+                };
+                if (
+                  next.heroLine1 === prev.heroLine1 &&
+                  next.heroLine2 === prev.heroLine2 &&
+                  next.heroAccent === prev.heroAccent &&
+                  next.heroSubtext === prev.heroSubtext &&
+                  next.heroCta === prev.heroCta &&
+                  next.footerTagline === prev.footerTagline
+                ) {
+                  return prev; // Bail out: zero re-render when copy is unchanged
+                }
+                return next;
+              });
+            }
+          },
+          (error) => {
+            console.warn('Copywriting settings snapshot error:', error);
           }
-        },
-        (error) => {
-          console.warn('Copywriting settings snapshot error:', error);
-        }
-      );
-      return () => unsub();
-    } catch (err) {
-      console.warn('Copywriting settings effect error:', err);
+        );
+      } catch (err) {
+        console.warn('Copywriting settings effect error:', err);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        idleId = (window as Window).requestIdleCallback(setupListener, { timeout: 3000 });
+      } else {
+        timerId = setTimeout(setupListener, 1500);
+      }
     }
+
+    return () => {
+      if (idleId !== null && 'cancelIdleCallback' in window) {
+        (window as Window).cancelIdleCallback(idleId);
+      }
+      if (timerId !== null) {
+        clearTimeout(timerId);
+      }
+      if (unsub) unsub();
+    };
   }, []);
 
+  // Defer visitor counter snapshot to idle time
   useEffect(() => {
-    try {
-      const db = getFirestoreDb();
-      if (!db) return;
-      const { doc, onSnapshot } = getFirestoreModule();
-      const unsub = onSnapshot(
-        doc(db, 'settings', 'global'),
-        (snap) => {
-          if (snap.exists()) {
-            const data = snap.data();
-            const visits = data.siteVisits ?? 0;
-            setVisitorCount(BASE_VISITOR_COUNT + visits);
+    let unsub: (() => void) | null = null;
+    let idleId: number | null = null;
+    let timerId: NodeJS.Timeout | null = null;
+
+    const setupVisitorListener = () => {
+      try {
+        const db = getFirestoreDb();
+        if (!db) return;
+        const { doc, onSnapshot } = getFirestoreModule();
+        unsub = onSnapshot(
+          doc(db, 'settings', 'global'),
+          (snap) => {
+            if (snap.exists()) {
+              const data = snap.data();
+              const visits = data.siteVisits ?? 0;
+              const nextCount = BASE_VISITOR_COUNT + visits;
+              setVisitorCount((prev) => (prev === nextCount ? prev : nextCount));
+            }
+          },
+          (error) => {
+            console.warn('Global settings snapshot error:', error);
           }
-        },
-        (error) => {
-          console.warn('Global settings snapshot error:', error);
-        }
-      );
-      return () => unsub();
-    } catch (err) {
-      console.warn('Global settings effect error:', err);
+        );
+      } catch (err) {
+        console.warn('Global settings effect error:', err);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        idleId = (window as Window).requestIdleCallback(setupVisitorListener, { timeout: 4000 });
+      } else {
+        timerId = setTimeout(setupVisitorListener, 2000);
+      }
     }
+
+    return () => {
+      if (idleId !== null && 'cancelIdleCallback' in window) {
+        (window as Window).cancelIdleCallback(idleId);
+      }
+      if (timerId !== null) {
+        clearTimeout(timerId);
+      }
+      if (unsub) unsub();
+    };
   }, []);
 
   const handleCTAShake = () => {
@@ -106,22 +172,22 @@ export default function HomePage() {
               className={styles.headlineWrap}
               aria-label={`${copy.heroLine1} ${copy.heroLine2} ${copy.heroAccent}`}
             >
-              <span className={`${styles.line1} animate-fadeUp`}>
+              <span className={styles.line1}>
                 {copy.heroLine1}
               </span>
-              <span className={`${styles.line2} animate-fadeUp delay-200`}>
+              <span className={styles.line2}>
                 {copy.heroLine2}
               </span>
-              <span className={`${styles.lineAccent} ${styles.noWrap} animate-fadeUp delay-500`}>
+              <span className={`${styles.lineAccent} ${styles.noWrap}`}>
                 {copy.heroAccent}
               </span>
             </h1>
 
-            <p className={`${styles.subText} animate-fadeUp delay-700`} style={{ whiteSpace: 'pre-line' }}>
+            <p className={styles.subText} style={{ whiteSpace: 'pre-line' }}>
               {copy.heroSubtext}
             </p>
 
-            <div className={`${styles.ctaRow} animate-fadeUp delay-900`}>
+            <div className={styles.ctaRow}>
               <Link
                 href="/shop"
                 className={`btn btn-primary btn-lg ${shakeBtn ? 'animate-shake' : ''} ${styles.ctaBtn}`}

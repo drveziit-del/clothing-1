@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useCart } from '@/context/CartContext';
 import { useRoast } from '@/hooks/useRoast';
 import { useCurrency } from '@/context/CurrencyContext';
@@ -12,9 +13,18 @@ import PriceTag from '@/components/ui/PriceTag';
 import type { Product, Variant, Review, ProductReviewSummary } from '@/types';
 import { sortSizes, getSmallVariant } from '@/lib/utils/sizes';
 import styles from './ProductDetailClient.module.css';
-import ProductReviewsSection from '@/components/reviews/ProductReviewsSection';
 import ProductCard from '@/components/ui/ProductCard';
-import SocietyFuckersDetailSections from '@/components/shop/SocietyFuckersDetailSections';
+
+// Dynamically split below-the-fold reviews and conditional collection sections
+const ProductReviewsSection = dynamic(
+  () => import('@/components/reviews/ProductReviewsSection'),
+  { ssr: false }
+);
+
+const SocietyFuckersDetailSections = dynamic(
+  () => import('@/components/shop/SocietyFuckersDetailSections'),
+  { ssr: false }
+);
 
 const TIER_META: Record<number, {
   name: string;

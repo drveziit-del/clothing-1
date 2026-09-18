@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useRoast } from '@/hooks/useRoast';
-import { generateAndDownloadReceiptPdf } from '@/lib/utils/generateReceiptPdf';
 import styles from './page.module.css';
 
 interface OrderData {
@@ -20,6 +19,10 @@ interface OrderData {
   tax: number;
   discount: number;
   total: number;
+  status?: string;
+  customerNumber?: number | null;
+  isFounding500?: boolean | null;
+  userReferralCode?: string | null;
   paymentGateway?: string;
   shippingAddress?: { name?: string };
 }
@@ -27,11 +30,13 @@ interface OrderData {
 function MinimalThankYouContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId') || searchParams.get('id') || '';
+  const guestToken = searchParams.get('token') || '';
   const { user } = useAuth();
   const { toast } = useRoast();
 
   const [order, setOrder] = useState<OrderData | null>(null);
   const [copiedId, setCopiedId] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
@@ -40,7 +45,9 @@ function MinimalThankYouContent() {
     let isMounted = true;
     async function loadOrder() {
       try {
-        const res = await fetch(`/api/order?orderId=${encodeURIComponent(orderId)}`);
+        const query = new URLSearchParams({ orderId });
+        if (guestToken) query.set('token', guestToken);
+        const res = await fetch(`/api/order?${query.toString()}`);
         if (res.ok) {
           const data = await res.json();
           if (isMounted) setOrder(data);
@@ -54,10 +61,14 @@ function MinimalThankYouContent() {
     return () => {
       isMounted = false;
     };
-  }, [orderId]);
+  }, [orderId, guestToken]);
 
   const activeOrderId = orderId || order?.id || 'GERKINK-ORDER';
   const displayId = activeOrderId.slice(0, 16).toUpperCase();
+
+  const referralCode = order?.userReferralCode || user?.referralCode || null;
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://gerkink.shop';
+  const referralUrl = referralCode ? `${origin}/r/${referralCode}` : '';
 
   const handleCopyId = () => {
     if (!activeOrderId) return;
@@ -67,9 +78,37 @@ function MinimalThankYouContent() {
     setTimeout(() => setCopiedId(false), 2000);
   };
 
-  const handleDownloadPdf = () => {
+  const handleCopyReferralLink = () => {
+    if (!referralUrl) return;
+    navigator.clipboard.writeText(referralUrl);
+    setCopiedLink(true);
+    toast('Referral link copied to clipboard', 'success');
+    setTimeout(() => setCopiedLink(false), 2500);
+  };
+
+  const handleNativeShare = async () => {
+    if (!referralUrl) return;
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'GERKINK — Wear Your Worth',
+          text: 'Two collections. Zero apologies. Make someone else make a bad decision.',
+          url: referralUrl,
+        });
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          handleCopyReferralLink();
+        }
+      }
+    } else {
+      handleCopyReferralLink();
+    }
+  };
+
+  const handleDownloadPdf = async () => {
     setDownloading(true);
     try {
+      const { generateAndDownloadReceiptPdf } = await import('@/lib/utils/generateReceiptPdf');
       generateAndDownloadReceiptPdf({
         orderId: activeOrderId,
         receiptDate: new Date().toLocaleDateString('en-US', {
@@ -85,12 +124,10 @@ function MinimalThankYouContent() {
         tax: order?.tax ?? 2.64,
         discount: order?.discount ?? 0,
         total: order?.total ?? 0,
-        paymentMethod: order?.total === 0 ? 'Store Credit • 100% Free' : 'Authorized Online Payment',
+        paymentMethod: order?.paymentGateway ? order.paymentGateway.toUpperCase() : 'ONLINE PAYMENT',
       });
-      toast('Receipt PDF downloaded', 'success');
     } catch (err) {
-      console.error('PDF error:', err);
-      toast('Failed to generate PDF', 'error');
+      console.error('PDF Download error:', err);
     } finally {
       setTimeout(() => setDownloading(false), 1000);
     }
@@ -124,6 +161,20 @@ function MinimalThankYouContent() {
           </p>
         </div>
 
+        {/* Customer Sequence Badge (Rendered ONLY if genuine atomic number exists) */}
+        {typeof order?.customerNumber === 'number' && (
+          <div className={styles.campaignBadge}>
+            <span className={styles.campaignTag}>
+              {order.customerNumber <= 500 ? "YOU'RE IN." : 'VERIFIED CLIENT'}
+            </span>
+            <span className={styles.campaignTitle}>
+              {order.customerNumber <= 500
+                ? `GERKINK CUSTOMER #${order.customerNumber} / 500`
+                : `GERKINK CLIENT #${order.customerNumber}`}
+            </span>
+          </div>
+        )}
+
         {/* Minimal Order ID Badge */}
         <button
           type="button"
@@ -135,6 +186,50 @@ function MinimalThankYouContent() {
           <span className={styles.orderIdText}>#{displayId}</span>
           <span className={styles.copyNotice}>{copiedId ? '✓ Copied' : 'Copy'}</span>
         </button>
+
+        {/* Post-Purchase Referral Entry Point A */}
+        <div className={styles.referralCard}>
+          <h3 className={styles.referralHeadline}>NOW GET YOUR FRIEND TO FAIL TOO.</h3>
+          <p className={styles.referralSub}>
+            Spread the noise. Every 10 friends who purchase using your link unlocks an instant{' '}
+            <strong>$100 USD cash commission</strong>.
+          </p>
+
+          {referralCode ? (
+            <>
+              <div className={styles.referralLinkBox}>
+                <span className={styles.referralUrlText}>{referralUrl}</span>
+                <button
+                  type="button"
+                  onClick={handleCopyReferralLink}
+                  className={styles.copyReferralBtn}
+                >
+                  {copiedLink ? '✓ LINK COPIED' : 'COPY REFERRAL LINK →'}
+                </button>
+              </div>
+
+              <div className={styles.shareRow}>
+                {typeof navigator !== 'undefined' && 'share' in navigator && (
+                  <button
+                    type="button"
+                    onClick={handleNativeShare}
+                    className={styles.nativeShareBtn}
+                  >
+                    Share Link ↗
+                  </button>
+                )}
+                <span className={styles.rewardNotice}>$100 FOR EVERY 10 SALES</span>
+              </div>
+            </>
+          ) : (
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: 0 }}>
+              <Link href="/auth/signup" style={{ textDecoration: 'underline', color: 'var(--accent, #ff6b81)' }}>
+                Create an account
+              </Link>{' '}
+              to generate your personal /r/ link and start earning $100 commissions.
+            </p>
+          )}
+        </div>
 
         {/* Minimal Action Buttons */}
         <div className={styles.actions}>
@@ -177,11 +272,13 @@ function MinimalThankYouContent() {
 export default function ThankYouPage() {
   return (
     <div className={styles.page}>
-      <Suspense fallback={
-        <div className={styles.loading}>
-          <span>Loading...</span>
-        </div>
-      }>
+      <Suspense
+        fallback={
+          <div className={styles.loading}>
+            <span>Loading...</span>
+          </div>
+        }
+      >
         <MinimalThankYouContent />
       </Suspense>
     </div>

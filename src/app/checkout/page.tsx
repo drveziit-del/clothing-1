@@ -1,30 +1,37 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useRouter } from 'next/navigation';
 import { useRoast } from '@/hooks/useRoast';
+import { useNetworkStatus } from '@/context/NetworkStatusContext';
 import { addressSchema } from '@/lib/utils/validation';
 import { calculateTax } from '@/lib/utils/taxCalculator';
 import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
 import RazorpayButton from '@/components/checkout/RazorpayButton';
-import PayPalMultiButton from '@/components/checkout/PayPalMultiButton';
+import dynamic from 'next/dynamic';
 import { COUNTRIES } from '@/lib/utils/countries';
 import styles from './page.module.css';
 import type { Address } from '@/types';
+
+// Dynamically split PayPal SDK from initial checkout bundle
+const PayPalMultiButton = dynamic(() => import('@/components/checkout/PayPalMultiButton'), {
+  ssr: false,
+});
 
 type Step = 'address' | 'payment';
 
 export default function CheckoutPage() {
   const { items, subtotal, referralCode, clearCart } = useCart();
   const { firebaseUser, user } = useAuth();
-  const { formatPrice, currency: selectedCurrency, setCurrency } = useCurrency();
+  const { formatPrice, setCurrency } = useCurrency();
   const router = useRouter();
   const { toast } = useRoast();
+  const { isOnline } = useNetworkStatus();
 
-  const orderCompletedRef = useRef(false);
+  const [orderCompleted, setOrderCompleted] = useState(false);
   const [step, setStep]               = useState<Step>('address');
   const [address, setAddress]         = useState<Address | null>(null);
   const [orderData, setOrderData]     = useState<{ orderId: string; razorpayOrderId: string; amount: number; currency: string } | null>(null);
@@ -76,10 +83,10 @@ export default function CheckoutPage() {
   }, []);
 
   useEffect(() => {
-    if (mounted && items.length === 0 && !orderCompletedRef.current) {
+    if (mounted && items.length === 0 && !orderCompleted) {
       router.replace('/cart');
     }
-  }, [mounted, items, router]);
+  }, [mounted, items, router, orderCompleted]);
 
   if (!mounted) {
     return (
@@ -131,7 +138,7 @@ export default function CheckoutPage() {
   }
 
   if (items.length === 0) {
-    if (orderCompletedRef.current) {
+    if (orderCompleted) {
       return (
         <div className={styles.page}>
           <div className={styles.processingWrapper}>
@@ -200,6 +207,11 @@ export default function CheckoutPage() {
   async function handleAddressSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrors({});
+
+    if (!isOnline) {
+      toast('You are currently offline. Please restore your connection to proceed.', 'error');
+      return;
+    }
 
     const formData = new FormData(e.currentTarget);
     const rawData = {
@@ -272,6 +284,10 @@ export default function CheckoutPage() {
   }
 
   async function handleFreeCheckout() {
+    if (!isOnline) {
+      toast('You are currently offline. Please restore your connection to place your order.', 'error');
+      return;
+    }
     setLoading(true);
     try {
       let currentOrderId = orderData?.orderId;
@@ -317,7 +333,7 @@ export default function CheckoutPage() {
         throw new Error(err.error || 'Free order checkout failed');
       }
 
-      orderCompletedRef.current = true;
+      setOrderCompleted(true);
       toast('Order placed successfully! Printing receipt...', 'success');
       clearCart();
       router.push(`/receipt?orderId=${currentOrderId}`);
@@ -354,9 +370,20 @@ export default function CheckoutPage() {
               ].map((field) => (
                 <div key={field.id}>
                   <label htmlFor={field.id} className="input-label">{field.label}</label>
-                  <input id={field.id} name={field.id} type={field.type}
-                    className="input" placeholder={field.placeholder} />
-                  {errors[field.id] && <span className={styles.fieldError}>{errors[field.id]}</span>}
+                  <input
+                    id={field.id}
+                    name={field.id}
+                    type={field.type}
+                    className="input"
+                    placeholder={field.placeholder}
+                    aria-invalid={errors[field.id] ? 'true' : 'false'}
+                    aria-describedby={errors[field.id] ? `${field.id}-error` : undefined}
+                  />
+                  {errors[field.id] && (
+                    <span id={`${field.id}-error`} role="alert" className={styles.fieldError}>
+                      {errors[field.id]}
+                    </span>
+                  )}
                 </div>
               ))}
 
@@ -367,6 +394,8 @@ export default function CheckoutPage() {
                   name="country"
                   className="input"
                   defaultValue="US"
+                  aria-invalid={errors.country ? 'true' : 'false'}
+                  aria-describedby={errors.country ? 'country-error' : undefined}
                   onChange={(e) => {
                     const country = e.target.value;
                     setSelectedCountry(country);
@@ -399,11 +428,39 @@ export default function CheckoutPage() {
                     </option>
                   ))}
                 </select>
-                {errors.country && <span className={styles.fieldError}>{errors.country}</span>}
+                {errors.country && (
+                  <span id="country-error" role="alert" className={styles.fieldError}>
+                    {errors.country}
+                  </span>
+                )}
               </div>
 
-              <button type="submit" disabled={loading} className="btn btn-primary btn-lg btn-full">
-                {loading ? 'Processing...' : 'Continue to Payment →'}
+              {!isOnline && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  background: 'rgba(255, 77, 77, 0.12)',
+                  border: '1px solid rgba(255, 77, 77, 0.35)',
+                  borderRadius: '8px',
+                  padding: '0.85rem 1rem',
+                  color: '#ff6b6b',
+                  fontSize: '0.85rem',
+                  fontFamily: 'var(--font-mono, monospace)',
+                  marginTop: '0.5rem',
+                }}>
+                  <span>🔴</span>
+                  <span>Offline: An active internet connection is required to validate shipping and process payment.</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading || !isOnline}
+                className="btn btn-primary btn-lg btn-full"
+                style={!isOnline ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}
+              >
+                {loading ? 'Processing...' : !isOnline ? 'Offline — Reconnect to Continue' : 'Continue to Payment →'}
               </button>
             </form>
           )}
@@ -411,6 +468,26 @@ export default function CheckoutPage() {
           {step === 'payment' && (
             <div className={styles.paymentStep}>
               <h2 className={styles.formTitle}>Payment</h2>
+
+              {!isOnline && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  background: 'rgba(255, 77, 77, 0.12)',
+                  border: '1px solid rgba(255, 77, 77, 0.35)',
+                  borderRadius: '8px',
+                  padding: '0.85rem 1rem',
+                  color: '#ff6b6b',
+                  fontSize: '0.85rem',
+                  fontFamily: 'var(--font-mono, monospace)',
+                  marginBottom: '1.25rem',
+                }}>
+                  <span>🔴</span>
+                  <span>Offline: Payment processing is paused. Please check your network connection to complete your order.</span>
+                </div>
+              )}
+
               {grandTotal <= 0 || (orderData && orderData.razorpayOrderId === 'free_order') ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   <div style={{
@@ -429,10 +506,11 @@ export default function CheckoutPage() {
 
                   <button
                     onClick={handleFreeCheckout}
-                    disabled={loading}
+                    disabled={loading || !isOnline}
                     className={`btn btn-lg btn-full ${styles.freeOrderBtn}`}
+                    style={!isOnline ? { opacity: 0.6, cursor: 'not-allowed' } : undefined}
                   >
-                    {loading ? 'Confirming Order & Printing...' : "🎁 It's Free — Complete Order →"}
+                    {loading ? 'Confirming Order & Printing...' : !isOnline ? 'Offline — Reconnect to Place Order' : "🎁 It's Free — Complete Order →"}
                   </button>
                 </div>
               ) : usePayPal ? (
@@ -447,7 +525,7 @@ export default function CheckoutPage() {
                     couponCode={appliedCoupon || undefined}
                     shippingAddress={address}
                     onSuccess={(orderId) => {
-                      orderCompletedRef.current = true;
+                      setOrderCompleted(true);
                       clearCart();
                       router.push(`/receipt?orderId=${orderId || orderData?.orderId || ''}`);
                     }}
@@ -468,7 +546,7 @@ export default function CheckoutPage() {
                     userName={user?.displayName ?? undefined}
                     amountUSD={grandTotal}
                     onSuccess={() => {
-                      orderCompletedRef.current = true;
+                      setOrderCompleted(true);
                       clearCart();
                       router.push(`/receipt?orderId=${orderData.orderId}`);
                     }}
@@ -532,12 +610,15 @@ export default function CheckoutPage() {
               ) : promoOpen ? (
                 <form onSubmit={handleApplyCoupon} className={styles.couponForm}>
                   <input
+                    id="checkout-coupon-code"
+                    name="couponCode"
                     type="text"
                     placeholder="ENTER REWARD CODE"
                     value={couponInput}
                     onChange={(e) => setCouponInput(e.target.value)}
                     className="input input-sm"
                     style={{ textTransform: 'uppercase', flex: 1, minWidth: 0 }}
+                    aria-label="Enter promotional reward code"
                   />
                   <button
                     type="submit"

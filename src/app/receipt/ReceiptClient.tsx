@@ -9,7 +9,6 @@ import {
   type ReceiptPrinterStage,
 } from '@/components/ui/ReceiptPrinter';
 import { useCurrency } from '@/context/CurrencyContext';
-import { generateAndDownloadReceiptPdf } from '@/lib/utils/generateReceiptPdf';
 import styles from './page.module.css';
 
 interface OrderData {
@@ -38,7 +37,7 @@ export default function ReceiptClient() {
   const { formatPrice } = useCurrency();
 
   const [order, setOrder] = useState<OrderData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [stage, setStage] = useState<ReceiptPrinterStage>('processing');
   const [downloading, setDownloading] = useState(false);
   const [receiptDate, setReceiptDate] = useState('');
@@ -87,11 +86,10 @@ export default function ReceiptClient() {
 
   // 2. Drive the physical printing animation stages
   useEffect(() => {
-    let t1: NodeJS.Timeout;
     let t2: NodeJS.Timeout;
 
     // Start in processing, switch to printing after 1000ms
-    t1 = setTimeout(() => {
+    const t1 = setTimeout(() => {
       setStage('printing');
 
       // Allow 2400ms for mechanical stepped paper feed, then complete
@@ -132,9 +130,10 @@ export default function ReceiptClient() {
       ? 'Store Reward Order'
       : 'Authorized Payment';
 
-  const handleDownloadReceipt = () => {
+  const handleDownloadReceipt = async () => {
     setDownloading(true);
     try {
+      const { generateAndDownloadReceiptPdf } = await import('@/lib/utils/generateReceiptPdf');
       generateAndDownloadReceiptPdf({
         orderId: activeOrderId,
         receiptDate,
