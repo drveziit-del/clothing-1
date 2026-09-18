@@ -64,22 +64,47 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setMounted(true);
-    // Load shipping settings from Firestore
-    async function loadShippingSettings() {
+    // Load shipping settings from Firestore deferred to idle time
+    const loadShippingSettings = async () => {
       try {
         const { doc, getDoc } = getFirestoreModule();
         const db = getFirestoreDb();
+        if (!db) return;
         const snap = await getDoc(doc(db, 'settings', 'global'));
         if (snap.exists()) {
           const data = snap.data();
-          if (typeof data.standardShippingFee === 'number') setShippingFee(data.standardShippingFee);
-          if (typeof data.freeShippingThreshold === 'number') setFreeShippingThreshold(data.freeShippingThreshold);
+          if (typeof data.standardShippingFee === 'number') {
+            setShippingFee((prev) => (prev === data.standardShippingFee ? prev : data.standardShippingFee));
+          }
+          if (typeof data.freeShippingThreshold === 'number') {
+            setFreeShippingThreshold((prev) =>
+              prev === data.freeShippingThreshold ? prev : data.freeShippingThreshold
+            );
+          }
         }
       } catch (err) {
         console.error('Failed to load shipping settings:', err);
       }
+    };
+
+    let idleId: number | null = null;
+    let timerId: NodeJS.Timeout | null = null;
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        idleId = (window as Window).requestIdleCallback(loadShippingSettings, { timeout: 2500 });
+      } else {
+        timerId = setTimeout(loadShippingSettings, 1500);
+      }
     }
-    loadShippingSettings();
+
+    return () => {
+      if (idleId !== null && 'cancelIdleCallback' in window) {
+        (window as Window).cancelIdleCallback(idleId);
+      }
+      if (timerId !== null) {
+        clearTimeout(timerId);
+      }
+    };
   }, []);
 
   useEffect(() => {

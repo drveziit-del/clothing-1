@@ -23,20 +23,43 @@ export default function CartPage() {
   const [freeShippingThreshold, setFreeShippingThreshold] = useState(100);
 
   useEffect(() => {
-    async function loadShippingSettings() {
+    const loadShippingSettings = async () => {
       try {
         const { doc, getDoc } = getFirestoreModule();
         const db = getFirestoreDb();
+        if (!db) return;
         const snap = await getDoc(doc(db, 'settings', 'global'));
         if (snap.exists()) {
           const data = snap.data();
-          if (typeof data.freeShippingThreshold === 'number') setFreeShippingThreshold(data.freeShippingThreshold);
+          if (typeof data.freeShippingThreshold === 'number') {
+            setFreeShippingThreshold((prev) =>
+              prev === data.freeShippingThreshold ? prev : data.freeShippingThreshold
+            );
+          }
         }
       } catch (err) {
         console.error('Failed to load shipping settings:', err);
       }
+    };
+
+    let idleId: number | null = null;
+    let timerId: NodeJS.Timeout | null = null;
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        idleId = (window as Window).requestIdleCallback(loadShippingSettings, { timeout: 2500 });
+      } else {
+        timerId = setTimeout(loadShippingSettings, 1500);
+      }
     }
-    loadShippingSettings();
+
+    return () => {
+      if (idleId !== null && 'cancelIdleCallback' in window) {
+        (window as Window).cancelIdleCallback(idleId);
+      }
+      if (timerId !== null) {
+        clearTimeout(timerId);
+      }
+    };
   }, []);
 
   // Validate on mount only if referralCode was pre-populated
@@ -178,9 +201,11 @@ export default function CartPage() {
 
           {/* Referral Code */}
           <div className={styles.referralRow}>
-            <label className="input-label">Referral Code</label>
+            <label htmlFor="cart-referral-code" className="input-label">Referral Code</label>
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
               <input
+                id="cart-referral-code"
+                name="referralCode"
                 type="text"
                 className="input"
                 style={{ flex: 1 }}
@@ -191,6 +216,7 @@ export default function CartPage() {
                   if (isValid !== null) setIsValid(null);
                 }}
                 maxLength={20}
+                aria-label="Referral Code"
               />
               <button
                 type="button"

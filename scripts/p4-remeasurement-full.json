@@ -1,0 +1,970 @@
+{
+  "home": {
+    "name": "Homepage",
+    "path": "/",
+    "stats": {
+      "fcp": {
+        "median": 1220,
+        "best": 820,
+        "worst": 5232
+      },
+      "lcp": {
+        "median": 1620,
+        "best": 1468,
+        "worst": 7948
+      },
+      "tbt": {
+        "median": 686,
+        "best": 635,
+        "worst": 1135
+      }
+    },
+    "median": {
+      "fcp": 1220,
+      "lcp": 1620,
+      "lcpElement": {
+        "renderTime": 1620,
+        "loadTime": 0,
+        "startTime": 1620,
+        "size": 27676,
+        "url": "",
+        "tagName": "SPAN",
+        "selector": "SPAN.page_lineAccent__efv06.page_noWrap__mxWtM",
+        "outerSnippet": "<span class=\"page_lineAccent__efv06 page_noWrap__mxWtM\">boring as f*ck.</span>",
+        "isText": true
+      },
+      "lcpRequestStart": "N/A (Inline DOM)",
+      "lcpResourceCompletion": "N/A (Inline DOM)",
+      "lcpRenderDelay": 0,
+      "tbt": 686,
+      "longTasksBeforeLcpCount": 5,
+      "totalBytes": 532945,
+      "requestCount": 63,
+      "cls": 0.0796
+    },
+    "runs": [
+      {
+        "ttfb": 333,
+        "fcp": 5232,
+        "lcp": 7948,
+        "cls": 0.1184,
+        "tbt": 1135,
+        "longTasksBeforeLcpCount": 7,
+        "jsTasksBeforeLcp": 1485,
+        "totalBytes": 940500,
+        "requestCount": 49,
+        "lcpElement": {
+          "renderTime": 7948,
+          "loadTime": 0,
+          "startTime": 7948,
+          "size": 27676,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.page_lineAccent__efv06.page_noWrap__mxWtM",
+          "outerSnippet": "<span class=\"page_lineAccent__efv06 page_noWrap__mxWtM\">boring as f*ck.</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      },
+      {
+        "ttfb": 657,
+        "fcp": 1220,
+        "lcp": 1620,
+        "cls": 0.0112,
+        "tbt": 635,
+        "longTasksBeforeLcpCount": 2,
+        "jsTasksBeforeLcp": 735,
+        "totalBytes": 532945,
+        "requestCount": 66,
+        "lcpElement": {
+          "renderTime": 1620,
+          "loadTime": 0,
+          "startTime": 1620,
+          "size": 27676,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.page_lineAccent__efv06.page_noWrap__mxWtM",
+          "outerSnippet": "<span class=\"page_lineAccent__efv06 page_noWrap__mxWtM\">boring as f*ck.</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      },
+      {
+        "ttfb": 10,
+        "fcp": 820,
+        "lcp": 1468,
+        "cls": 0.1091,
+        "tbt": 686,
+        "longTasksBeforeLcpCount": 5,
+        "jsTasksBeforeLcp": 936,
+        "totalBytes": 154305,
+        "requestCount": 63,
+        "lcpElement": {
+          "renderTime": 1468,
+          "loadTime": 0,
+          "startTime": 1468,
+          "size": 22378,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.page_lineAccent__efv06.page_noWrap__mxWtM",
+          "outerSnippet": "<span class=\"page_lineAccent__efv06 page_noWrap__mxWtM\">boring as f*ck.</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      }
+    ]
+  },
+  "shop": {
+    "name": "Shop Catalog",
+    "path": "/shop",
+    "stats": {
+      "fcp": {
+        "median": 828,
+        "best": 740,
+        "worst": 916
+      },
+      "lcp": {
+        "median": 828,
+        "best": 740,
+        "worst": 916
+      },
+      "tbt": {
+        "median": 552,
+        "best": 288,
+        "worst": 668
+      }
+    },
+    "median": {
+      "fcp": 828,
+      "lcp": 828,
+      "lcpElement": {
+        "renderTime": 828,
+        "loadTime": 0,
+        "startTime": 828,
+        "size": 17136,
+        "url": "",
+        "tagName": "P",
+        "selector": "P.page_cardSubtext__wAZZW",
+        "outerSnippet": "<p class=\"page_cardSubtext__wAZZW\">Five escalating tiers of unapologetic luxury. From $1,000 to $10,000,000. For those with more capital than shame.</p>",
+        "isText": true
+      },
+      "lcpRequestStart": "N/A (Inline DOM)",
+      "lcpResourceCompletion": "N/A (Inline DOM)",
+      "lcpRenderDelay": 0,
+      "tbt": 552,
+      "longTasksBeforeLcpCount": 2,
+      "totalBytes": 48555,
+      "requestCount": 54,
+      "cls": 0.0212
+    },
+    "runs": [
+      {
+        "ttfb": 8,
+        "fcp": 916,
+        "lcp": 916,
+        "cls": 0.0295,
+        "tbt": 668,
+        "longTasksBeforeLcpCount": 2,
+        "jsTasksBeforeLcp": 768,
+        "totalBytes": 51936,
+        "requestCount": 54,
+        "lcpElement": {
+          "renderTime": 916,
+          "loadTime": 0,
+          "startTime": 916,
+          "size": 17136,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page_cardSubtext__wAZZW",
+          "outerSnippet": "<p class=\"page_cardSubtext__wAZZW\">Five escalating tiers of unapologetic luxury. From $1,000 to $10,000,000. For those with more capital than shame.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      },
+      {
+        "ttfb": 7,
+        "fcp": 828,
+        "lcp": 828,
+        "cls": 0.0047,
+        "tbt": 552,
+        "longTasksBeforeLcpCount": 2,
+        "jsTasksBeforeLcp": 652,
+        "totalBytes": 48555,
+        "requestCount": 54,
+        "lcpElement": {
+          "renderTime": 828,
+          "loadTime": 0,
+          "startTime": 828,
+          "size": 17136,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page_cardSubtext__wAZZW",
+          "outerSnippet": "<p class=\"page_cardSubtext__wAZZW\">Five escalating tiers of unapologetic luxury. From $1,000 to $10,000,000. For those with more capital than shame.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      },
+      {
+        "ttfb": 7,
+        "fcp": 740,
+        "lcp": 740,
+        "cls": 0.0295,
+        "tbt": 288,
+        "longTasksBeforeLcpCount": 1,
+        "jsTasksBeforeLcp": 338,
+        "totalBytes": 45385,
+        "requestCount": 55,
+        "lcpElement": {
+          "renderTime": 740,
+          "loadTime": 0,
+          "startTime": 740,
+          "size": 17136,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page_cardSubtext__wAZZW",
+          "outerSnippet": "<p class=\"page_cardSubtext__wAZZW\">Five escalating tiers of unapologetic luxury. From $1,000 to $10,000,000. For those with more capital than shame.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      }
+    ]
+  },
+  "valueless-bitches": {
+    "name": "Valueless Bitches Collection",
+    "path": "/shop/valueless-bitches",
+    "stats": {
+      "fcp": {
+        "median": 668,
+        "best": 632,
+        "worst": 776
+      },
+      "lcp": {
+        "median": 1836,
+        "best": 1732,
+        "worst": 2076
+      },
+      "tbt": {
+        "median": 676,
+        "best": 611,
+        "worst": 709
+      }
+    },
+    "median": {
+      "fcp": 668,
+      "lcp": 1836,
+      "lcpElement": {
+        "renderTime": 1836,
+        "loadTime": 1547,
+        "startTime": 1836,
+        "size": 35644,
+        "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75",
+        "tagName": "IMG",
+        "selector": "IMG.ProductCard_image___Su7M",
+        "outerSnippet": "<img alt=\"Unisex Oversized Boxy Tee\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductCard_image___Su7M\" style=\"position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent\" sizes=\"(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw\" srcset=\"/_next/image?url=https%3A%2F",
+        "isText": false
+      },
+      "lcpRequestStart": 1430,
+      "lcpResourceCompletion": 1433,
+      "lcpRenderDelay": 374,
+      "tbt": 676,
+      "longTasksBeforeLcpCount": 7,
+      "totalBytes": 76302,
+      "requestCount": 65,
+      "cls": 0.075
+    },
+    "runs": [
+      {
+        "ttfb": 104,
+        "fcp": 776,
+        "lcp": 2076,
+        "cls": 0.0733,
+        "tbt": 611,
+        "longTasksBeforeLcpCount": 5,
+        "jsTasksBeforeLcp": 861,
+        "totalBytes": 151771,
+        "requestCount": 65,
+        "lcpElement": {
+          "renderTime": 2076,
+          "loadTime": 1965,
+          "startTime": 2076,
+          "size": 35644,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductCard_image___Su7M",
+          "outerSnippet": "<img alt=\"Unisex Oversized Boxy Tee\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductCard_image___Su7M\" style=\"position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent\" sizes=\"(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw\" srcset=\"/_next/image?url=https%3A%2F",
+          "isText": false
+        },
+        "lcpRequestStart": 1453,
+        "lcpResourceCompletion": 1826,
+        "lcpRenderDelay": 250
+      },
+      {
+        "ttfb": 29,
+        "fcp": 668,
+        "lcp": 1836,
+        "cls": 0.076,
+        "tbt": 709,
+        "longTasksBeforeLcpCount": 7,
+        "jsTasksBeforeLcp": 1059,
+        "totalBytes": 76302,
+        "requestCount": 65,
+        "lcpElement": {
+          "renderTime": 1836,
+          "loadTime": 1547,
+          "startTime": 1836,
+          "size": 35644,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductCard_image___Su7M",
+          "outerSnippet": "<img alt=\"Unisex Oversized Boxy Tee\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductCard_image___Su7M\" style=\"position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent\" sizes=\"(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw\" srcset=\"/_next/image?url=https%3A%2F",
+          "isText": false
+        },
+        "lcpRequestStart": 1430,
+        "lcpResourceCompletion": 1433,
+        "lcpRenderDelay": 403
+      },
+      {
+        "ttfb": 24,
+        "fcp": 632,
+        "lcp": 1732,
+        "cls": 0.0758,
+        "tbt": 676,
+        "longTasksBeforeLcpCount": 7,
+        "jsTasksBeforeLcp": 1026,
+        "totalBytes": 72908,
+        "requestCount": 65,
+        "lcpElement": {
+          "renderTime": 1732,
+          "loadTime": 1432,
+          "startTime": 1732,
+          "size": 35644,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductCard_image___Su7M",
+          "outerSnippet": "<img alt=\"Unisex Oversized Boxy Tee\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductCard_image___Su7M\" style=\"position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent\" sizes=\"(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw\" srcset=\"/_next/image?url=https%3A%2F",
+          "isText": false
+        },
+        "lcpRequestStart": 1356,
+        "lcpResourceCompletion": 1358,
+        "lcpRenderDelay": 374
+      }
+    ]
+  },
+  "society-fuckers": {
+    "name": "Society Fuckers Collection",
+    "path": "/shop/society-fuckers",
+    "stats": {
+      "fcp": {
+        "median": 652,
+        "best": 624,
+        "worst": 676
+      },
+      "lcp": {
+        "median": 1576,
+        "best": 1536,
+        "worst": 1840
+      },
+      "tbt": {
+        "median": 642,
+        "best": 629,
+        "worst": 932
+      }
+    },
+    "median": {
+      "fcp": 652,
+      "lcp": 1576,
+      "lcpElement": {
+        "renderTime": 1576,
+        "loadTime": 0,
+        "startTime": 1576,
+        "size": 42598,
+        "url": "",
+        "tagName": "P",
+        "selector": "P.page_desc__Qy9j9",
+        "outerSnippet": "<p class=\"page_desc__Qy9j9\">Five escalating tiers of unapologetic absurdist luxury. Starting at <strong>$1,000</strong> — because mediocrity is expensive — up to <strong>$10,000,000</strong> for the single individual with a god complex and the bank receipt to prove it.</p>",
+        "isText": true
+      },
+      "lcpRequestStart": "N/A (Inline DOM)",
+      "lcpResourceCompletion": "N/A (Inline DOM)",
+      "lcpRenderDelay": 0,
+      "tbt": 642,
+      "longTasksBeforeLcpCount": 5,
+      "totalBytes": 54633,
+      "requestCount": 55,
+      "cls": 0.0742
+    },
+    "runs": [
+      {
+        "ttfb": 24,
+        "fcp": 676,
+        "lcp": 1576,
+        "cls": 0.0047,
+        "tbt": 629,
+        "longTasksBeforeLcpCount": 4,
+        "jsTasksBeforeLcp": 829,
+        "totalBytes": 325758,
+        "requestCount": 55,
+        "lcpElement": {
+          "renderTime": 1576,
+          "loadTime": 0,
+          "startTime": 1576,
+          "size": 42598,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page_desc__Qy9j9",
+          "outerSnippet": "<p class=\"page_desc__Qy9j9\">Five escalating tiers of unapologetic absurdist luxury. Starting at <strong>$1,000</strong> — because mediocrity is expensive — up to <strong>$10,000,000</strong> for the single individual with a god complex and the bank receipt to prove it.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      },
+      {
+        "ttfb": 23,
+        "fcp": 652,
+        "lcp": 1536,
+        "cls": 0.109,
+        "tbt": 642,
+        "longTasksBeforeLcpCount": 5,
+        "jsTasksBeforeLcp": 892,
+        "totalBytes": 52559,
+        "requestCount": 55,
+        "lcpElement": {
+          "renderTime": 1536,
+          "loadTime": 0,
+          "startTime": 1536,
+          "size": 42598,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page_desc__Qy9j9",
+          "outerSnippet": "<p class=\"page_desc__Qy9j9\">Five escalating tiers of unapologetic absurdist luxury. Starting at <strong>$1,000</strong> — because mediocrity is expensive — up to <strong>$10,000,000</strong> for the single individual with a god complex and the bank receipt to prove it.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      },
+      {
+        "ttfb": 19,
+        "fcp": 624,
+        "lcp": 1840,
+        "cls": 0.109,
+        "tbt": 932,
+        "longTasksBeforeLcpCount": 6,
+        "jsTasksBeforeLcp": 1232,
+        "totalBytes": 54633,
+        "requestCount": 55,
+        "lcpElement": {
+          "renderTime": 1840,
+          "loadTime": 0,
+          "startTime": 1840,
+          "size": 42598,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page_desc__Qy9j9",
+          "outerSnippet": "<p class=\"page_desc__Qy9j9\">Five escalating tiers of unapologetic absurdist luxury. Starting at <strong>$1,000</strong> — because mediocrity is expensive — up to <strong>$10,000,000</strong> for the single individual with a god complex and the bank receipt to prove it.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      }
+    ]
+  },
+  "gods-plan": {
+    "name": "Product Detail (Gods Plan)",
+    "path": "/shop/gods-plan",
+    "stats": {
+      "fcp": {
+        "median": 660,
+        "best": 616,
+        "worst": 664
+      },
+      "lcp": {
+        "median": 3376,
+        "best": 3048,
+        "worst": 3616
+      },
+      "tbt": {
+        "median": 1274,
+        "best": 1083,
+        "worst": 1289
+      }
+    },
+    "median": {
+      "fcp": 660,
+      "lcp": 3376,
+      "lcpElement": {
+        "renderTime": 3376,
+        "loadTime": 2697,
+        "startTime": 3376,
+        "size": 171599,
+        "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75",
+        "tagName": "IMG",
+        "selector": "IMG.ProductDetailClient_carouselMedia__qL08l",
+        "outerSnippet": "<img alt=\"god's plan - Slide 1\" fetchpriority=\"high\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductDetailClient_carouselMedia__qL08l\" sizes=\"(max-width: 768px) 100vw, 50vw\" srcset=\"/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2F",
+        "isText": false
+      },
+      "lcpRequestStart": 2312,
+      "lcpResourceCompletion": 2317,
+      "lcpRenderDelay": 951,
+      "tbt": 1274,
+      "longTasksBeforeLcpCount": 8,
+      "totalBytes": 72487,
+      "requestCount": 63,
+      "cls": 0.0042
+    },
+    "runs": [
+      {
+        "ttfb": 22,
+        "fcp": 616,
+        "lcp": 3616,
+        "cls": 0.0027,
+        "tbt": 1274,
+        "longTasksBeforeLcpCount": 7,
+        "jsTasksBeforeLcp": 1624,
+        "totalBytes": 125813,
+        "requestCount": 63,
+        "lcpElement": {
+          "renderTime": 3616,
+          "loadTime": 2826,
+          "startTime": 3616,
+          "size": 171599,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductDetailClient_carouselMedia__qL08l",
+          "outerSnippet": "<img alt=\"god's plan - Slide 1\" fetchpriority=\"high\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductDetailClient_carouselMedia__qL08l\" sizes=\"(max-width: 768px) 100vw, 50vw\" srcset=\"/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2F",
+          "isText": false
+        },
+        "lcpRequestStart": 2294,
+        "lcpResourceCompletion": 2665,
+        "lcpRenderDelay": 951
+      },
+      {
+        "ttfb": 25,
+        "fcp": 660,
+        "lcp": 3376,
+        "cls": 0.0072,
+        "tbt": 1289,
+        "longTasksBeforeLcpCount": 8,
+        "jsTasksBeforeLcp": 1689,
+        "totalBytes": 72419,
+        "requestCount": 63,
+        "lcpElement": {
+          "renderTime": 3376,
+          "loadTime": 2697,
+          "startTime": 3376,
+          "size": 171599,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductDetailClient_carouselMedia__qL08l",
+          "outerSnippet": "<img alt=\"god's plan - Slide 1\" fetchpriority=\"high\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductDetailClient_carouselMedia__qL08l\" sizes=\"(max-width: 768px) 100vw, 50vw\" srcset=\"/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2F",
+          "isText": false
+        },
+        "lcpRequestStart": 2315,
+        "lcpResourceCompletion": 2317,
+        "lcpRenderDelay": 1059
+      },
+      {
+        "ttfb": 25,
+        "fcp": 664,
+        "lcp": 3048,
+        "cls": 0.0027,
+        "tbt": 1083,
+        "longTasksBeforeLcpCount": 9,
+        "jsTasksBeforeLcp": 1533,
+        "totalBytes": 72487,
+        "requestCount": 63,
+        "lcpElement": {
+          "renderTime": 3048,
+          "loadTime": 2507,
+          "startTime": 3048,
+          "size": 171599,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductDetailClient_carouselMedia__qL08l",
+          "outerSnippet": "<img alt=\"god's plan - Slide 1\" fetchpriority=\"high\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductDetailClient_carouselMedia__qL08l\" sizes=\"(max-width: 768px) 100vw, 50vw\" srcset=\"/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2F",
+          "isText": false
+        },
+        "lcpRequestStart": 2312,
+        "lcpResourceCompletion": 2314,
+        "lcpRenderDelay": 734
+      }
+    ]
+  },
+  "cart": {
+    "name": "Cart Page",
+    "path": "/cart",
+    "stats": {
+      "fcp": {
+        "median": 824,
+        "best": 628,
+        "worst": 860
+      },
+      "lcp": {
+        "median": 824,
+        "best": 628,
+        "worst": 860
+      },
+      "tbt": {
+        "median": 322,
+        "best": 198,
+        "worst": 360
+      }
+    },
+    "median": {
+      "fcp": 824,
+      "lcp": 824,
+      "lcpElement": {
+        "renderTime": 824,
+        "loadTime": 0,
+        "startTime": 824,
+        "size": 8680,
+        "url": "",
+        "tagName": "SPAN",
+        "selector": "SPAN.AnnouncementBar_giantWord__PRphp",
+        "outerSnippet": "<span class=\"AnnouncementBar_giantWord__PRphp\">LOOK AT ME</span>",
+        "isText": true
+      },
+      "lcpRequestStart": "N/A (Inline DOM)",
+      "lcpResourceCompletion": "N/A (Inline DOM)",
+      "lcpRenderDelay": 0,
+      "tbt": 322,
+      "longTasksBeforeLcpCount": 1,
+      "totalBytes": 42064,
+      "requestCount": 51,
+      "cls": 0.005
+    },
+    "runs": [
+      {
+        "ttfb": 7,
+        "fcp": 628,
+        "lcp": 628,
+        "cls": 0.0046,
+        "tbt": 198,
+        "longTasksBeforeLcpCount": 1,
+        "jsTasksBeforeLcp": 248,
+        "totalBytes": 53224,
+        "requestCount": 51,
+        "lcpElement": {
+          "renderTime": 628,
+          "loadTime": 0,
+          "startTime": 628,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar_giantWord__PRphp",
+          "outerSnippet": "<span class=\"AnnouncementBar_giantWord__PRphp\">LOOK AT ME</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      },
+      {
+        "ttfb": 6,
+        "fcp": 860,
+        "lcp": 860,
+        "cls": 0.0015,
+        "tbt": 322,
+        "longTasksBeforeLcpCount": 1,
+        "jsTasksBeforeLcp": 372,
+        "totalBytes": 42060,
+        "requestCount": 51,
+        "lcpElement": {
+          "renderTime": 860,
+          "loadTime": 0,
+          "startTime": 860,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar_giantWord__PRphp",
+          "outerSnippet": "<span class=\"AnnouncementBar_giantWord__PRphp\">LOOK AT ME</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      },
+      {
+        "ttfb": 5,
+        "fcp": 824,
+        "lcp": 824,
+        "cls": 0.0088,
+        "tbt": 360,
+        "longTasksBeforeLcpCount": 2,
+        "jsTasksBeforeLcp": 460,
+        "totalBytes": 42064,
+        "requestCount": 51,
+        "lcpElement": {
+          "renderTime": 824,
+          "loadTime": 0,
+          "startTime": 824,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar_giantWord__PRphp",
+          "outerSnippet": "<span class=\"AnnouncementBar_giantWord__PRphp\">LOOK AT ME</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      }
+    ]
+  },
+  "checkout": {
+    "name": "Checkout Guard",
+    "path": "/checkout",
+    "stats": {
+      "fcp": {
+        "median": 872,
+        "best": 780,
+        "worst": 912
+      },
+      "lcp": {
+        "median": 872,
+        "best": 780,
+        "worst": 912
+      },
+      "tbt": {
+        "median": 182,
+        "best": 143,
+        "worst": 261
+      }
+    },
+    "median": {
+      "fcp": 872,
+      "lcp": 872,
+      "lcpElement": {
+        "renderTime": 872,
+        "loadTime": 0,
+        "startTime": 872,
+        "size": 8680,
+        "url": "",
+        "tagName": "SPAN",
+        "selector": "SPAN.AnnouncementBar_giantWord__PRphp",
+        "outerSnippet": "<span class=\"AnnouncementBar_giantWord__PRphp\">LOOK AT ME</span>",
+        "isText": true
+      },
+      "lcpRequestStart": "N/A (Inline DOM)",
+      "lcpResourceCompletion": "N/A (Inline DOM)",
+      "lcpRenderDelay": 0,
+      "tbt": 182,
+      "longTasksBeforeLcpCount": 1,
+      "totalBytes": 46071,
+      "requestCount": 51,
+      "cls": 0.0035
+    },
+    "runs": [
+      {
+        "ttfb": 7,
+        "fcp": 912,
+        "lcp": 912,
+        "cls": 0.0015,
+        "tbt": 143,
+        "longTasksBeforeLcpCount": 1,
+        "jsTasksBeforeLcp": 193,
+        "totalBytes": 57892,
+        "requestCount": 51,
+        "lcpElement": {
+          "renderTime": 912,
+          "loadTime": 0,
+          "startTime": 912,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar_giantWord__PRphp",
+          "outerSnippet": "<span class=\"AnnouncementBar_giantWord__PRphp\">LOOK AT ME</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      },
+      {
+        "ttfb": 4,
+        "fcp": 780,
+        "lcp": 780,
+        "cls": 0.0047,
+        "tbt": 182,
+        "longTasksBeforeLcpCount": 1,
+        "jsTasksBeforeLcp": 232,
+        "totalBytes": 46071,
+        "requestCount": 51,
+        "lcpElement": {
+          "renderTime": 780,
+          "loadTime": 0,
+          "startTime": 780,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar_giantWord__PRphp",
+          "outerSnippet": "<span class=\"AnnouncementBar_giantWord__PRphp\">LOOK AT ME</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      },
+      {
+        "ttfb": 3,
+        "fcp": 872,
+        "lcp": 872,
+        "cls": 0.0044,
+        "tbt": 261,
+        "longTasksBeforeLcpCount": 2,
+        "jsTasksBeforeLcp": 361,
+        "totalBytes": 43925,
+        "requestCount": 51,
+        "lcpElement": {
+          "renderTime": 872,
+          "loadTime": 0,
+          "startTime": 872,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar_giantWord__PRphp",
+          "outerSnippet": "<span class=\"AnnouncementBar_giantWord__PRphp\">LOOK AT ME</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      }
+    ]
+  },
+  "custom-design": {
+    "name": "Custom Design Atelier",
+    "path": "/custom-design",
+    "stats": {
+      "fcp": {
+        "median": 652,
+        "best": 604,
+        "worst": 724
+      },
+      "lcp": {
+        "median": 1220,
+        "best": 1204,
+        "worst": 1472
+      },
+      "tbt": {
+        "median": 434,
+        "best": 377,
+        "worst": 444
+      }
+    },
+    "median": {
+      "fcp": 652,
+      "lcp": 1220,
+      "lcpElement": {
+        "renderTime": 1220,
+        "loadTime": 0,
+        "startTime": 1220,
+        "size": 25896,
+        "url": "",
+        "tagName": "P",
+        "selector": "P.custom-design_heroSubtitle__5TFTs",
+        "outerSnippet": "<p class=\"custom-design_heroSubtitle__5TFTs\">Send us your design. Your artwork. Your concept. Your weird idea.<br>We'll figure out how to turn it into an authentic GERKINK statement piece.</p>",
+        "isText": true
+      },
+      "lcpRequestStart": "N/A (Inline DOM)",
+      "lcpResourceCompletion": "N/A (Inline DOM)",
+      "lcpRenderDelay": 0,
+      "tbt": 434,
+      "longTasksBeforeLcpCount": 3,
+      "totalBytes": 37413,
+      "requestCount": 50,
+      "cls": 0.0391
+    },
+    "runs": [
+      {
+        "ttfb": 22,
+        "fcp": 724,
+        "lcp": 1472,
+        "cls": 0.0044,
+        "tbt": 377,
+        "longTasksBeforeLcpCount": 3,
+        "jsTasksBeforeLcp": 527,
+        "totalBytes": 78968,
+        "requestCount": 51,
+        "lcpElement": {
+          "renderTime": 1472,
+          "loadTime": 0,
+          "startTime": 1472,
+          "size": 25896,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.custom-design_heroSubtitle__5TFTs",
+          "outerSnippet": "<p class=\"custom-design_heroSubtitle__5TFTs\">Send us your design. Your artwork. Your concept. Your weird idea.<br>We'll figure out how to turn it into an authentic GERKINK statement piece.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      },
+      {
+        "ttfb": 6,
+        "fcp": 604,
+        "lcp": 1204,
+        "cls": 0.0044,
+        "tbt": 434,
+        "longTasksBeforeLcpCount": 3,
+        "jsTasksBeforeLcp": 584,
+        "totalBytes": 37413,
+        "requestCount": 50,
+        "lcpElement": {
+          "renderTime": 1204,
+          "loadTime": 0,
+          "startTime": 1204,
+          "size": 25896,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.custom-design_heroSubtitle__5TFTs",
+          "outerSnippet": "<p class=\"custom-design_heroSubtitle__5TFTs\">Send us your design. Your artwork. Your concept. Your weird idea.<br>We'll figure out how to turn it into an authentic GERKINK statement piece.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      },
+      {
+        "ttfb": 5,
+        "fcp": 652,
+        "lcp": 1220,
+        "cls": 0.1086,
+        "tbt": 444,
+        "longTasksBeforeLcpCount": 4,
+        "jsTasksBeforeLcp": 644,
+        "totalBytes": 37379,
+        "requestCount": 50,
+        "lcpElement": {
+          "renderTime": 1220,
+          "loadTime": 0,
+          "startTime": 1220,
+          "size": 25896,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.custom-design_heroSubtitle__5TFTs",
+          "outerSnippet": "<p class=\"custom-design_heroSubtitle__5TFTs\">Send us your design. Your artwork. Your concept. Your weird idea.<br>We'll figure out how to turn it into an authentic GERKINK statement piece.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0
+      }
+    ]
+  }
+}

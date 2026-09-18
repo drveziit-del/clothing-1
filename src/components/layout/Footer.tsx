@@ -12,25 +12,49 @@ export default function Footer() {
   const [tagline, setTagline] = useState('We are nobody.\nOur clothes speak louder.');
 
   useEffect(() => {
-    try {
-      const db = getFirestoreDb();
-      if (!db) return;
-      const { doc, onSnapshot } = getFirestoreModule();
-      const unsub = onSnapshot(
-        doc(db, 'settings', 'copywriting'),
-        (snap) => {
-          if (snap.exists() && snap.data().footerTagline) {
-            setTagline(snap.data().footerTagline);
+    let unsub: (() => void) | null = null;
+    let idleId: number | null = null;
+    let timerId: NodeJS.Timeout | null = null;
+
+    const setupListener = () => {
+      try {
+        const db = getFirestoreDb();
+        if (!db) return;
+        const { doc, onSnapshot } = getFirestoreModule();
+        unsub = onSnapshot(
+          doc(db, 'settings', 'copywriting'),
+          (snap) => {
+            if (snap.exists() && snap.data().footerTagline) {
+              const nextTagline = snap.data().footerTagline;
+              setTagline((prev) => (prev === nextTagline ? prev : nextTagline));
+            }
+          },
+          (error) => {
+            console.warn('Footer copywriting settings snapshot error:', error);
           }
-        },
-        (error) => {
-          console.warn('Footer copywriting settings snapshot error:', error);
-        }
-      );
-      return () => unsub();
-    } catch (err) {
-      console.warn('Footer copywriting effect error:', err);
+        );
+      } catch (err) {
+        console.warn('Footer copywriting effect error:', err);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        idleId = (window as Window).requestIdleCallback(setupListener, { timeout: 4000 });
+      } else {
+        timerId = setTimeout(setupListener, 2500);
+      }
     }
+
+    return () => {
+      if (idleId !== null && 'cancelIdleCallback' in window) {
+        (window as Window).cancelIdleCallback(idleId);
+      }
+      if (timerId !== null) {
+        clearTimeout(timerId);
+      }
+      if (unsub) unsub();
+    };
   }, []);
 
   return (
