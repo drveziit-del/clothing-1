@@ -67,7 +67,7 @@
   letter-spacing: -0.05em;
   color: var(--text-secondary);   /* muted — builds tension */
   display: block;
-  opacity: 0;
+  opacity: 1;
 }
 
 .line2 {
