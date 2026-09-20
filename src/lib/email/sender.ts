@@ -23,6 +23,10 @@ function sanitizeErrorMessage(msg: unknown): string {
     .slice(0, 500);
 }
 
+function getFromEmail(): string {
+  return process.env.SMTP_FROM || 'hello@gerkink.shop';
+}
+
 export interface PayoutAlertDetails {
   userName: string;
   userEmail: string;
@@ -129,7 +133,7 @@ export async function sendAdminPayoutAlert(details: PayoutAlertDetails): Promise
     });
 
     await transporter.sendMail({
-      from: `"GERKINK Referrals" <${user}>`,
+      from: `"GERKINK Referrals" <${getFromEmail()}>`,
       to: adminEmail,
       subject,
       html: htmlBody,
@@ -261,7 +265,7 @@ export async function sendAdminPrebookNotification(details: PrebookAlertDetails)
     });
 
     await transporter.sendMail({
-      from: `"GERKINK Prebookings" <${user}>`,
+      from: `"GERKINK Prebookings" <${getFromEmail()}>`,
       to: adminEmail,
       subject,
       html: htmlBody,
@@ -423,7 +427,7 @@ export async function sendOrderConfirmationEmail(order: Order): Promise<void> {
     });
 
     await transporter.sendMail({
-      from: `"GERKINK" <${user}>`,
+      from: `"GERKINK" <${getFromEmail()}>`,
       to: customerEmail,
       subject,
       html: htmlBody,
@@ -585,7 +589,7 @@ export async function sendAdminOrderNotification(order: Order): Promise<void> {
     });
 
     await transporter.sendMail({
-      from: `"GERKINK Order Alerts" <${user}>`,
+      from: `"GERKINK Order Alerts" <${getFromEmail()}>`,
       to: adminEmail,
       subject,
       html: htmlBody,
@@ -746,7 +750,7 @@ export async function sendAdminContactMessage(details: ContactMessageDetails): P
     });
 
     await transporter.sendMail({
-      from: `"GERKINK Contact Form" <${user}>`,
+      from: `"GERKINK Contact Form" <${getFromEmail()}>`,
       to: adminEmail,
       subject,
       html: htmlBody,
@@ -845,7 +849,7 @@ export async function sendPayoutStatusEmail(details: PayoutStatusDetails): Promi
       auth: { user, pass },
     });
     await transporter.sendMail({
-      from: `"GERKINK Referrals" <${user}>`,
+      from: `"GERKINK Referrals" <${getFromEmail()}>`,
       to: details.userEmail,
       subject,
       html: htmlBody,
@@ -947,7 +951,7 @@ export async function sendPostDeliveryReviewRequestEmail(details: ReviewRequestD
       auth: { user, pass },
     });
     await transporter.sendMail({
-      from: `"GERKINK" <${user}>`,
+      from: `"GERKINK" <${getFromEmail()}>`,
       to: details.userEmail,
       subject,
       html: htmlBody,
@@ -1380,7 +1384,7 @@ export async function sendCustomDesignNotification(details: CustomDesignEmailDet
 
     for (const mail of outboundMails) {
       await transporter.sendMail({
-        from: `"GERKINK Custom Studio" <${user}>`,
+        from: `"GERKINK Custom Studio" <${getFromEmail()}>`,
         to: mail.to,
         subject: mail.subject,
         html: mail.html,

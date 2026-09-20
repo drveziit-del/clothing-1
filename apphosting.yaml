@@ -33,6 +33,8 @@ env:
     value: "587"
   - variable: SMTP_USER
     value: gerkinkofficial@gmail.com
+  - variable: SMTP_FROM
+    value: hello@gerkink.shop
   - variable: ADMIN_EMAIL
     value: support@gerkink.shop
   - variable: CUSTOM_DESIGN_ALERT_EMAIL
