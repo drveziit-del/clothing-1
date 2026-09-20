@@ -1,6 +1,5 @@
 import { adminDb } from '@/lib/firebase/admin';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import WireApprovalActions from '@/components/admin/WireApprovalActions';
 
 export const dynamic = 'force-dynamic';

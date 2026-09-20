@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRoast } from '@/hooks/useRoast';
 import styles from './RoastToast.module.css';
 

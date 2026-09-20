@@ -9,7 +9,7 @@
  * transparently loads and initialises everything on first property access.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -92,7 +92,7 @@ function ensureStorage() {
 
 const isServer = typeof window === 'undefined';
 
-function createLazyProxy<T extends object>(initializer: () => T, name: string): T {
+function createLazyProxy<T extends object>(initializer: () => T, _name: string): T {
   return new Proxy({} as any, {
     get(target, prop) {
       if (

@@ -52,8 +52,8 @@ async function testRun() {
 
   const MIN_ORDER_FOR_REFERRAL = 100;
   const COMMISSION_PER_10_REFERRALS = 100;
-  const MILESTONE_CUSTOMER = 100000;
-  const MILESTONE_REWARD = 100000;
+  const _MILESTONE_CUSTOMER = 100000;
+  const _MILESTONE_REWARD = 100000;
 
   const orderValue = order.subtotal || order.total || 0;
   if (orderValue < MIN_ORDER_FOR_REFERRAL || !order.referralCode) return;
@@ -90,7 +90,7 @@ async function testRun() {
       const commission = newCount % 10 === 0 ? COMMISSION_PER_10_REFERRALS : 0;
 
       const prevCount = globalSettingsDoc.data()?.globalReferralCount ?? 0;
-      const newGlobalCount = prevCount + 1;
+      const _newGlobalCount = prevCount + 1;
 
       const referralData = {
         affiliateUid,

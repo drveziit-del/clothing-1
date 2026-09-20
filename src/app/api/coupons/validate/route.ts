@@ -1,3 +1,4 @@
+import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const code = (body.code || '').trim().toUpperCase();
-    const subtotal = parseFloat(body.subtotal) || 0;
+    const subtotal = Math.max(0, parseFloat(body.subtotal) || 0);
 
     // Resolve uid from the verified session cookie — never trust a client-supplied userId.
     let uid: string | null = null;
@@ -62,6 +63,14 @@ export async function POST(request: NextRequest) {
     }
 
     const couponData = couponSnap.docs[0].data();
+
+    // Check if coupon is inactive
+    if (couponData.isActive === false) {
+      return NextResponse.json(
+        { error: 'This coupon is currently inactive.' },
+        { status: 400 }
+      );
+    }
 
     // Check max uses if specified for global coupon
     if (couponData.isGlobal && couponData.maxUses) {

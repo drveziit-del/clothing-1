@@ -2,8 +2,8 @@
   width: 100%;
   overflow: hidden;
   background: var(--surface-2);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  border-top: none;
+  border-bottom: none;
   padding: 0.65rem 0;
   white-space: nowrap;
 }

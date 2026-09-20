@@ -169,3 +169,27 @@
     grid-row: span 1;
   }
 }
+
+/* ── Light Mode Overrides ── */
+[data-theme="light"] .bentoCard {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .bentoCard:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .glowOverlay {
+  background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0, 0, 0, 0.02), transparent 40%);
+}
+
+[data-theme="light"] .cardCta {
+  color: var(--mist-100);
+}
+
+[data-theme="light"] .bentoCard:hover .cardCta {
+  color: var(--accent);
+}

@@ -1045,7 +1045,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: 100000;
   cursor: zoom-out;
 }
 
@@ -1058,7 +1058,7 @@
   color: var(--text-primary);
   font-size: 2rem;
   cursor: pointer;
-  z-index: 2100;
+  z-index: 100001;
 }
 
 .lightboxFrame {
@@ -1085,7 +1085,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: 100000;
   padding: 1rem;
 }
 
@@ -1224,6 +1224,25 @@
   color: var(--accent);
 }
 
+.stickyBarSub {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.stickyBarSizeBadge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 2px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
 .stickyBarBtn {
   flex-grow: 1;
   max-width: 160px;
@@ -1236,10 +1255,14 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 .stickyBarBtn:hover {
   opacity: 0.9;
+}
+.stickyBarBtnSelect {
+  background: var(--accent);
+  color: #07090E;
 }
 
 @media (max-width: 900px) {
@@ -2033,4 +2056,24 @@
   font-size: 0.65rem;
   font-weight: 800;
   color: var(--coral-100);
+}
+
+/* ── Light Mode Overrides ── */
+[data-theme="light"] .absurdityTag {
+  color: var(--coral-300);
+}
+
+[data-theme="light"] .absurdityLine::before {
+  color: var(--coral-300);
+}
+
+[data-theme="light"] .absurdityCard {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .galleryItem {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
 }

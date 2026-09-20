@@ -1,10 +1,9 @@
 .page {
-  min-height: 100vh;
-  padding-top: 68px;
+  min-height: calc(100vh - var(--site-header-height, 82px));
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 88px 1rem 3rem;
+  padding: 2.5rem 1rem 3rem;
   background: radial-gradient(ellipse at 50% 0%, rgba(107,138,171,0.08) 0%, transparent 60%);
 }
 

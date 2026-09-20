@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, ReactNode, ElementType } from 'react';
+import React, { useRef, ReactNode } from 'react';
 import Link from 'next/link';
 import styles from './BentoGrid.module.css';
 

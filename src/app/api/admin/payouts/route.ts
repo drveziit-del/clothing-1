@@ -1,3 +1,4 @@
+import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
@@ -16,38 +17,68 @@ async function requireAdmin(): Promise<{ uid: string } | { error: NextResponse }
   const cookieStore = await cookies();
   const session = cookieStore.get('session')?.value;
   if (!session) {
-    return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
+    return { error: NextResponse.json({ error: 'Unauthorized: Session required' }, { status: 401 }) };
   }
+
   try {
     const decoded = await adminAuth.verifySessionCookie(session, true);
-    if (!decoded.admin) {
-      return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+    if (!decoded?.admin) {
+      return { error: NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 }) };
     }
     return { uid: decoded.uid };
-  } catch {
-    return { error: NextResponse.json({ error: 'Invalid session' }, { status: 401 }) };
+  } catch (err) {
+    return { error: NextResponse.json({ error: 'Unauthorized: Invalid or revoked session' }, { status: 401 }) };
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const auth = await requireAdmin();
   if ('error' in auth) return auth.error;
 
   try {
-    // Pending queue first (oldest first so nothing starves), then recent decisions.
-    const pendingSnap = await adminDb
-      .collection('payout_requests')
-      .where('status', '==', 'pending')
-      .orderBy('createdAt', 'asc')
-      .limit(100)
-      .get();
+    // 1. Pending queue (with index-missing fallback)
+    let pendingDocs: FirebaseFirestore.QueryDocumentSnapshot[] = [];
+    try {
+      const snap = await adminDb
+        .collection('payout_requests')
+        .where('status', '==', 'pending')
+        .orderBy('createdAt', 'asc')
+        .limit(100)
+        .get();
+      pendingDocs = snap.docs;
+    } catch (idxErr: any) {
+      console.warn('[admin/payouts] pending query orderBy failed, falling back to unordered query:', idxErr?.message);
+      const snap = await adminDb
+        .collection('payout_requests')
+        .where('status', '==', 'pending')
+        .limit(100)
+        .get();
+      pendingDocs = snap.docs;
+    }
 
-    const processedSnap = await adminDb
-      .collection('payout_requests')
-      .where('status', 'in', ['paid_manual', 'rejected'])
-      .orderBy('updatedAt', 'desc')
-      .limit(20)
-      .get();
+    // 2. Processed queue (with index-missing fallback)
+    let processedDocs: FirebaseFirestore.QueryDocumentSnapshot[] = [];
+    try {
+      const snap = await adminDb
+        .collection('payout_requests')
+        .where('status', 'in', ['paid_manual', 'rejected', 'processed'])
+        .orderBy('updatedAt', 'desc')
+        .limit(20)
+        .get();
+      processedDocs = snap.docs;
+    } catch (idxErr: any) {
+      console.warn('[admin/payouts] processed query orderBy failed, falling back to unordered query:', idxErr?.message);
+      try {
+        const snap = await adminDb
+          .collection('payout_requests')
+          .where('status', 'in', ['paid_manual', 'rejected', 'processed'])
+          .limit(20)
+          .get();
+        processedDocs = snap.docs;
+      } catch {
+        processedDocs = [];
+      }
+    }
 
     const serialize = (d: FirebaseFirestore.QueryDocumentSnapshot) => ({
       id: d.id,
@@ -56,13 +87,20 @@ export async function GET(request: NextRequest) {
       updatedAt: d.data().updatedAt?.toDate?.()?.toISOString() ?? null,
     });
 
+    const pending = pendingDocs.map(serialize);
+    const processed = processedDocs.map(serialize);
+
+    // In-memory sort fallback
+    pending.sort((a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime());
+    processed.sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
+
     return NextResponse.json({
-      pending: pendingSnap.docs.map(serialize),
-      processed: processedSnap.docs.map(serialize),
+      pending,
+      processed,
     });
   } catch (err) {
     console.error('[admin/payouts] Failed to list payout requests:', err);
-    return NextResponse.json({ error: 'Failed to load payout requests' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to list payout requests', pending: [], processed: [] }, { status: 500 });
   }
 }
 
@@ -109,7 +147,16 @@ export async function POST(request: NextRequest) {
         return { amount: Number(data.amount) || 0, userEmail: String(data.userEmail || ''), userName: String(data.userName || ''), method: String(data.method || '') };
       }
 
-      // reject
+      // reject: Firestore requires all reads to execute before any writes.
+      // Read linked referrals first before executing updates.
+      const linked = await transaction.get(
+        adminDb.collection('referrals')
+          .where('affiliateUid', '==', data.userId)
+          .where('payoutDetail', '==', requestId)
+          .where('status', '==', 'claimed')
+          .limit(500)
+      );
+
       transaction.update(requestRef, {
         status: 'rejected',
         rejectedBy: auth.uid,
@@ -120,13 +167,6 @@ export async function POST(request: NextRequest) {
 
       // Restore the affiliate's claimable balance: referrals consumed by this
       // request go back to eligible_for_claim so they can re-claim with fixed details.
-      const linked = await transaction.get(
-        adminDb.collection('referrals')
-          .where('affiliateUid', '==', data.userId)
-          .where('payoutDetail', '==', requestId)
-          .where('status', '==', 'claimed')
-          .limit(500)
-      );
       linked.forEach((doc) => {
         transaction.update(doc.ref, {
           status: 'eligible_for_claim',

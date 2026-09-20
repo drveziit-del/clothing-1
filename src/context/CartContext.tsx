@@ -96,7 +96,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 
 const CART_KEY = 'gerkink_cart';
 
-function loadCartFromStorage(): CartState {
+function _loadCartFromStorage(): CartState {
   if (typeof window === 'undefined') return { items: [], referralCode: '' };
   try {
     const raw = localStorage.getItem(CART_KEY);

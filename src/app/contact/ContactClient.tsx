@@ -64,9 +64,15 @@ export default function ContactClient() {
               But we read everything.
             </span>
             <div className={styles.emailContainer}>
-              <span className={styles.emailTagline}>Or scream into the void:</span>
-              <a href="mailto:gerkinkofficial@gmail.com" className={styles.emailLink}>
-                gerkinkofficial@gmail.com
+              <span className={styles.emailTagline}>Talk or suggestions:</span>
+              <a href="mailto:hello@gerkink.shop" className={styles.emailLink}>
+                hello@gerkink.shop
+              </a>
+            </div>
+            <div className={styles.emailContainer}>
+              <span className={styles.emailTagline}>Orders &amp; client support:</span>
+              <a href="mailto:support@gerkink.shop" className={styles.emailLink}>
+                support@gerkink.shop
               </a>
             </div>
             <div style={{ marginTop: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.85rem' }}>

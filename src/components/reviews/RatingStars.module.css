@@ -1,0 +1,80 @@
+.starContainer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+}
+
+.starsRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.starDisplay {
+  display: inline-block;
+  line-height: 1;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.starBtn {
+  background: none;
+  border: none;
+  padding: 0 2px;
+  margin: 0;
+  cursor: pointer;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.2);
+  transition: color 0.15s ease, transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.starBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  border-radius: 2px;
+}
+
+.starBtn:hover {
+  transform: scale(1.18);
+}
+
+.filled {
+  color: #ff6b6b !important;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.4);
+}
+
+.half {
+  color: #ff8e8e;
+}
+
+.empty {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="light"] .empty {
+  color: rgba(0, 0, 0, 0.15);
+}
+
+/* Sizes */
+.sm .starDisplay,
+.sm .starBtn {
+  font-size: 0.9rem;
+}
+
+.md .starDisplay,
+.md .starBtn {
+  font-size: 1.25rem;
+}
+
+.lg .starDisplay,
+.lg .starBtn {
+  font-size: 1.85rem;
+}
+
+.scoreText {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}

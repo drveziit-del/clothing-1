@@ -1,3 +1,4 @@
+import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Code is required' }, { status: 400 });
     }
 
-    const uppercaseCode = code.toUpperCase();
+    const uppercaseCode = code.trim().toUpperCase();
 
     // Deduplication check: 1 click per IP per code per hour
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || '127.0.0.1';
@@ -45,21 +46,59 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ status: 'ok', cached: true });
     }
 
-    clickCache.set(dedupKey, { expireTime: now + 60 * 60 * 1000 });
-
+    // Lookup across users, referral_codes, and orders
     const userSnap = await adminDb.collection('users')
       .where('referralCode', '==', uppercaseCode)
       .limit(1)
       .get();
 
-    if (userSnap.empty) {
+    let targetDocRef: FirebaseFirestore.DocumentReference | null = !userSnap.empty ? userSnap.docs[0].ref : null;
+
+    if (!targetDocRef) {
+      const codeDoc = await adminDb.collection('referral_codes').doc(uppercaseCode).get();
+      if (codeDoc.exists) {
+        const codeData = codeDoc.data() || {};
+        if (codeData.userId && !codeData.userId.startsWith('guest_')) {
+          targetDocRef = adminDb.collection('users').doc(codeData.userId);
+        } else if (codeData.orderId) {
+          const ordDoc = await adminDb.collection('orders').doc(codeData.orderId).get();
+          if (ordDoc.exists) {
+            const ordData = ordDoc.data() || {};
+            if (ordData.userId && !ordData.userId.startsWith('guest_')) {
+              targetDocRef = adminDb.collection('users').doc(ordData.userId);
+            } else {
+              targetDocRef = ordDoc.ref;
+            }
+          }
+        }
+      }
+    }
+
+    if (!targetDocRef) {
+      const orderSnap = await adminDb.collection('orders')
+        .where('userReferralCode', '==', uppercaseCode)
+        .limit(1)
+        .get();
+      if (!orderSnap.empty) {
+        const orderDoc = orderSnap.docs[0];
+        const orderData = orderDoc.data() || {};
+        if (orderData.userId && !orderData.userId.startsWith('guest_')) {
+          targetDocRef = adminDb.collection('users').doc(orderData.userId);
+        } else {
+          targetDocRef = orderDoc.ref;
+        }
+      }
+    }
+
+    if (!targetDocRef) {
       return NextResponse.json({ error: 'Referral code not found' }, { status: 404 });
     }
 
-    const userDoc = userSnap.docs[0];
-    await userDoc.ref.update({
+    clickCache.set(dedupKey, { expireTime: now + 60 * 60 * 1000 });
+
+    await targetDocRef.set({
       linkClicks: FieldValue.increment(1),
-    });
+    }, { merge: true });
 
     return NextResponse.json({ status: 'ok' });
   } catch (err: any) {

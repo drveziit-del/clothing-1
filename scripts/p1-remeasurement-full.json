@@ -1,0 +1,2210 @@
+{
+  "home": {
+    "name": "Homepage",
+    "path": "/",
+    "median": {
+      "fcp": 1424,
+      "lcp": 8992,
+      "lcpElement": {
+        "renderTime": 8992,
+        "loadTime": 0,
+        "startTime": 8992,
+        "size": 22110,
+        "url": "",
+        "tagName": "SPAN",
+        "selector": "SPAN.page-module___8aEwW__lineAccent.page-module___8aEwW__noWrap.animate-fadeUp.delay-500",
+        "outerSnippet": "<span class=\"page-module___8aEwW__lineAccent page-module___8aEwW__noWrap animate-fadeUp delay-500\">Boring as F*ck</span>",
+        "isText": true
+      },
+      "lcpRequestStart": "N/A (Inline DOM)",
+      "lcpResourceCompletion": "N/A (Inline DOM)",
+      "lcpRenderDelay": 0,
+      "tbt": 2699,
+      "longTasksBeforeLcpCount": 13,
+      "totalBytes": 420102,
+      "requestCount": 50,
+      "cls": 0.1298,
+      "headPreloads": [
+        {
+          "as": "script",
+          "href": "/_next/static/chunks/0rqmg49wirni2.js",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1hllz6p95kihq.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1_88q75ditvd_.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1qrp0e3lxbg1t.css",
+          "imageSrcSet": null
+        }
+      ],
+      "headPreconnects": [
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com",
+        "https://firebasestorage.googleapis.com",
+        "https://images-api.printify.com"
+      ]
+    },
+    "runs": [
+      {
+        "ttfb": 12,
+        "fcp": 4244,
+        "lcp": 7028,
+        "cls": 0.1537,
+        "tbt": 1737,
+        "longTasksBeforeLcpCount": 6,
+        "jsTasksBeforeLcp": 2037,
+        "totalBytes": 1116920,
+        "requestCount": 49,
+        "lcpElement": {
+          "renderTime": 7028,
+          "loadTime": 0,
+          "startTime": 7028,
+          "size": 22378,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.page-module___8aEwW__lineAccent.page-module___8aEwW__noWrap.animate-fadeUp.delay-500",
+          "outerSnippet": "<span class=\"page-module___8aEwW__lineAccent page-module___8aEwW__noWrap animate-fadeUp delay-500\">boring as f*ck.</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1_88q75ditvd_.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1qrp0e3lxbg1t.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 9,
+        "fcp": 1300,
+        "lcp": 10568,
+        "cls": 0.1202,
+        "tbt": 3291,
+        "longTasksBeforeLcpCount": 20,
+        "jsTasksBeforeLcp": 4291,
+        "totalBytes": 420102,
+        "requestCount": 53,
+        "lcpElement": {
+          "renderTime": 10568,
+          "loadTime": 0,
+          "startTime": 10568,
+          "size": 22110,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.page-module___8aEwW__lineAccent.page-module___8aEwW__noWrap.animate-fadeUp.delay-500",
+          "outerSnippet": "<span class=\"page-module___8aEwW__lineAccent page-module___8aEwW__noWrap animate-fadeUp delay-500\">Boring as F*ck</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1_88q75ditvd_.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1qrp0e3lxbg1t.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 11,
+        "fcp": 1424,
+        "lcp": 8992,
+        "cls": 0.1156,
+        "tbt": 2699,
+        "longTasksBeforeLcpCount": 13,
+        "jsTasksBeforeLcp": 3349,
+        "totalBytes": 153164,
+        "requestCount": 50,
+        "lcpElement": {
+          "renderTime": 8992,
+          "loadTime": 0,
+          "startTime": 8992,
+          "size": 22110,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.page-module___8aEwW__lineAccent.page-module___8aEwW__noWrap.animate-fadeUp.delay-500",
+          "outerSnippet": "<span class=\"page-module___8aEwW__lineAccent page-module___8aEwW__noWrap animate-fadeUp delay-500\">Boring as F*ck</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1_88q75ditvd_.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1qrp0e3lxbg1t.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      }
+    ]
+  },
+  "shop": {
+    "name": "Shop Catalog",
+    "path": "/shop",
+    "median": {
+      "fcp": 996,
+      "lcp": 1900,
+      "lcpElement": {
+        "renderTime": 1900,
+        "loadTime": 0,
+        "startTime": 1900,
+        "size": 22378,
+        "url": "",
+        "tagName": "P",
+        "selector": "P.page-module__Nm5nzG__pageDesc",
+        "outerSnippet": "<p class=\"page-module__Nm5nzG__pageDesc\">Two distinct collections. Zero corporate apologies. Pick the one that matches your level of audacity.</p>",
+        "isText": true
+      },
+      "lcpRequestStart": "N/A (Inline DOM)",
+      "lcpResourceCompletion": "N/A (Inline DOM)",
+      "lcpRenderDelay": 0,
+      "tbt": 685,
+      "longTasksBeforeLcpCount": 2,
+      "totalBytes": 47885,
+      "requestCount": 45,
+      "cls": 0.0113,
+      "headPreloads": [
+        {
+          "as": "script",
+          "href": "/_next/static/chunks/0rqmg49wirni2.js",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1hllz6p95kihq.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+          "imageSrcSet": null
+        }
+      ],
+      "headPreconnects": [
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com",
+        "https://firebasestorage.googleapis.com",
+        "https://images-api.printify.com"
+      ]
+    },
+    "runs": [
+      {
+        "ttfb": 12,
+        "fcp": 996,
+        "lcp": 2812,
+        "cls": 0.0112,
+        "tbt": 987,
+        "longTasksBeforeLcpCount": 2,
+        "jsTasksBeforeLcp": 1087,
+        "totalBytes": 50918,
+        "requestCount": 45,
+        "lcpElement": {
+          "renderTime": 2812,
+          "loadTime": 0,
+          "startTime": 2812,
+          "size": 22378,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page-module__Nm5nzG__pageDesc",
+          "outerSnippet": "<p class=\"page-module__Nm5nzG__pageDesc\">Two distinct collections. Zero corporate apologies. Pick the one that matches your level of audacity.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 6,
+        "fcp": 924,
+        "lcp": 1724,
+        "cls": 0.0112,
+        "tbt": 685,
+        "longTasksBeforeLcpCount": 3,
+        "jsTasksBeforeLcp": 835,
+        "totalBytes": 47885,
+        "requestCount": 45,
+        "lcpElement": {
+          "renderTime": 1724,
+          "loadTime": 0,
+          "startTime": 1724,
+          "size": 17136,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page-module__Nm5nzG__cardSubtext",
+          "outerSnippet": "<p class=\"page-module__Nm5nzG__cardSubtext\">Five escalating tiers of unapologetic luxury. From $1,000 to $10,000,000. For those with more capital than shame.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 7,
+        "fcp": 1068,
+        "lcp": 1900,
+        "cls": 0.0114,
+        "tbt": 375,
+        "longTasksBeforeLcpCount": 1,
+        "jsTasksBeforeLcp": 425,
+        "totalBytes": 47872,
+        "requestCount": 45,
+        "lcpElement": {
+          "renderTime": 1900,
+          "loadTime": 0,
+          "startTime": 1900,
+          "size": 22378,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page-module__Nm5nzG__pageDesc",
+          "outerSnippet": "<p class=\"page-module__Nm5nzG__pageDesc\">Two distinct collections. Zero corporate apologies. Pick the one that matches your level of audacity.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      }
+    ]
+  },
+  "valueless-bitches": {
+    "name": "Valueless Bitches Collection",
+    "path": "/shop/valueless-bitches",
+    "median": {
+      "fcp": 1356,
+      "lcp": 4156,
+      "lcpElement": {
+        "renderTime": 4156,
+        "loadTime": 3242,
+        "startTime": 4156,
+        "size": 35644,
+        "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75",
+        "tagName": "IMG",
+        "selector": "IMG.ProductCard-module__O-UVIa__image",
+        "outerSnippet": "<img alt=\"Unisex Oversized Boxy Tee\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductCard-module__O-UVIa__image\" style=\"position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent\" sizes=\"(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw\" srcset=\"/_next/image?url=ht",
+        "isText": false
+      },
+      "lcpRequestStart": 2523,
+      "lcpResourceCompletion": 2554,
+      "lcpRenderDelay": 918,
+      "tbt": 1941,
+      "longTasksBeforeLcpCount": 4,
+      "totalBytes": 77881,
+      "requestCount": 56,
+      "cls": 0.0797,
+      "headPreloads": [
+        {
+          "as": "script",
+          "href": "/_next/static/chunks/0rqmg49wirni2.js",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1hllz6p95kihq.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1_88q75ditvd_.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "image",
+          "href": null,
+          "imageSrcSet": "/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=3840&q=75 3840w"
+        },
+        {
+          "as": "image",
+          "href": null,
+          "imageSrcSet": "/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=3840&q=75 3840w"
+        },
+        {
+          "as": "image",
+          "href": null,
+          "imageSrcSet": "/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=3840&q=75 3840w"
+        }
+      ],
+      "headPreconnects": [
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com",
+        "https://firebasestorage.googleapis.com",
+        "https://images-api.printify.com"
+      ]
+    },
+    "runs": [
+      {
+        "ttfb": 43,
+        "fcp": 1500,
+        "lcp": 5816,
+        "cls": 0.0796,
+        "tbt": 3297,
+        "longTasksBeforeLcpCount": 9,
+        "jsTasksBeforeLcp": 3747,
+        "totalBytes": 144741,
+        "requestCount": 56,
+        "lcpElement": {
+          "renderTime": 5816,
+          "loadTime": 5547,
+          "startTime": 5816,
+          "size": 35644,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductCard-module__O-UVIa__image",
+          "outerSnippet": "<img alt=\"Unisex Oversized Boxy Tee\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductCard-module__O-UVIa__image\" style=\"position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent\" sizes=\"(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw\" srcset=\"/_next/image?url=ht",
+          "isText": false
+        },
+        "lcpRequestStart": 2869,
+        "lcpResourceCompletion": 5475,
+        "lcpRenderDelay": 341,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1_88q75ditvd_.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "image",
+            "href": null,
+            "imageSrcSet": "/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=3840&q=75 3840w"
+          },
+          {
+            "as": "image",
+            "href": null,
+            "imageSrcSet": "/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=3840&q=75 3840w"
+          },
+          {
+            "as": "image",
+            "href": null,
+            "imageSrcSet": "/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=3840&q=75 3840w"
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 33,
+        "fcp": 1356,
+        "lcp": 4156,
+        "cls": 0.0796,
+        "tbt": 1941,
+        "longTasksBeforeLcpCount": 4,
+        "jsTasksBeforeLcp": 2141,
+        "totalBytes": 77881,
+        "requestCount": 56,
+        "lcpElement": {
+          "renderTime": 4156,
+          "loadTime": 3242,
+          "startTime": 4156,
+          "size": 35644,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductCard-module__O-UVIa__image",
+          "outerSnippet": "<img alt=\"Unisex Oversized Boxy Tee\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductCard-module__O-UVIa__image\" style=\"position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent\" sizes=\"(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw\" srcset=\"/_next/image?url=ht",
+          "isText": false
+        },
+        "lcpRequestStart": 1693,
+        "lcpResourceCompletion": 1742,
+        "lcpRenderDelay": 2414,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1_88q75ditvd_.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "image",
+            "href": null,
+            "imageSrcSet": "/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=3840&q=75 3840w"
+          },
+          {
+            "as": "image",
+            "href": null,
+            "imageSrcSet": "/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=3840&q=75 3840w"
+          },
+          {
+            "as": "image",
+            "href": null,
+            "imageSrcSet": "/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=3840&q=75 3840w"
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 33,
+        "fcp": 1320,
+        "lcp": 3472,
+        "cls": 0.0798,
+        "tbt": 907,
+        "longTasksBeforeLcpCount": 1,
+        "jsTasksBeforeLcp": 957,
+        "totalBytes": 74135,
+        "requestCount": 56,
+        "lcpElement": {
+          "renderTime": 3472,
+          "loadTime": 2760,
+          "startTime": 3472,
+          "size": 35644,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductCard-module__O-UVIa__image",
+          "outerSnippet": "<img alt=\"Unisex Oversized Boxy Tee\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductCard-module__O-UVIa__image\" style=\"position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent\" sizes=\"(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw\" srcset=\"/_next/image?url=ht",
+          "isText": false
+        },
+        "lcpRequestStart": 2523,
+        "lcpResourceCompletion": 2554,
+        "lcpRenderDelay": 918,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1_88q75ditvd_.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "image",
+            "href": null,
+            "imageSrcSet": "/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=3840&q=75 3840w"
+          },
+          {
+            "as": "image",
+            "href": null,
+            "imageSrcSet": "/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=3840&q=75 3840w"
+          },
+          {
+            "as": "image",
+            "href": null,
+            "imageSrcSet": "/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=3840&q=75 3840w"
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      }
+    ]
+  },
+  "society-fuckers": {
+    "name": "Society Fuckers Collection",
+    "path": "/shop/society-fuckers",
+    "median": {
+      "fcp": 1316,
+      "lcp": 4152,
+      "lcpElement": {
+        "renderTime": 4152,
+        "loadTime": 0,
+        "startTime": 4152,
+        "size": 42598,
+        "url": "",
+        "tagName": "P",
+        "selector": "P.page-module__93oUla__desc",
+        "outerSnippet": "<p class=\"page-module__93oUla__desc\">Five escalating tiers of unapologetic absurdist luxury. Starting at <strong>$1,000</strong> — because mediocrity is expensive — up to <strong>$10,000,000</strong> for the single individual with a god complex and the bank receipt to prove it.</p>",
+        "isText": true
+      },
+      "lcpRequestStart": "N/A (Inline DOM)",
+      "lcpResourceCompletion": "N/A (Inline DOM)",
+      "lcpRenderDelay": 0,
+      "tbt": 1224,
+      "longTasksBeforeLcpCount": 3,
+      "totalBytes": 52636,
+      "requestCount": 43,
+      "cls": 0.116,
+      "headPreloads": [
+        {
+          "as": "script",
+          "href": "/_next/static/chunks/0rqmg49wirni2.js",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1hllz6p95kihq.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+          "imageSrcSet": null
+        }
+      ],
+      "headPreconnects": [
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com",
+        "https://firebasestorage.googleapis.com",
+        "https://images-api.printify.com"
+      ]
+    },
+    "runs": [
+      {
+        "ttfb": 30,
+        "fcp": 1352,
+        "lcp": 4152,
+        "cls": 0.1163,
+        "tbt": 1219,
+        "longTasksBeforeLcpCount": 1,
+        "jsTasksBeforeLcp": 1269,
+        "totalBytes": 110344,
+        "requestCount": 43,
+        "lcpElement": {
+          "renderTime": 4152,
+          "loadTime": 0,
+          "startTime": 4152,
+          "size": 42598,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page-module__93oUla__desc",
+          "outerSnippet": "<p class=\"page-module__93oUla__desc\">Five escalating tiers of unapologetic absurdist luxury. Starting at <strong>$1,000</strong> — because mediocrity is expensive — up to <strong>$10,000,000</strong> for the single individual with a god complex and the bank receipt to prove it.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 32,
+        "fcp": 1316,
+        "lcp": 4632,
+        "cls": 0.1163,
+        "tbt": 1224,
+        "longTasksBeforeLcpCount": 3,
+        "jsTasksBeforeLcp": 1374,
+        "totalBytes": 49721,
+        "requestCount": 43,
+        "lcpElement": {
+          "renderTime": 4632,
+          "loadTime": 0,
+          "startTime": 4632,
+          "size": 42598,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page-module__93oUla__desc",
+          "outerSnippet": "<p class=\"page-module__93oUla__desc\">Five escalating tiers of unapologetic absurdist luxury. Starting at <strong>$1,000</strong> — because mediocrity is expensive — up to <strong>$10,000,000</strong> for the single individual with a god complex and the bank receipt to prove it.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 84,
+        "fcp": 1084,
+        "lcp": 3348,
+        "cls": 0.1155,
+        "tbt": 1638,
+        "longTasksBeforeLcpCount": 3,
+        "jsTasksBeforeLcp": 1788,
+        "totalBytes": 52636,
+        "requestCount": 43,
+        "lcpElement": {
+          "renderTime": 3348,
+          "loadTime": 0,
+          "startTime": 3348,
+          "size": 42598,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page-module__93oUla__desc",
+          "outerSnippet": "<p class=\"page-module__93oUla__desc\">Five escalating tiers of unapologetic absurdist luxury. Starting at <strong>$1,000</strong> — because mediocrity is expensive — up to <strong>$10,000,000</strong> for the single individual with a god complex and the bank receipt to prove it.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      }
+    ]
+  },
+  "gods-plan": {
+    "name": "Product Detail (Gods Plan)",
+    "path": "/shop/gods-plan",
+    "median": {
+      "fcp": 1116,
+      "lcp": 7248,
+      "lcpElement": {
+        "renderTime": 7248,
+        "loadTime": 7060,
+        "startTime": 7248,
+        "size": 171599,
+        "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75",
+        "tagName": "IMG",
+        "selector": "IMG.ProductDetailClient-module__HT8uQq__carouselMedia",
+        "outerSnippet": "<img alt=\"god's plan - Slide 1\" fetchpriority=\"high\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductDetailClient-module__HT8uQq__carouselMedia\" sizes=\"(max-width: 768px) 100vw, 50vw\" srcset=\"/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestora",
+        "isText": false
+      },
+      "lcpRequestStart": 3369,
+      "lcpResourceCompletion": 3431,
+      "lcpRenderDelay": 3037,
+      "tbt": 4364,
+      "longTasksBeforeLcpCount": 9,
+      "totalBytes": 81402,
+      "requestCount": 55,
+      "cls": 0,
+      "headPreloads": [
+        {
+          "as": "script",
+          "href": "/_next/static/chunks/0rqmg49wirni2.js",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1hllz6p95kihq.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "image",
+          "href": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+          "imageSrcSet": null
+        },
+        {
+          "as": "image",
+          "href": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1_88q75ditvd_.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1dj50bracemt7.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "image",
+          "href": null,
+          "imageSrcSet": "/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=3840&q=75 3840w"
+        },
+        {
+          "as": "image",
+          "href": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+          "imageSrcSet": null
+        }
+      ],
+      "headPreconnects": [
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com",
+        "https://firebasestorage.googleapis.com",
+        "https://images-api.printify.com"
+      ]
+    },
+    "runs": [
+      {
+        "ttfb": 367,
+        "fcp": 1480,
+        "lcp": 7248,
+        "cls": 0,
+        "tbt": 4943,
+        "longTasksBeforeLcpCount": 10,
+        "jsTasksBeforeLcp": 5443,
+        "totalBytes": 149162,
+        "requestCount": 55,
+        "lcpElement": {
+          "renderTime": 7248,
+          "loadTime": 7060,
+          "startTime": 7248,
+          "size": 171599,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductDetailClient-module__HT8uQq__carouselMedia",
+          "outerSnippet": "<img alt=\"god's plan - Slide 1\" fetchpriority=\"high\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductDetailClient-module__HT8uQq__carouselMedia\" sizes=\"(max-width: 768px) 100vw, 50vw\" srcset=\"/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestora",
+          "isText": false
+        },
+        "lcpRequestStart": 3369,
+        "lcpResourceCompletion": 6724,
+        "lcpRenderDelay": 524,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "image",
+            "href": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+            "imageSrcSet": null
+          },
+          {
+            "as": "image",
+            "href": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1_88q75ditvd_.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1dj50bracemt7.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "image",
+            "href": null,
+            "imageSrcSet": "/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=3840&q=75 3840w"
+          },
+          {
+            "as": "image",
+            "href": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 90,
+        "fcp": 1000,
+        "lcp": 7452,
+        "cls": 0,
+        "tbt": 4364,
+        "longTasksBeforeLcpCount": 9,
+        "jsTasksBeforeLcp": 4814,
+        "totalBytes": 81402,
+        "requestCount": 56,
+        "lcpElement": {
+          "renderTime": 7452,
+          "loadTime": 5070,
+          "startTime": 7452,
+          "size": 171599,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductDetailClient-module__HT8uQq__carouselMedia",
+          "outerSnippet": "<img alt=\"god's plan - Slide 1\" fetchpriority=\"high\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductDetailClient-module__HT8uQq__carouselMedia\" sizes=\"(max-width: 768px) 100vw, 50vw\" srcset=\"/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestora",
+          "isText": false
+        },
+        "lcpRequestStart": 2952,
+        "lcpResourceCompletion": 2989,
+        "lcpRenderDelay": 4463,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "image",
+            "href": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "image",
+            "href": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1_88q75ditvd_.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1dj50bracemt7.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "image",
+            "href": null,
+            "imageSrcSet": "/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=3840&q=75 3840w"
+          },
+          {
+            "as": "image",
+            "href": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 164,
+        "fcp": 1116,
+        "lcp": 6468,
+        "cls": 0,
+        "tbt": 4058,
+        "longTasksBeforeLcpCount": 6,
+        "jsTasksBeforeLcp": 4358,
+        "totalBytes": 75184,
+        "requestCount": 55,
+        "lcpElement": {
+          "renderTime": 6468,
+          "loadTime": 4365,
+          "startTime": 6468,
+          "size": 171599,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductDetailClient-module__HT8uQq__carouselMedia",
+          "outerSnippet": "<img alt=\"god's plan - Slide 1\" fetchpriority=\"high\" decoding=\"async\" data-nimg=\"fill\" class=\"ProductDetailClient-module__HT8uQq__carouselMedia\" sizes=\"(max-width: 768px) 100vw, 50vw\" srcset=\"/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestora",
+          "isText": false
+        },
+        "lcpRequestStart": 3419,
+        "lcpResourceCompletion": 3431,
+        "lcpRenderDelay": 3037,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "image",
+            "href": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+            "imageSrcSet": null
+          },
+          {
+            "as": "image",
+            "href": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1_88q75ditvd_.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1dj50bracemt7.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "image",
+            "href": null,
+            "imageSrcSet": "/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=3840&q=75 3840w"
+          },
+          {
+            "as": "image",
+            "href": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      }
+    ]
+  },
+  "cart": {
+    "name": "Cart Page",
+    "path": "/cart",
+    "median": {
+      "fcp": 1060,
+      "lcp": 1060,
+      "lcpElement": {
+        "renderTime": 1060,
+        "loadTime": 0,
+        "startTime": 1060,
+        "size": 8680,
+        "url": "",
+        "tagName": "SPAN",
+        "selector": "SPAN.AnnouncementBar-module__tQURPG__giantWord",
+        "outerSnippet": "<span class=\"AnnouncementBar-module__tQURPG__giantWord\">LOOK AT ME</span>",
+        "isText": true
+      },
+      "lcpRequestStart": "N/A (Inline DOM)",
+      "lcpResourceCompletion": "N/A (Inline DOM)",
+      "lcpRenderDelay": 0,
+      "tbt": 0,
+      "longTasksBeforeLcpCount": 0,
+      "totalBytes": 43093,
+      "requestCount": 42,
+      "cls": 0.012,
+      "headPreloads": [
+        {
+          "as": "script",
+          "href": "/_next/static/chunks/0rqmg49wirni2.js",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1hllz6p95kihq.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1_88q75ditvd_.css",
+          "imageSrcSet": null
+        }
+      ],
+      "headPreconnects": [
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com",
+        "https://firebasestorage.googleapis.com",
+        "https://images-api.printify.com"
+      ]
+    },
+    "runs": [
+      {
+        "ttfb": 21,
+        "fcp": 900,
+        "lcp": 900,
+        "cls": 0.0156,
+        "tbt": 0,
+        "longTasksBeforeLcpCount": 0,
+        "jsTasksBeforeLcp": 0,
+        "totalBytes": 48700,
+        "requestCount": 42,
+        "lcpElement": {
+          "renderTime": 900,
+          "loadTime": 0,
+          "startTime": 900,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar-module__tQURPG__giantWord",
+          "outerSnippet": "<span class=\"AnnouncementBar-module__tQURPG__giantWord\">LOOK AT ME</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1_88q75ditvd_.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 11,
+        "fcp": 1060,
+        "lcp": 1060,
+        "cls": 0.0156,
+        "tbt": 0,
+        "longTasksBeforeLcpCount": 0,
+        "jsTasksBeforeLcp": 0,
+        "totalBytes": 43042,
+        "requestCount": 42,
+        "lcpElement": {
+          "renderTime": 1060,
+          "loadTime": 0,
+          "startTime": 1060,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar-module__tQURPG__giantWord",
+          "outerSnippet": "<span class=\"AnnouncementBar-module__tQURPG__giantWord\">LOOK AT ME</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1_88q75ditvd_.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 11,
+        "fcp": 1224,
+        "lcp": 1224,
+        "cls": 0.0047,
+        "tbt": 0,
+        "longTasksBeforeLcpCount": 0,
+        "jsTasksBeforeLcp": 0,
+        "totalBytes": 43093,
+        "requestCount": 42,
+        "lcpElement": {
+          "renderTime": 1224,
+          "loadTime": 0,
+          "startTime": 1224,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar-module__tQURPG__giantWord",
+          "outerSnippet": "<span class=\"AnnouncementBar-module__tQURPG__giantWord\">LOOK AT ME</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1_88q75ditvd_.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      }
+    ]
+  },
+  "checkout": {
+    "name": "Checkout Guard",
+    "path": "/checkout",
+    "median": {
+      "fcp": 1172,
+      "lcp": 1172,
+      "lcpElement": {
+        "renderTime": 1172,
+        "loadTime": 0,
+        "startTime": 1172,
+        "size": 8680,
+        "url": "",
+        "tagName": "SPAN",
+        "selector": "SPAN.AnnouncementBar-module__tQURPG__giantWord",
+        "outerSnippet": "<span class=\"AnnouncementBar-module__tQURPG__giantWord\">LOOK AT ME</span>",
+        "isText": true
+      },
+      "lcpRequestStart": "N/A (Inline DOM)",
+      "lcpResourceCompletion": "N/A (Inline DOM)",
+      "lcpRenderDelay": 0,
+      "tbt": 0,
+      "longTasksBeforeLcpCount": 0,
+      "totalBytes": 44992,
+      "requestCount": 43,
+      "cls": 0.0141,
+      "headPreloads": [
+        {
+          "as": "script",
+          "href": "/_next/static/chunks/0rqmg49wirni2.js",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1hllz6p95kihq.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+          "imageSrcSet": null
+        }
+      ],
+      "headPreconnects": [
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com",
+        "https://firebasestorage.googleapis.com",
+        "https://images-api.printify.com"
+      ]
+    },
+    "runs": [
+      {
+        "ttfb": 7,
+        "fcp": 1172,
+        "lcp": 1172,
+        "cls": 0.0047,
+        "tbt": 0,
+        "longTasksBeforeLcpCount": 0,
+        "jsTasksBeforeLcp": 0,
+        "totalBytes": 56713,
+        "requestCount": 43,
+        "lcpElement": {
+          "renderTime": 1172,
+          "loadTime": 0,
+          "startTime": 1172,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar-module__tQURPG__giantWord",
+          "outerSnippet": "<span class=\"AnnouncementBar-module__tQURPG__giantWord\">LOOK AT ME</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 6,
+        "fcp": 1144,
+        "lcp": 1144,
+        "cls": 0.0112,
+        "tbt": 0,
+        "longTasksBeforeLcpCount": 0,
+        "jsTasksBeforeLcp": 0,
+        "totalBytes": 44992,
+        "requestCount": 43,
+        "lcpElement": {
+          "renderTime": 1144,
+          "loadTime": 0,
+          "startTime": 1144,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar-module__tQURPG__giantWord",
+          "outerSnippet": "<span class=\"AnnouncementBar-module__tQURPG__giantWord\">LOOK AT ME</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 5,
+        "fcp": 1372,
+        "lcp": 1372,
+        "cls": 0.0264,
+        "tbt": 0,
+        "longTasksBeforeLcpCount": 0,
+        "jsTasksBeforeLcp": 0,
+        "totalBytes": 42075,
+        "requestCount": 43,
+        "lcpElement": {
+          "renderTime": 1372,
+          "loadTime": 0,
+          "startTime": 1372,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar-module__tQURPG__giantWord",
+          "outerSnippet": "<span class=\"AnnouncementBar-module__tQURPG__giantWord\">LOOK AT ME</span>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      }
+    ]
+  },
+  "custom-design": {
+    "name": "Custom Design Atelier",
+    "path": "/custom-design",
+    "median": {
+      "fcp": 924,
+      "lcp": 2676,
+      "lcpElement": {
+        "renderTime": 2676,
+        "loadTime": 0,
+        "startTime": 2676,
+        "size": 25896,
+        "url": "",
+        "tagName": "P",
+        "selector": "P.custom-design-module__vRC1na__heroSubtitle",
+        "outerSnippet": "<p class=\"custom-design-module__vRC1na__heroSubtitle\">Send us your design. Your artwork. Your concept. Your weird idea.<br>We'll figure out how to turn it into an authentic GERKINK statement piece.</p>",
+        "isText": true
+      },
+      "lcpRequestStart": "N/A (Inline DOM)",
+      "lcpResourceCompletion": "N/A (Inline DOM)",
+      "lcpRenderDelay": 0,
+      "tbt": 567,
+      "longTasksBeforeLcpCount": 3,
+      "totalBytes": 36496,
+      "requestCount": 42,
+      "cls": 0.0773,
+      "headPreloads": [
+        {
+          "as": "script",
+          "href": "/_next/static/chunks/0rqmg49wirni2.js",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1hllz6p95kihq.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+          "imageSrcSet": null
+        },
+        {
+          "as": "style",
+          "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+          "imageSrcSet": null
+        }
+      ],
+      "headPreconnects": [
+        "https://fonts.googleapis.com",
+        "https://fonts.gstatic.com",
+        "https://firebasestorage.googleapis.com",
+        "https://images-api.printify.com"
+      ]
+    },
+    "runs": [
+      {
+        "ttfb": 28,
+        "fcp": 1364,
+        "lcp": 3428,
+        "cls": 0.1155,
+        "tbt": 1284,
+        "longTasksBeforeLcpCount": 4,
+        "jsTasksBeforeLcp": 1484,
+        "totalBytes": 68262,
+        "requestCount": 42,
+        "lcpElement": {
+          "renderTime": 3428,
+          "loadTime": 0,
+          "startTime": 3428,
+          "size": 25896,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.custom-design-module__vRC1na__heroSubtitle",
+          "outerSnippet": "<p class=\"custom-design-module__vRC1na__heroSubtitle\">Send us your design. Your artwork. Your concept. Your weird idea.<br>We'll figure out how to turn it into an authentic GERKINK statement piece.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 6,
+        "fcp": 924,
+        "lcp": 2676,
+        "cls": 0.1117,
+        "tbt": 409,
+        "longTasksBeforeLcpCount": 3,
+        "jsTasksBeforeLcp": 559,
+        "totalBytes": 36496,
+        "requestCount": 42,
+        "lcpElement": {
+          "renderTime": 2676,
+          "loadTime": 0,
+          "startTime": 2676,
+          "size": 25896,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.custom-design-module__vRC1na__heroSubtitle",
+          "outerSnippet": "<p class=\"custom-design-module__vRC1na__heroSubtitle\">Send us your design. Your artwork. Your concept. Your weird idea.<br>We'll figure out how to turn it into an authentic GERKINK statement piece.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      },
+      {
+        "ttfb": 7,
+        "fcp": 704,
+        "lcp": 1288,
+        "cls": 0.0046,
+        "tbt": 567,
+        "longTasksBeforeLcpCount": 3,
+        "jsTasksBeforeLcp": 717,
+        "totalBytes": 33568,
+        "requestCount": 42,
+        "lcpElement": {
+          "renderTime": 1288,
+          "loadTime": 0,
+          "startTime": 1288,
+          "size": 25896,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.custom-design-module__vRC1na__heroSubtitle",
+          "outerSnippet": "<p class=\"custom-design-module__vRC1na__heroSubtitle\">Send us your design. Your artwork. Your concept. Your weird idea.<br>We'll figure out how to turn it into an authentic GERKINK statement piece.</p>",
+          "isText": true
+        },
+        "lcpRequestStart": "N/A (Inline DOM)",
+        "lcpResourceCompletion": "N/A (Inline DOM)",
+        "lcpRenderDelay": 0,
+        "headPreloads": [
+          {
+            "as": "script",
+            "href": "/_next/static/chunks/0rqmg49wirni2.js",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1hllz6p95kihq.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1k8l1rl4xa-3r.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/1umn3-xmtj_-5.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/2ruy7kt5mjx25.css",
+            "imageSrcSet": null
+          },
+          {
+            "as": "style",
+            "href": "/_next/static/chunks/0t8q5h_m0iwvx.css",
+            "imageSrcSet": null
+          }
+        ],
+        "headPreconnects": [
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+          "https://firebasestorage.googleapis.com",
+          "https://images-api.printify.com"
+        ]
+      }
+    ]
+  }
+}

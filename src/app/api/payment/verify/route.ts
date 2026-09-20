@@ -106,6 +106,7 @@ export async function POST(request: NextRequest) {
 
   try {
     await adminDb.runTransaction(async (transaction) => {
+      // 1. All reads must occur before any writes
       const snap = await transaction.get(orderRef);
       if (!snap.exists) throw new Error('ORDER_MISSING');
 
@@ -122,28 +123,75 @@ export async function POST(request: NextRequest) {
         return;
       }
 
-      transaction.update(orderRef, {
+      let couponDocSnap: FirebaseFirestore.DocumentSnapshot | null = null;
+      if (couponRef) {
+        couponDocSnap = await transaction.get(couponRef);
+      }
+
+      // 2. Validate coupon state inside the transaction
+      let couponValidInsideTx = false;
+      let couponConflictReason: string | null = null;
+
+      if (couponDocSnap && couponDocSnap.exists) {
+        const cData = couponDocSnap.data()!;
+        const isGlobal = !!cData.isGlobal;
+        const timesUsed = cData.timesUsed || 0;
+        const maxUses = cData.maxUses;
+
+        if (!isGlobal && cData.isUsed) {
+          couponConflictReason = 'Single-use coupon was already used';
+        } else if (isGlobal && typeof maxUses === 'number' && timesUsed >= maxUses) {
+          couponConflictReason = 'Global coupon reached maximum usage limit';
+        } else if (cData.isActive === false) {
+          couponConflictReason = 'Coupon is inactive';
+        } else if (cData.expiresAt) {
+          const expiryDate = typeof cData.expiresAt?.toDate === 'function'
+            ? cData.expiresAt.toDate()
+            : new Date(cData.expiresAt);
+          if (Number.isNaN(expiryDate.getTime()) || expiryDate < new Date()) {
+            couponConflictReason = 'Coupon has expired';
+          } else {
+            couponValidInsideTx = true;
+          }
+        } else {
+          couponValidInsideTx = true;
+        }
+      } else if (couponRef) {
+        couponConflictReason = 'Coupon document not found during transaction';
+      }
+
+      // 3. Writes: Record payment. If coupon was exhausted concurrently,
+      //    the captured payment MUST still be recorded on the order with a conflict flag.
+      const orderUpdates: Record<string, any> = {
         status:             'paid',
         paymentCaptured:    true,
         razorpayPaymentId:  razorpay_payment_id,
         updatedAt:          FieldValue.serverTimestamp(),
-      });
+      };
 
       if (couponRef) {
-        if (couponIsGlobal) {
-          transaction.update(couponRef, {
-            timesUsed: FieldValue.increment(1),
-            updatedAt: FieldValue.serverTimestamp(),
-          });
+        if (couponValidInsideTx) {
+          orderUpdates.couponConsumed = true;
+          if (couponIsGlobal) {
+            transaction.update(couponRef, {
+              timesUsed: FieldValue.increment(1),
+              updatedAt: FieldValue.serverTimestamp(),
+            });
+          } else {
+            transaction.update(couponRef, {
+              isUsed: true,
+              usedAt: FieldValue.serverTimestamp(),
+              orderId: orderId,
+              timesUsed: FieldValue.increment(1),
+            });
+          }
         } else {
-          transaction.update(couponRef, {
-            isUsed: true,
-            usedAt: FieldValue.serverTimestamp(),
-            orderId: orderId,
-            timesUsed: FieldValue.increment(1),
-          });
+          orderUpdates.couponConflict = true;
+          orderUpdates.couponConflictReason = couponConflictReason;
         }
       }
+
+      transaction.update(orderRef, orderUpdates);
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : '';

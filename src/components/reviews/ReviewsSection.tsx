@@ -1,9 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
-import type { Review } from '@/types';
+/* eslint-disable @next/next/no-img-element -- dynamic customer uploads & avatars */
+
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import Link from 'next/link';
+import RatingStars from './RatingStars';
+import WriteReviewModal from './WriteReviewModal';
+import { normalizeMediaUrl } from '@/lib/utils/videoThumbnail';
+import type { Review, ReviewMedia } from '@/types';
 import styles from './ReviewsSection.module.css';
 
 interface ReviewsSectionProps {
@@ -11,353 +16,349 @@ interface ReviewsSectionProps {
   onReviewsLoaded?: (reviews: Review[]) => void;
 }
 
+// Business Rule: Prioritize verified reviews + media + useful substantive content
+function scoreReviewQuality(r: Review): number {
+  let score = 0;
+  if (r.verifiedPurchase) score += 25;
+  if (r.media && r.media.length > 0) score += 30;
+  const len = (r.text || '').length;
+  if (len >= 25 && len <= 350) score += 15;
+  else if (len > 350) score += 8;
+  if (r.rating >= 4) score += 10;
+  else if (r.rating >= 3) score += 6;
+  return score;
+}
+
+// Assign visual card archetype: 'media' | 'quote' | 'text'
+function getCardType(review: Review, index: number): 'media' | 'quote' | 'text' {
+  if (review.media && review.media.length > 0) return 'media';
+  const textLen = (review.text || '').length;
+  // If very punchy and short, render as a large typography quote card
+  if (textLen > 0 && textLen <= 80 && (index % 3 === 1 || review.rating === 5)) {
+    return 'quote';
+  }
+  return 'text';
+}
+
 export default function ReviewsSection({ productId, onReviewsLoaded }: ReviewsSectionProps) {
-  const { firebaseUser, user, isAdmin } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingReview, setEditingReview] = useState<Review | null>(null);
-  const [formRating, setFormRating] = useState(5);
-  const [formText, setFormText] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+  const [isWriteModalOpen, setIsWriteModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [lightboxMedia, setLightboxMedia] = useState<{ media: ReviewMedia; review: Review } | null>(null);
 
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -340 : 340;
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  const onReviewsLoadedRef = useRef(onReviewsLoaded);
+  useEffect(() => {
+    onReviewsLoadedRef.current = onReviewsLoaded;
+  }, [onReviewsLoaded]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const lastFetchedKeyRef = useRef<string>('');
+
+  const fetchApiReviews = useCallback(async (force = false) => {
+    const cacheKey = `${productId || 'homepage'}`;
+    if (!force && lastFetchedKeyRef.current === cacheKey) {
+      return;
     }
-  };
+    lastFetchedKeyRef.current = cacheKey;
 
-  const fetchApiReviews = useCallback(async () => {
     try {
-      const url = productId ? `/api/reviews?productId=${encodeURIComponent(productId)}` : '/api/reviews';
+      const url = productId
+        ? `/api/reviews?productId=${encodeURIComponent(productId)}&limit=24`
+        : '/api/reviews?limit=24';
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data)) {
-          setReviews(data);
-          onReviewsLoaded?.(data);
-        }
+        const items: Review[] = Array.isArray(data) ? data : data.reviews || [];
+        setReviews(items);
+        onReviewsLoadedRef.current?.(items);
       }
     } catch (err) {
       console.warn('API reviews fetch error:', err);
+    } finally {
+      setLoading(false);
     }
-  }, [productId, onReviewsLoaded]);
+  }, [productId]);
 
-  // Fetch reviews from API and subscribe to real-time updates
   useEffect(() => {
     fetchApiReviews();
+  }, [fetchApiReviews]);
 
-    try {
-      const db = getFirestoreDb();
-      if (!db) return;
-
-      const { collection, query, where, orderBy, limit, onSnapshot } = getFirestoreModule();
-
-      // Cap the realtime stream — an unbounded collection listener streams every
-      // review to every visitor and grows unbounded with catalog size.
-      const q = productId
-        ? query(collection(db, 'reviews'), where('productId', '==', productId), limit(50))
-        : query(collection(db, 'reviews'), orderBy('createdAt', 'desc'), limit(20));
-
-      const unsub = onSnapshot(q, (snap: any) => {
-        const items: Review[] = snap.docs
-          .map((doc: any) => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              createdAt: data.createdAt?.toDate?.() ?? new Date(),
-              updatedAt: data.updatedAt?.toDate?.() ?? undefined,
-            } as Review;
-          })
-          // Keep parity with the public API: hide un-moderated reviews.
-          .filter((r: any) => (r as any).approved !== false);
-
-        // Sort client-side to prevent missing/null serverTimestamp index drops
-        items.sort((a: any, b: any) => {
-          const tA = new Date(a.createdAt).getTime() || 0;
-          const tB = new Date(b.createdAt).getTime() || 0;
-          return tB - tA;
-        });
-
-        if (items.length > 0) {
-          setReviews(items);
-          onReviewsLoaded?.(items);
-        }
-      }, async (_err: any) => {
-        fetchApiReviews();
-      });
-
-      return () => unsub();
-    } catch (err) {
-      console.warn('ReviewsSection firebase error:', err);
-    }
-  }, [fetchApiReviews, productId, onReviewsLoaded]);
-
-  const openAddForm = useCallback(() => {
-    setEditingReview(null);
-    setFormRating(5);
-    setFormText('');
-    setShowForm(true);
-  }, []);
-
-  const openEditForm = useCallback((review: Review) => {
-    setEditingReview(review);
-    setFormRating(review.rating);
-    setFormText(review.text);
-    setShowForm(true);
-  }, []);
-
-  const closeForm = useCallback(() => {
-    setShowForm(false);
-    setEditingReview(null);
-  }, []);
-
-  const handleSubmit = async () => {
-    if (!formText.trim()) return;
-    setSubmitting(true);
-
-    try {
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-
-      if (firebaseUser) {
-        try {
-          const idToken = await firebaseUser.getIdToken();
-          headers['Authorization'] = `Bearer ${idToken}`;
-        } catch (tokenErr) {
-          console.warn('[ReviewsSection] Failed to acquire ID token for POST:', tokenErr);
-        }
-      }
-
-      const res = await fetch('/api/reviews', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          reviewId: editingReview ? editingReview.id : undefined,
-          productId: productId || undefined,
-          rating: formRating,
-          text: formText.trim(),
-        }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to submit review');
-      }
-
-      closeForm();
-      fetchApiReviews();
-    } catch (err: any) {
-      console.error('Error submitting review:', err);
-      alert(err.message || 'Failed to submit review. Please ensure you are logged in.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (reviewId: string) => {
-    if (!confirm('Delete this review?')) return;
-    try {
-      const headers: Record<string, string> = {};
-      if (firebaseUser) {
-        try {
-          const idToken = await firebaseUser.getIdToken();
-          headers['Authorization'] = `Bearer ${idToken}`;
-        } catch (tokenErr) {
-          console.warn('[ReviewsSection] Failed to acquire ID token for DELETE:', tokenErr);
-        }
-      }
-
-      const res = await fetch(`/api/reviews?id=${reviewId}`, {
-        method: 'DELETE',
-        headers,
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to delete review');
-      }
-      fetchApiReviews();
-    } catch (err: any) {
-      console.error('Error deleting review:', err);
-      alert(err.message || 'Failed to delete review');
-    }
-  };
-
-  // Check if current user already has a review
-  const userReview = firebaseUser
-    ? reviews.find((r) => r.userId === firebaseUser.uid)
-    : null;
-
-  const canWriteReview = firebaseUser && !userReview;
-
-  const formatDate = (date: Date | string) => {
-    const d = typeof date === 'string' ? new Date(date) : date;
-    if (!d || isNaN(d.getTime())) return 'Recently';
-    return d.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+  // Ranked reviews according to authenticity & substance
+  const sortedReviews = useMemo(() => {
+    return [...reviews].sort((a, b) => {
+      const scoreDiff = scoreReviewQuality(b) - scoreReviewQuality(a);
+      if (scoreDiff !== 0) return scoreDiff;
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
     });
+  }, [reviews]);
+
+  // Ensure we have at least 8 items for a smooth, seamless infinite continuous marquee loop
+  const marqueeItems = useMemo(() => {
+    if (sortedReviews.length === 0) return [];
+    let items = [...sortedReviews];
+    while (items.length < 8) {
+      items = [...items, ...sortedReviews];
+    }
+    return items;
+  }, [sortedReviews]);
+
+  // Metrics summary
+  const totalCount = reviews.length;
+  const verifiedCount = reviews.filter((r) => r.verifiedPurchase).length;
+  const avgRating = totalCount > 0
+    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / totalCount).toFixed(1)
+    : '5.0';
+
+  const renderCard = (rev: Review, keyPrefix: string, index: number) => {
+    const cardType = getCardType(rev, index);
+    const dateFormatted = rev.createdAt
+      ? new Date(rev.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      : 'RECENT';
+
+    const authorInitials = rev.userName?.slice(0, 1).toUpperCase() || 'C';
+
+    if (cardType === 'media' && rev.media && rev.media.length > 0) {
+      const firstMedia = rev.media[0];
+      return (
+        <article
+          key={`${keyPrefix}-${rev.id}-${index}`}
+          className={`${styles.card} ${styles.cardMedia}`}
+          onClick={() => setLightboxMedia({ media: firstMedia, review: rev })}
+        >
+          <div className={styles.mediaBackdrop}>
+            {firstMedia.type === 'video' ? (
+              firstMedia.thumbnailUrl ? (
+                <img src={firstMedia.thumbnailUrl} alt="Customer video thumbnail" className={styles.mediaImg} />
+              ) : (
+                <video
+                  src={normalizeMediaUrl(firstMedia.url)}
+                  className={styles.mediaImg}
+                  muted
+                  playsInline
+                  preload="auto"
+                  onLoadedMetadata={(e) => {
+                    try {
+                      e.currentTarget.currentTime = 0.05;
+                    } catch {}
+                  }}
+                />
+              )
+            ) : (
+              <img src={normalizeMediaUrl(firstMedia.url)} alt="Customer wearing GERKINK" className={styles.mediaImg} />
+            )}
+            <div className={styles.mediaGradient} />
+            {firstMedia.type === 'video' && <span className={styles.videoBadge}>▶ VIDEO</span>}
+          </div>
+
+          <div className={styles.mediaCardContent}>
+            <div className={styles.cardHeader}>
+              <RatingStars rating={rev.rating} size="sm" />
+              {rev.verifiedPurchase && <span className={styles.verifiedTag}>✓ VERIFIED</span>}
+            </div>
+
+            <p className={styles.mediaQuote}>
+              &ldquo;{rev.title || rev.text.slice(0, 75)}&rdquo;
+            </p>
+
+            <div className={styles.cardFooter}>
+              <span className={styles.authorName}>{rev.userName || 'Customer'}</span>
+              <span className={styles.metaDate}>{dateFormatted}</span>
+            </div>
+          </div>
+        </article>
+      );
+    }
+
+    if (cardType === 'quote') {
+      return (
+        <article key={`${keyPrefix}-${rev.id}-${index}`} className={`${styles.card} ${styles.cardQuote}`}>
+          <div className={styles.cardHeader}>
+            <RatingStars rating={rev.rating} size="sm" />
+            {rev.verifiedPurchase && <span className={styles.verifiedTag}>✓ VERIFIED</span>}
+          </div>
+
+          <div className={styles.quoteBody}>
+            <p className={styles.boldQuoteText}>
+              &ldquo;{rev.title || rev.text}&rdquo;
+            </p>
+            {rev.title && rev.text && rev.text !== rev.title && (
+              <p className={styles.subTextSnippet}>
+                {rev.text.length > 90 ? `${rev.text.slice(0, 90)}…` : rev.text}
+              </p>
+            )}
+          </div>
+
+          <div className={styles.cardFooter}>
+            <div className={styles.authorGroup}>
+              <span className={styles.authorInitialCircle}>{authorInitials}</span>
+              <span className={styles.authorName}>{rev.userName || 'Customer'}</span>
+            </div>
+            <span className={styles.metaDate}>{dateFormatted}</span>
+          </div>
+        </article>
+      );
+    }
+
+    // Default: Text Card
+    return (
+      <article key={`${keyPrefix}-${rev.id}-${index}`} className={`${styles.card} ${styles.cardText}`}>
+        <div className={styles.cardHeader}>
+          <RatingStars rating={rev.rating} size="sm" />
+          {rev.verifiedPurchase ? (
+            <span className={styles.verifiedTag}>✓ VERIFIED</span>
+          ) : (
+            <span className={styles.neutralTag}>CUSTOMER</span>
+          )}
+        </div>
+
+        {rev.title && <h4 className={styles.cardTitle}>{rev.title}</h4>}
+        <p className={styles.standardBodyText}>
+          &ldquo;{rev.text.length > 130 ? `${rev.text.slice(0, 130)}…` : rev.text}&rdquo;
+        </p>
+
+        <div className={styles.cardFooter}>
+          <div className={styles.authorGroup}>
+            <span className={styles.authorInitialCircle}>{authorInitials}</span>
+            <span className={styles.authorName}>{rev.userName || 'Customer'}</span>
+          </div>
+          <span className={styles.metaDate}>{dateFormatted}</span>
+        </div>
+      </article>
+    );
   };
 
   return (
-    <section className={styles.section}>
+    <section className={styles.section} aria-label="Customer Reviews">
+      <div className={styles.glowBg} aria-hidden />
+
       <div className={styles.inner}>
-        {/* Header */}
+        {/* ── HEADER ── */}
         <div className={styles.header}>
           <div className={styles.headerLeft}>
-            <h2 className={styles.title}>What They Say</h2>
-            <p className={styles.subtitle}>
-              Real people. Real opinions. We didn&apos;t pay them — they just have taste.
+            <p className="text-label" style={{ color: 'var(--coral-200)' }}>
+              AUTHENTIC CUSTOMER VERDICTS
             </p>
+            <div className={styles.scoreRow}>
+              <span className={styles.bigScore}>{avgRating} ★</span>
+              <span className={styles.verifiedCountPill}>
+                {verifiedCount > 0 ? `${verifiedCount} VERIFIED REVIEWS` : `${totalCount} CUSTOMER VERDICTS`}
+              </span>
+            </div>
           </div>
-          
-          <div className={styles.headerRight}>
-            {reviews.length > 0 && (
-              <div className={styles.navControls}>
-                <button
-                  type="button"
-                  className={styles.navBtn}
-                  onClick={() => scroll('left')}
-                  aria-label="Scroll left"
-                >
-                  ←
-                </button>
-                <button
-                  type="button"
-                  className={styles.navBtn}
-                  onClick={() => scroll('right')}
-                  aria-label="Scroll right"
-                >
-                  →
-                </button>
-              </div>
-            )}
-            {(canWriteReview || isAdmin) && (
-              <button
-                className={`btn btn-primary btn-sm ${styles.writeBtn}`}
-                onClick={openAddForm}
-              >
-                Write a Review
-              </button>
-            )}
+
+          <div className={styles.headerActions}>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsWriteModalOpen(true);
+              }}
+            >
+              Write a Review →
+            </button>
           </div>
         </div>
 
-        {/* Reviews Grid */}
-        {reviews.length === 0 ? (
-          <div className={styles.empty}>
-            No reviews yet. Be the first to say something we can&apos;t delete.
+        {/* ── CONTENT AREA ── */}
+        {loading ? (
+          <div className={styles.loadingBox}>
+            <div className={styles.spinner} />
+            <span>Loading authentic verdicts…</span>
+          </div>
+        ) : sortedReviews.length === 0 ? (
+          /* 0 Reviews: Compact Launch State */
+          <div className={styles.emptyLaunchState}>
+            <div className={styles.launchTag}>FIRST CUSTOMER OPPORTUNITY</div>
+            <h3 className={styles.launchTitle}>NO REVIEWS. YET.</h3>
+            <p className={styles.launchDesc}>
+              Be the first GERKINK customer to leave your mark.
+            </p>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsWriteModalOpen(true);
+              }}
+            >
+              WRITE THE FIRST REVIEW →
+            </button>
           </div>
         ) : (
-          <div className={styles.grid} ref={scrollRef}>
-            {reviews.map((review) => (
-              <div key={review.id} className={styles.card}>
-                <div className={styles.cardTop}>
-                  <div className={styles.avatar}>
-                    {review.userPhoto ? (
-                      <img src={review.userPhoto} alt="" referrerPolicy="no-referrer" />
-                    ) : (
-                      review.userName.charAt(0).toUpperCase()
-                    )}
-                  </div>
-                  <div className={styles.cardMeta}>
-                    <span className={styles.cardName}>{review.userName}</span>
-                    <span className={styles.cardDate}>{formatDate(review.createdAt)}</span>
-                  </div>
-                  <div className={styles.stars}>
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <span
-                        key={s}
-                        className={`${styles.star} ${s <= review.rating ? styles.starFilled : ''}`}
-                      >
-                        ★
-                      </span>
-                    ))}
-                  </div>
-                </div>
+          /* Seamless Continuous Infinite Marquee Loop (Set A + Set B) */
+          <div className={styles.marqueeViewport}>
+            <div className={styles.marqueeTrack}>
+              {marqueeItems.map((rev, i) => renderCard(rev, `track1-${i}`, i))}
+              {marqueeItems.map((rev, i) => renderCard(rev, `track2-${i}`, i))}
+            </div>
+          </div>
+        )}
 
-                <p className={styles.cardText}>{review.text}</p>
-
-                {/* Actions — user can edit their own, admin can edit/delete any */}
-                {(firebaseUser?.uid === review.userId || isAdmin) && (
-                  <div className={styles.cardActions}>
-                    <button
-                      className={styles.actionBtn}
-                      onClick={() => openEditForm(review)}
-                    >
-                      Edit
-                    </button>
-                    {isAdmin && (
-                      <button
-                        className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                        onClick={() => handleDelete(review.id)}
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
+        {/* ── BOTTOM LINK ── */}
+        {sortedReviews.length > 0 && (
+          <div className={styles.footerLinkWrap}>
+            <Link href="/shop" className={styles.seeAllLink}>
+              EXPLORE ALL GERKINK COLLECTIONS →
+            </Link>
           </div>
         )}
       </div>
 
-      {/* ── Add/Edit Modal ─────────────────────────────── */}
-      {showForm && (
-        <div className={styles.overlay} onClick={closeForm}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>
-              {editingReview ? 'Edit Your Review' : 'Share Your Experience'}
-            </h3>
+      {/* ── WRITE REVIEW MODAL (PORTALED) ── */}
+      <WriteReviewModal
+        isOpen={isWriteModalOpen}
+        onClose={() => setIsWriteModalOpen(false)}
+        productId={productId}
+        onReviewSubmitted={fetchApiReviews}
+      />
 
-            <div className={styles.formGroup}>
-              <label className="input-label">Rating</label>
-              <div className={styles.starsInput}>
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    className={`${styles.starBtn} ${s <= formRating ? styles.starBtnFilled : ''}`}
-                    onClick={() => setFormRating(s)}
-                    aria-label={`${s} star${s > 1 ? 's' : ''}`}
-                  >
-                    ★
-                  </button>
-                ))}
+      {/* ── MEDIA LIGHTBOX (PORTALED) ── */}
+      {lightboxMedia && mounted && createPortal(
+        <div className={styles.lightboxOverlay} onClick={() => setLightboxMedia(null)}>
+          <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className={styles.lightboxClose}
+              onClick={() => setLightboxMedia(null)}
+            >
+              ✕
+            </button>
+            <div className={styles.lightboxMediaBox}>
+              {lightboxMedia.media.type === 'video' ? (
+                <video
+                  src={normalizeMediaUrl(lightboxMedia.media.url)}
+                  poster={lightboxMedia.media.thumbnailUrl}
+                  controls
+                  autoPlay
+                  playsInline
+                  preload="auto"
+                  className={styles.lightboxMedia}
+                />
+              ) : (
+                <img src={normalizeMediaUrl(lightboxMedia.media.url)} alt="Review upload full" className={styles.lightboxMedia} />
+              )}
+            </div>
+            <div className={styles.lightboxSidebar}>
+              <div className={styles.lightboxUserRow}>
+                <span className={styles.lightboxUserName}>{lightboxMedia.review.userName || 'Customer'}</span>
+                {lightboxMedia.review.verifiedPurchase && (
+                  <span className={styles.verifiedTag}>✓ VERIFIED PURCHASE</span>
+                )}
               </div>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className="input-label">Your Review</label>
-              <textarea
-                className={styles.textarea}
-                value={formText}
-                onChange={(e) => setFormText(e.target.value.slice(0, 500))}
-                placeholder="Tell us what you really think — we can take it."
-                maxLength={500}
-              />
-              <span className={styles.charCount}>{formText.length}/500</span>
-            </div>
-
-            <div className={styles.modalActions}>
-              <button className="btn btn-secondary btn-sm" onClick={closeForm}>
-                Cancel
-              </button>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={handleSubmit}
-                disabled={submitting || !formText.trim()}
-              >
-                {submitting ? 'Posting...' : editingReview ? 'Save Changes' : 'Post Review'}
-              </button>
+              <RatingStars rating={lightboxMedia.review.rating} size="sm" />
+              {lightboxMedia.review.title && (
+                <h4 className={styles.lightboxTitle}>{lightboxMedia.review.title}</h4>
+              )}
+              <p className={styles.lightboxBody}>{lightboxMedia.review.text}</p>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

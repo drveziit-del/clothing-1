@@ -1,3 +1,4 @@
+import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
@@ -55,13 +56,35 @@ export async function POST(request: NextRequest) {
   }
 
   // 3. Save to Firestore — treasury credentials encrypted at rest (AES-256-GCM)
-  //    per project security rules; the public GET route decrypts before serving.
+  //    Explicitly map every field to prevent sensitive plaintext leakage via object spreading.
   try {
+    const {
+      bankName,
+      accountHolder,
+      accountNumber,
+      routingNumber,
+      swiftBic,
+      bankCountry,
+      currency,
+      wiseEmail,
+      wiseTag,
+      referenceInstructions,
+      supportNotice,
+    } = result.data;
+
     await adminDb.collection('settings').doc('bank_details').set({
-      ...result.data,
-      accountNumber: result.data.accountNumber ? encrypt(result.data.accountNumber) : result.data.accountNumber,
-      routingNumber: result.data.routingNumber ? encrypt(result.data.routingNumber) : result.data.routingNumber,
-      swiftBic: result.data.swiftBic ? encrypt(result.data.swiftBic) : result.data.swiftBic,
+      bankName,
+      bankCountry,
+      currency,
+      referenceInstructions: referenceInstructions ?? null,
+      supportNotice: supportNotice ?? null,
+      // Sensitive fields encrypted at rest
+      accountHolder: accountHolder ? encrypt(accountHolder) : '',
+      accountNumber: accountNumber ? encrypt(accountNumber) : '',
+      routingNumber: routingNumber ? encrypt(routingNumber) : null,
+      swiftBic: swiftBic ? encrypt(swiftBic) : null,
+      wiseEmail: wiseEmail ? encrypt(wiseEmail) : null,
+      wiseTag: wiseTag ? encrypt(wiseTag) : null,
       updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true });
 

@@ -8,7 +8,7 @@ import { FieldValue } from 'firebase-admin/firestore';
  * GET /api/user/bank
  * Retrieve the saved bank details for the logged-in user (decrypted).
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const cookieStore = await cookies();
   const session = cookieStore.get('session')?.value;
   if (!session) {

@@ -50,70 +50,133 @@ export async function POST(request: NextRequest) {
 
   const { orderId, action, adminNote } = result.data;
 
-  // 3. Process action in Firestore
+  // 3. Process action in Firestore transaction
   try {
     const orderRef = adminDb.collection('orders').doc(orderId);
-    const orderDoc = await orderRef.get();
 
-    if (!orderDoc.exists) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    let transitionWon = false;
+    let isAlreadyApproved = false;
+    let isAlreadyRejected = false;
+
+    try {
+      await adminDb.runTransaction(async (transaction) => {
+        const doc = await transaction.get(orderRef);
+        if (!doc.exists) {
+          throw new Error('ORDER_NOT_FOUND');
+        }
+
+        const data = doc.data()!;
+
+        if (action === 'approve') {
+          // If already paid and captured, treat as idempotent retry
+          if (data.status === 'paid' && data.paymentCaptured === true) {
+            isAlreadyApproved = true;
+            return;
+          }
+
+          if (!['awaiting_wire_confirmation', 'pending'].includes(data.status)) {
+            throw new Error(`INVALID_STATUS:${data.status}`);
+          }
+
+          transaction.update(orderRef, {
+            status: 'paid',
+            paymentCaptured: true,
+            wireApprovedBy: adminUid,
+            wireApprovedAt: FieldValue.serverTimestamp(),
+            adminNote: adminNote || 'Wire transfer verified and approved by admin treasury desk.',
+            updatedAt: FieldValue.serverTimestamp(),
+          });
+          transitionWon = true;
+        } else {
+          // Reject action
+          if (data.status === 'cancelled') {
+            isAlreadyRejected = true;
+            return;
+          }
+
+          if (['paid', 'shipped', 'fulfilled', 'in_production'].includes(data.status)) {
+            throw new Error(`INVALID_STATUS:${data.status}`);
+          }
+
+          transaction.update(orderRef, {
+            status: 'cancelled',
+            wireRejectedBy: adminUid,
+            wireRejectedAt: FieldValue.serverTimestamp(),
+            adminNote: adminNote || 'Wire transfer rejected or not received.',
+            updatedAt: FieldValue.serverTimestamp(),
+          });
+          transitionWon = true;
+        }
+      });
+    } catch (txErr: any) {
+      if (txErr?.message === 'ORDER_NOT_FOUND') {
+        return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+      }
+      if (txErr?.message?.startsWith('INVALID_STATUS:')) {
+        const st = txErr.message.replace('INVALID_STATUS:', '');
+        return NextResponse.json({ error: `Cannot ${action} order with status: ${st}` }, { status: 409 });
+      }
+      throw txErr;
     }
 
-    const orderData = orderDoc.data()!;
-
-    // Status precondition: prevent resurrecting cancelled/shipped orders or double-approval
-    if (action === 'approve' && !['awaiting_wire_confirmation', 'pending'].includes(orderData.status)) {
-      return NextResponse.json({ error: `Cannot approve order with status: ${orderData.status}` }, { status: 409 });
-    }
-
+    // Downstream side effects only executed by the winning transition
     if (action === 'approve') {
-      await orderRef.update({
-        status: 'paid',
-        paymentCaptured: true,
-        wireApprovedBy: adminUid,
-        wireApprovedAt: FieldValue.serverTimestamp(),
-        adminNote: adminNote || 'Wire transfer verified and approved by admin treasury desk.',
-        updatedAt: FieldValue.serverTimestamp(),
-      });
+      if (isAlreadyApproved) {
+        return NextResponse.json({
+          success: true,
+          orderId,
+          status: 'paid',
+          idempotent: true,
+          message: 'Wire transfer payment already approved and allocation confirmed.',
+        });
+      }
 
-      await appendOrderHistory(orderId, 'wire_deposit_approved_by_admin', 'admin', {
-        adminUid,
-        adminNote,
-        approvedAt: new Date().toISOString(),
-      });
+      if (transitionWon) {
+        await appendOrderHistory(orderId, 'wire_deposit_approved_by_admin', 'admin', {
+          adminUid,
+          adminNote,
+          approvedAt: new Date().toISOString(),
+        });
 
-      // Enqueue fulfillment (Printify submission, confirmation emails, referral engine).
-      // Without this, wire-approved orders never reached production.
-      await enqueueOrderProcessing(orderId);
+        // Enqueue fulfillment (Printify submission, confirmation emails, referral engine).
+        // Only the single winner enqueues processing!
+        await enqueueOrderProcessing(orderId);
 
-      return NextResponse.json({
-        success: true,
-        orderId,
-        status: 'paid',
-        message: 'Wire transfer payment approved and allocation confirmed!',
-      });
+        return NextResponse.json({
+          success: true,
+          orderId,
+          status: 'paid',
+          message: 'Wire transfer payment approved and allocation confirmed!',
+        });
+      }
     } else {
-      await orderRef.update({
-        status: 'cancelled',
-        wireRejectedBy: adminUid,
-        wireRejectedAt: FieldValue.serverTimestamp(),
-        adminNote: adminNote || 'Wire transfer rejected or not received.',
-        updatedAt: FieldValue.serverTimestamp(),
-      });
+      if (isAlreadyRejected) {
+        return NextResponse.json({
+          success: true,
+          orderId,
+          status: 'cancelled',
+          idempotent: true,
+          message: 'Wire transfer already rejected.',
+        });
+      }
 
-      await appendOrderHistory(orderId, 'wire_deposit_rejected_by_admin', 'admin', {
-        adminUid,
-        adminNote,
-        rejectedAt: new Date().toISOString(),
-      });
+      if (transitionWon) {
+        await appendOrderHistory(orderId, 'wire_deposit_rejected_by_admin', 'admin', {
+          adminUid,
+          adminNote,
+          rejectedAt: new Date().toISOString(),
+        });
 
-      return NextResponse.json({
-        success: true,
-        orderId,
-        status: 'cancelled',
-        message: 'Wire transfer rejected.',
-      });
+        return NextResponse.json({
+          success: true,
+          orderId,
+          status: 'cancelled',
+          message: 'Wire transfer rejected.',
+        });
+      }
     }
+
+    return NextResponse.json({ error: 'State transition conflict' }, { status: 409 });
   } catch (err) {
     console.error('Error approving/rejecting wire order:', err);
     return NextResponse.json({ error: 'Database update failed' }, { status: 500 });

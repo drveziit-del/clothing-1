@@ -1,14 +1,16 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element -- dynamic external avatars, dimension-free layout */
+
 import { useAuth } from '@/context/AuthContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState, useMemo, useRef, Suspense } from 'react';
 import { getFirestoreDb, getFirestoreModule, getFirebaseStorage, getStorageModule, getFirebaseAuth } from '@/lib/firebase/config';
 import { useRoast } from '@/hooks/useRoast';
 import { BentoGrid, BentoCard } from '@/components/ui/BentoGrid';
+import DeleteAccountModal from '@/components/account/DeleteAccountModal';
 import styles from './page.module.css';
 import type { Coupon, Referral, Order } from '@/types';
 
@@ -52,7 +54,7 @@ function parseFirestoreDate(timestamp: any): Date {
   return isNaN(date.getTime()) ? new Date() : date;
 }
 
-export type AccountTab = 'dashboard' | 'orders' | 'payouts' | 'analytics' | 'rewards' | 'profile';
+export type AccountTab = 'dashboard' | 'orders' | 'custom_designs' | 'payouts' | 'analytics' | 'rewards' | 'profile';
 
 export default function AccountPage() {
   return (
@@ -63,17 +65,41 @@ export default function AccountPage() {
 }
 
 function AccountPageContent() {
-  const { user, loading } = useAuth();
+  const { user, firebaseUser, loading } = useAuth();
   const { formatPrice } = useCurrency();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useRoast();
   const [copied, setCopied] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Firestore Subscriptions
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+
+  // Custom Design Requests State
+  const [customRequests, setCustomRequests] = useState<any[]>([]);
+  const [customLoading, setCustomLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    async function loadCustomRequests() {
+      setCustomLoading(true);
+      try {
+        const res = await fetch('/api/custom-design/my-requests');
+        if (res.ok) {
+          const data = await res.json();
+          setCustomRequests(data.requests || []);
+        }
+      } catch {
+        // non-fatal
+      } finally {
+        setCustomLoading(false);
+      }
+    }
+    loadCustomRequests();
+  }, [user]);
 
   // Orders Tab Filter States
   const [orderCollectionFilter, setOrderCollectionFilter] = useState<'all' | 'society_fuckers' | 'valueless_bitches'>('all');
@@ -92,7 +118,7 @@ function AccountPageContent() {
   // Handle URL tab parameter
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['dashboard', 'orders', 'payouts', 'analytics', 'rewards', 'profile'].includes(tabParam)) {
+    if (tabParam && ['dashboard', 'orders', 'custom_designs', 'payouts', 'analytics', 'rewards', 'profile'].includes(tabParam)) {
       setActiveTab(tabParam as AccountTab);
     }
   }, [searchParams]);
@@ -1649,6 +1675,42 @@ function AccountPageContent() {
             </button>
           </form>
         </section>
+
+        {/* Danger Zone: Account Deletion */}
+        <section
+          className={styles.card}
+          style={{
+            marginTop: '2rem',
+            border: '1px solid rgba(255, 71, 87, 0.35)',
+            background: 'rgba(255, 71, 87, 0.04)',
+            borderRadius: '12px',
+            padding: '1.5rem',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+            <span style={{ fontSize: '1.25rem' }} aria-hidden>⚠️</span>
+            <h2 className={styles.cardTitle} style={{ color: '#ff4757', margin: 0, fontSize: '1.15rem' }}>
+              Danger Zone
+            </h2>
+          </div>
+          <p className={styles.cardDesc} style={{ marginBottom: '1.25rem', color: '#9ca3af', fontSize: '0.85rem' }}>
+            Permanently delete your account, authentication credentials, and encrypted payout data. Your personal association will be removed from all records. This action cannot be undone.
+          </p>
+          <button
+            type="button"
+            onClick={() => setIsDeleteModalOpen(true)}
+            className="btn btn-secondary"
+            style={{
+              borderColor: '#ff4757',
+              color: '#ff4757',
+              fontWeight: 700,
+              minHeight: '44px',
+              minWidth: '44px',
+            }}
+          >
+            Delete My Account
+          </button>
+        </section>
       </div>
     </div>
   );
@@ -1855,7 +1917,7 @@ function AccountPageContent() {
                           <div className={styles.itemMeta}>
                             <span className={styles.itemTitle}>Bespoke Allocation: {order.prebookName || 'Private Client Piece'}</span>
                             <span className={styles.itemSpecs}>
-                              Priority Escrow Deposit Reserved • Tier Allocation
+                              Priority Allocation Deposit Reserved • Tier Allocation
                             </span>
                           </div>
                         </div>
@@ -1871,7 +1933,7 @@ function AccountPageContent() {
                     <div className={styles.prebookCallout}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                         <span className={styles.prebookCalloutTitle}>
-                          ✦ Bespoke Manufacturing &amp; Escrow Deposit Details
+                          ✦ Bespoke Manufacturing &amp; Allocation Deposit Details
                         </span>
                         <span style={{ fontSize: '0.75rem', color: '#2ed573', fontWeight: 800 }}>
                           Deposit: {formatPrice(order.total || 500)}
@@ -1887,7 +1949,7 @@ function AccountPageContent() {
                       {isAwaitingWire && (
                         <div style={{ background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.3)', borderRadius: '4px', padding: '0.65rem 0.85rem', fontSize: '0.8rem', color: '#FFD700', marginTop: '0.25rem' }}>
                           <strong>Submitted Wire Reference:</strong> {order.wireDetails?.senderReference || 'Submitted'}.
-                          <div style={{ marginTop: '0.25rem', color: '#ddd', fontSize: '0.75rem' }}>
+                          <div style={{ marginTop: '0.25rem', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
                             Our executive treasury desk is auditing settlement. Your priority allocation sequence is reserved.
                           </div>
                         </div>
@@ -1900,7 +1962,7 @@ function AccountPageContent() {
                     <div className={styles.footerPayInfo}>
                       <span>
                         Payment:{' '}
-                        <strong style={{ color: '#fff' }}>
+                        <strong style={{ color: 'var(--text-primary)' }}>
                           {order.paymentGateway === 'wise_bank_transfer'
                             ? '🏦 Wise / Wire'
                             : order.paymentGateway === 'paypal'
@@ -1945,6 +2007,91 @@ function AccountPageContent() {
     </div>
   );
 
+  const renderCustomDesignsTab = () => (
+    <div className={styles.tabView}>
+      <div className={styles.header}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h1 className="text-display">My Custom Requests</h1>
+            <p className={styles.subhead}>Track your custom garments, studio proofs, and design iterations.</p>
+          </div>
+          <Link href="/custom-design" className="btn btn-primary btn-sm">
+            + Start New Request →
+          </Link>
+        </div>
+      </div>
+
+      {customLoading ? (
+        <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
+          Loading your custom design matrix...
+        </div>
+      ) : customRequests.length === 0 ? (
+        <div className={styles.emptyOrdersState}>
+          <span className={styles.emptyOrdersIcon}>✦</span>
+          <h3 className={styles.emptyOrdersTitle}>No Custom Requests Yet</h3>
+          <p className={styles.emptyOrdersSubtitle}>
+            Got an idea, graphic, or weird concept? Submit a custom design request and our atelier team will turn it into GERKINK.
+          </p>
+          <Link href="/custom-design" className="btn btn-primary btn-sm" style={{ marginTop: '0.5rem' }}>
+            Submit Your Concept →
+          </Link>
+        </div>
+      ) : (
+        <div className={styles.ordersList}>
+          {customRequests.map((req) => (
+            <div key={req.id} className={styles.orderCard}>
+              <div className={styles.orderCardHeader}>
+                <div className={styles.orderMetaLeft}>
+                  <div className={styles.orderIdBadge}>
+                    <span>#{req.requestId || req.id.slice(0, 10)}</span>
+                  </div>
+                  <span className={styles.orderDateText}>
+                    Submitted {formatFirestoreDate(req.createdAt)}
+                  </span>
+                </div>
+                <div className={styles.orderBadgesRight}>
+                  <span className={styles.collectionTagGold}>
+                    ✦ CUSTOM {req.productType?.toUpperCase()}
+                  </span>
+                  <span className={req.paymentStatus === 'paid' ? styles.statusBadgePaid : styles.statusBadgeProcessing}>
+                    ${req.prepaymentAmount || 15} {req.paymentStatus === 'paid' ? 'PAID ✓' : 'PENDING'}
+                  </span>
+                </div>
+              </div>
+
+              <div className={styles.orderContent} style={{ padding: '1rem 1.25rem' }}>
+                <p style={{ fontSize: '0.9rem', color: '#e5e7eb', margin: '0 0 0.5rem', fontStyle: 'italic' }}>
+                  "{req.description ? req.description.slice(0, 140) + (req.description.length > 140 ? '...' : '') : 'Custom concept'}"
+                </p>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  <span>Level: <strong>{req.plan === 'better_quality' || req.plan === 'priority' ? 'Better Quality ($20)' : 'Regular ($15)'}</strong></span>
+                  <span>Files: <strong>{req.uploads?.length || 0} attached</strong></span>
+                  <span>Status: <strong style={{ color: req.status === 'NEEDS_INFORMATION' ? '#f59e0b' : '#ff6b6b' }}>{req.status?.replace(/_/g, ' ')}</strong></span>
+                </div>
+              </div>
+
+              <div className={styles.orderFooter}>
+                <div className={styles.footerPrice}>
+                  <span className={styles.totalPriceLabel}>Prepayment</span>
+                  <span className={styles.totalPriceAmount}>${req.prepaymentAmount || 15} USD</span>
+                </div>
+                <div className={styles.footerActions}>
+                  <Link
+                    href={`/account/custom-design/${req.id}`}
+                    className="btn btn-secondary btn-sm"
+                    style={{ fontSize: '0.75rem' }}
+                  >
+                    View Request Details →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
   // State-driven sidebar container rendering
 
   return (
@@ -1968,6 +2115,12 @@ function AccountPageContent() {
             className={`${styles.sidebarButton} ${activeTab === 'orders' ? styles.sidebarButtonActive : ''}`}
           >
             📦 My Orders {orderCounts.all > 0 && <span className="tag" style={{ marginLeft: 'auto', fontSize: '0.7rem', padding: '0.1rem 0.4rem' }}>{orderCounts.all}</span>}
+          </button>
+          <button
+            onClick={() => setActiveTab('custom_designs')}
+            className={`${styles.sidebarButton} ${activeTab === 'custom_designs' ? styles.sidebarButtonActive : ''}`}
+          >
+            ✦ Custom Requests {customRequests.length > 0 && <span className="tag" style={{ marginLeft: 'auto', fontSize: '0.7rem', padding: '0.1rem 0.4rem' }}>{customRequests.length}</span>}
           </button>
           <button
             onClick={() => setActiveTab('payouts')}
@@ -1999,12 +2152,22 @@ function AccountPageContent() {
         <main className={styles.mainContent}>
           {activeTab === 'dashboard' && renderDashboardTab()}
           {activeTab === 'orders' && renderOrdersTab()}
+          {activeTab === 'custom_designs' && renderCustomDesignsTab()}
           {activeTab === 'payouts' && renderPayoutsTab()}
           {activeTab === 'analytics' && renderAnalyticsTab()}
           {activeTab === 'rewards' && renderRewardsTab()}
           {activeTab === 'profile' && renderProfileTab()}
         </main>
       </div>
+
+      {isDeleteModalOpen && (
+        <DeleteAccountModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          userEmail={user.email || ''}
+          firebaseUser={firebaseUser}
+        />
+      )}
     </div>
   );
 }

@@ -34,7 +34,9 @@ env:
   - variable: SMTP_USER
     value: gerkinkofficial@gmail.com
   - variable: ADMIN_EMAIL
-    value: gerkinkofficial@gmail.com
+    value: support@gerkink.shop
+  - variable: CUSTOM_DESIGN_ALERT_EMAIL
+    value: custom@gerkink.shop
 
   - variable: NEXT_PUBLIC_PAYPAL_CLIENT_ID
     value: BAA0FXeEfhQGPJRKfisCPkD1Y1g2ogXYXnJGiVPKEPZQB7DoCPBFxET8LzgJVKCQJpy6gCgrmNt4sqSvRg

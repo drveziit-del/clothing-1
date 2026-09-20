@@ -619,3 +619,22 @@
   border-color: #e2e8f0;
 }
 
+[data-theme="light"] .badgePlatinum {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+  color: #1E293B;
+  box-shadow: none;
+}
+
+[data-theme="light"] .navTabActiveGold {
+  color: #0F172A !important;
+  background: #F1F5F9 !important;
+  border-color: #0F172A !important;
+}
+
+[data-theme="light"] .navTabActiveMist {
+  color: #0F172A !important;
+  background: #F1F5F9 !important;
+  border-color: #0F172A !important;
+}
+

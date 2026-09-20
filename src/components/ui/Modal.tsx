@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, ReactNode } from 'react';
+import { ReactNode } from 'react';
+import { useFocusTrap } from '@/lib/utils/useFocusTrap';
 import styles from './Modal.module.css';
 
 interface ModalProps {
@@ -12,21 +13,7 @@ interface ModalProps {
 }
 
 export default function Modal({ open, onClose, title, children, maxWidth = '560px' }: ModalProps) {
-  const overlayRef = useRef<HTMLDivElement>(null);
-
-  // Trap focus + close on Escape
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handler);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', handler);
-      document.body.style.overflow = '';
-    };
-  }, [open, onClose]);
+  const overlayRef = useFocusTrap<HTMLDivElement>(open, onClose);
 
   if (!open) return null;
 

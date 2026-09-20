@@ -122,7 +122,7 @@ export default function TierPyramid({ products }: TierPyramidProps) {
             </button>
 
             {TIER_CONFIGS.map((config) => {
-              const count = products.filter((p) => p.tier === config.tier && p.isPublished).length;
+              const _count = products.filter((p) => p.tier === config.tier && p.isPublished).length;
               const isActive = selectedTier === config.tier;
               const activeClass =
                 config.tier === 1

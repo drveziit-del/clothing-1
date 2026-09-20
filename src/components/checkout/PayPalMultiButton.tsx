@@ -7,6 +7,7 @@ import {
 } from '@paypal/react-paypal-js';
 import { useCart } from '@/context/CartContext';
 import { useRoast } from '@/hooks/useRoast';
+import { useNetworkStatus } from '@/context/NetworkStatusContext';
 
 interface PayPalMultiButtonProps {
   amountUSD: number;
@@ -19,7 +20,6 @@ interface PayPalMultiButtonProps {
 }
 
 export default function PayPalMultiButton({
-  amountUSD,
   items,
   referralCode,
   couponCode,
@@ -29,6 +29,7 @@ export default function PayPalMultiButton({
 }: PayPalMultiButtonProps) {
   const { clearCart } = useCart();
   const { toast } = useRoast();
+  const { isOnline } = useNetworkStatus();
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || '';
 
   if (!clientId) {
@@ -40,6 +41,12 @@ export default function PayPalMultiButton({
   }
 
   const handleCreateOrder = async () => {
+    if (!isOnline) {
+      const msg = 'Payment cannot be processed while offline. Please check your connection.';
+      toast(msg, 'error');
+      onError?.(msg);
+      throw new Error(msg);
+    }
     try {
       const res = await fetch('/api/paypal/create-order', {
         method: 'POST',
@@ -66,6 +73,12 @@ export default function PayPalMultiButton({
         throw new Error(errMsg);
       }
 
+      if (data.guestToken) {
+        sessionStorage.setItem('pending_paypal_guest_token', data.guestToken);
+      } else {
+        sessionStorage.removeItem('pending_paypal_guest_token');
+      }
+
       sessionStorage.setItem('pending_paypal_order_id', data.orderId);
       return data.paypalOrderId;
     } catch (err: any) {
@@ -79,12 +92,14 @@ export default function PayPalMultiButton({
   const handleApprove = async (data: { orderID: string }) => {
     try {
       const storedOrderId = sessionStorage.getItem('pending_paypal_order_id') || '';
+      const storedGuestToken = sessionStorage.getItem('pending_paypal_guest_token') || undefined;
       const res = await fetch('/api/paypal/capture-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           orderId: storedOrderId,
           paypalOrderId: data.orderID,
+          guestToken: storedGuestToken,
         }),
       });
 
@@ -104,6 +119,7 @@ export default function PayPalMultiButton({
       const finalOrderId = resData.orderId || storedOrderId;
       clearCart();
       sessionStorage.removeItem('pending_paypal_order_id');
+      sessionStorage.removeItem('pending_paypal_guest_token');
       toast("Order confirmed! Payment processed via PayPal.", 'success');
       onSuccess?.(finalOrderId);
     } catch (err: any) {
@@ -115,7 +131,16 @@ export default function PayPalMultiButton({
 
   return (
     <PayPalScriptProvider options={{ clientId, currency: 'USD', intent: 'capture' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem', maxWidth: '420px', width: '100%' }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.75rem',
+        marginTop: '1rem',
+        maxWidth: '420px',
+        width: '100%',
+        pointerEvents: isOnline ? 'auto' : 'none',
+        opacity: isOnline ? 1 : 0.55,
+      }}>
         <style>{`
           iframe:focus-visible, .paypal-buttons:focus-visible, div[data-funding-source]:focus-visible {
             outline: 2px solid var(--accent, #ff4444) !important;
@@ -123,13 +148,31 @@ export default function PayPalMultiButton({
           }
         `}</style>
 
+        {!isOnline && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            background: 'rgba(255, 77, 77, 0.12)',
+            border: '1px solid rgba(255, 77, 77, 0.35)',
+            borderRadius: '6px',
+            padding: '0.65rem 0.85rem',
+            color: '#ff6b6b',
+            fontSize: '0.8rem',
+            fontFamily: 'var(--font-mono, monospace)',
+          }}>
+            <span>🔴</span>
+            <span>Offline: Payment processing paused until connection is restored.</span>
+          </div>
+        )}
+
         {/* 1. Direct Express PayPal Button */}
         <PayPalButtons
           fundingSource={FUNDING.PAYPAL}
           style={{ layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal', height: 48 }}
           createOrder={handleCreateOrder}
           onApprove={handleApprove}
-          onError={(err) => toast('PayPal transaction error', 'error')}
+          onError={(_err) => toast('PayPal transaction error', 'error')}
         />
 
         {/* 2. Standalone Debit or Credit Card Button */}
@@ -138,7 +181,7 @@ export default function PayPalMultiButton({
           style={{ layout: 'vertical', color: 'black', shape: 'rect', label: 'pay', height: 48 }}
           createOrder={handleCreateOrder}
           onApprove={handleApprove}
-          onError={(err) => toast('Card transaction error', 'error')}
+          onError={(_err) => toast('Card transaction error', 'error')}
         />
       </div>
     </PayPalScriptProvider>

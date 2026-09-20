@@ -44,7 +44,7 @@ export default function RefundPage() {
         "name": "How do I request a replacement?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Please email us at gerkinkofficial@gmail.com or submit a message on our Contact Page. Include your order number (e.g. #2347), a description of the issue, and clear photo evidence of the damage or defect."
+          "text": "Please email us at support@gerkink.shop or submit a message on our Contact Page. Include your order number (e.g. #2347), a description of the issue, and clear photo evidence of the damage or defect."
         }
       }
     ]
@@ -94,7 +94,7 @@ export default function RefundPage() {
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>3. How do I request a replacement?</h2>
             <p className={styles.bodyText}>
-              Please email us at <span className={styles.emphasis}>gerkinkofficial@gmail.com</span> or submit a message on our{' '}
+              Please email us at <span className={styles.emphasis}>support@gerkink.shop</span> or submit a message on our{' '}
               <Link href="/contact" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>
                 Contact Page
               </Link>.

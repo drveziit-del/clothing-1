@@ -1,0 +1,2430 @@
+{
+  "home": {
+    "events": {
+      "fetchCalls": [
+        {
+          "url": "/api/analytics/visit",
+          "method": "POST",
+          "start": 8765,
+          "provider": "LayoutWrapper",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/1k5e1my859ux2.js:8:94551 -> at iw (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:101652) -> at ug (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:125794)",
+          "duration": 698,
+          "status": 200
+        },
+        {
+          "url": "/api/health",
+          "method": "GET",
+          "start": 8808,
+          "provider": "NetworkStatusProvider",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:30051 -> at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:30817 -> at iw (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:101652)",
+          "duration": 659,
+          "status": 200
+        },
+        {
+          "url": "/api/currency",
+          "method": "GET",
+          "start": 8823,
+          "provider": "CurrencyProvider",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:28648 -> at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:28899 -> at iw (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:101652)",
+          "duration": 649,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 9380,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 532,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 9401,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 533,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 9408,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 538,
+          "status": 200
+        },
+        {
+          "url": "/api/reviews?limit=24",
+          "method": "GET",
+          "start": 9837,
+          "provider": "Unknown",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/39wv8psnipsou.js:1:4580 -> at http://127.0.0.1:3005/_next/static/chunks/39wv8psnipsou.js:1:4770 -> at iw (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:101652)",
+          "duration": 1031,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 10006,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 246,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 10056,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 247,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 10123,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 398,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 10138,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 405,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 10321,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 243,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 10461,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 262,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 10647,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 544,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 10676,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 554,
+          "status": 200
+        },
+        {
+          "url": "/api/auth/session",
+          "method": "DELETE",
+          "start": 10925,
+          "provider": "AuthProvider",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:24354 -> at http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:1:34268",
+          "duration": 465,
+          "status": 200
+        },
+        {
+          "url": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=98001&CVER=22&X-HTTP-Session-Id=gsessionid&zx=7w0bjxru64h0&t=1",
+          "method": "GET",
+          "start": 11339,
+          "provider": "Firebase Firestore",
+          "stack": "at n.send (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:89728) -> at n.ea (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:100510) -> at eD (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:77714)",
+          "duration": 634,
+          "status": 200
+        },
+        {
+          "url": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=6p6MF-s1buock5IkZl1krzypFyfULOB4Rpy-_xU3O-eHK_MdOelA2g&VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=rpc&SID=a42coqgzg5jqOLEB6iJ00A&AID=0&CI=1&TYPE=xmlhttp&zx=kyxgaycz1ux6&t=1",
+          "method": "GET",
+          "start": 12059,
+          "provider": "Firebase Firestore",
+          "stack": "at n.send (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:89728) -> at n.ea (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:100510) -> at eD (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:77748)",
+          "duration": 0,
+          "status": 0
+        }
+      ],
+      "storageReads": [
+        {
+          "storageType": "sessionStorage",
+          "key": "gk_visited",
+          "time": 8754,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_theme",
+          "time": 9179,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "gerkink_splash_seen",
+          "time": 9827,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gkink_user_currency",
+          "time": 10011,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "firebase:authUser:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 10825,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "firebase:authUser:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 10826,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "firebase:redirectUser:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 10875,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "firebase:redirectUser:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 10876,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "firebase:pendingRedirect:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 10881,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_cart_guest",
+          "time": 11415,
+          "hasValue": false
+        }
+      ],
+      "storageWrites": [
+        {
+          "storageType": "sessionStorage",
+          "key": "gk_visited",
+          "time": 8760
+        },
+        {
+          "storageType": "localStorage",
+          "key": "__sak",
+          "time": 9213
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "__sak",
+          "time": 9214
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "gerkink_splash_seen",
+          "time": 9827
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "__sak",
+          "time": 10874
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "__sak",
+          "time": 10881
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_cart_guest",
+          "time": 11417
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_cart_guest",
+          "time": 11527
+        }
+      ],
+      "reflowTriggers": [
+        {
+          "type": "getBoundingClientRect",
+          "time": 8728,
+          "tag": "DIV",
+          "className": "AnnouncementBar-module__tQURPG__announcementViewport"
+        },
+        {
+          "type": "getBoundingClientRect",
+          "time": 8729,
+          "tag": "DIV",
+          "className": "Navbar-module__cRh5nW__inner"
+        },
+        {
+          "type": "getBoundingClientRect",
+          "time": 9267,
+          "tag": "DIV",
+          "className": "AnnouncementBar-module__tQURPG__announcementViewport"
+        },
+        {
+          "type": "getBoundingClientRect",
+          "time": 9267,
+          "tag": "DIV",
+          "className": "Navbar-module__cRh5nW__inner"
+        }
+      ],
+      "lcpCandidates": [
+        {
+          "renderTime": 2256,
+          "loadTime": 0,
+          "startTime": 2256,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar-module__tQURPG__giantWord",
+          "isText": true
+        },
+        {
+          "renderTime": 6604,
+          "loadTime": 0,
+          "startTime": 6604,
+          "size": 22378,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.page-module___8aEwW__lineAccent.page-module___8aEwW__noWrap.animate-fadeUp.delay-500",
+          "isText": true
+        }
+      ],
+      "longTasks": [
+        {
+          "startTime": 5313,
+          "duration": 857
+        },
+        {
+          "startTime": 6584,
+          "duration": 118
+        },
+        {
+          "startTime": 7364,
+          "duration": 201
+        },
+        {
+          "startTime": 8249,
+          "duration": 103
+        },
+        {
+          "startTime": 8372,
+          "duration": 845
+        },
+        {
+          "startTime": 9220,
+          "duration": 66
+        },
+        {
+          "startTime": 9287,
+          "duration": 123
+        },
+        {
+          "startTime": 9481,
+          "duration": 388
+        },
+        {
+          "startTime": 10062,
+          "duration": 67
+        },
+        {
+          "startTime": 10354,
+          "duration": 69
+        },
+        {
+          "startTime": 10466,
+          "duration": 50
+        },
+        {
+          "startTime": 10916,
+          "duration": 242
+        },
+        {
+          "startTime": 11234,
+          "duration": 120
+        },
+        {
+          "startTime": 11826,
+          "duration": 51
+        },
+        {
+          "startTime": 12016,
+          "duration": 86
+        }
+      ],
+      "paints": [
+        {
+          "name": "first-paint",
+          "startTime": 2256
+        },
+        {
+          "name": "first-contentful-paint",
+          "startTime": 2256
+        }
+      ]
+    },
+    "nav": {
+      "name": "http://127.0.0.1:3005/",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 6786.799999952316,
+      "navigationId": 1002,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.1",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "text/html",
+      "contentEncoding": "gzip",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 7.599999904632568,
+      "domainLookupStart": 7.599999904632568,
+      "domainLookupEnd": 7.599999904632568,
+      "connectStart": 7.599999904632568,
+      "secureConnectionStart": 0,
+      "connectEnd": 7.599999904632568,
+      "requestStart": 53.200000047683716,
+      "responseStart": 67.79999995231628,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 67.79999995231628,
+      "responseEnd": 614,
+      "transferSize": 11970,
+      "encodedBodySize": 11670,
+      "decodedBodySize": 56048,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 2122.399999856949,
+      "domContentLoadedEventStart": 2122.5,
+      "domContentLoadedEventEnd": 2128.399999856949,
+      "domComplete": 6786.299999952316,
+      "loadEventStart": 6786.700000047684,
+      "loadEventEnd": 6786.799999952316,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "low"
+      }
+    },
+    "resources": [
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/3z32-ylw2492g.css",
+        "initiatorType": "link",
+        "startTime": 551,
+        "duration": 326,
+        "transferSize": 5320
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/07ou0g-eedazb.css",
+        "initiatorType": "link",
+        "startTime": 554,
+        "duration": 338,
+        "transferSize": 4271
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1k8l1rl4xa-3r.css",
+        "initiatorType": "link",
+        "startTime": 554,
+        "duration": 265,
+        "transferSize": 1065
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1umn3-xmtj_-5.css",
+        "initiatorType": "link",
+        "startTime": 556,
+        "duration": 398,
+        "transferSize": 16937
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/0rqmg49wirni2.js",
+        "initiatorType": "link",
+        "startTime": 557,
+        "duration": 326,
+        "transferSize": 2629
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/11jq0c2_zavac.js",
+        "initiatorType": "script",
+        "startTime": 557,
+        "duration": 767,
+        "transferSize": 8804
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js",
+        "initiatorType": "script",
+        "startTime": 557,
+        "duration": 2104,
+        "transferSize": 73261
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js",
+        "initiatorType": "script",
+        "startTime": 557,
+        "duration": 1474,
+        "transferSize": 42601
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/turbopack-0iulbwcwdgo63.js",
+        "initiatorType": "script",
+        "startTime": 557,
+        "duration": 682,
+        "transferSize": 4583
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js",
+        "initiatorType": "script",
+        "startTime": 557,
+        "duration": 868,
+        "transferSize": 12374
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1k5e1my859ux2.js",
+        "initiatorType": "script",
+        "startTime": 557,
+        "duration": 1741,
+        "transferSize": 37424
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js",
+        "initiatorType": "script",
+        "startTime": 557,
+        "duration": 3144,
+        "transferSize": 235558
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/3sqw6ol507_bg.js",
+        "initiatorType": "script",
+        "startTime": 558,
+        "duration": 973,
+        "transferSize": 1176
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/2npflmjk-r0nd.js",
+        "initiatorType": "script",
+        "startTime": 558,
+        "duration": 1083,
+        "transferSize": 1098
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/39wv8psnipsou.js",
+        "initiatorType": "script",
+        "startTime": 558,
+        "duration": 1487,
+        "transferSize": 13040
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1hllz6p95kihq.css",
+        "initiatorType": "link",
+        "startTime": 558,
+        "duration": 294,
+        "transferSize": 1124
+      },
+      {
+        "name": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap",
+        "initiatorType": "css",
+        "startTime": 880,
+        "duration": 236,
+        "transferSize": 1412
+      },
+      {
+        "name": "http://127.0.0.1:3005/favicon.ico",
+        "initiatorType": "other",
+        "startTime": 6871,
+        "duration": 3517,
+        "transferSize": 264215
+      },
+      {
+        "name": "http://127.0.0.1:3005/api/analytics/visit",
+        "initiatorType": "fetch",
+        "startTime": 8792,
+        "duration": 189,
+        "transferSize": 316
+      },
+      {
+        "name": "http://127.0.0.1:3005/api/currency",
+        "initiatorType": "fetch",
+        "startTime": 8829,
+        "duration": 240,
+        "transferSize": 3205
+      },
+      {
+        "name": "http://127.0.0.1:3005/?_rsc=5CB68i4pnAekjehf",
+        "initiatorType": "fetch",
+        "startTime": 9400,
+        "duration": 268,
+        "transferSize": 552
+      },
+      {
+        "name": "http://127.0.0.1:3005/cart?_rsc=5CB68i4pnAekjehf",
+        "initiatorType": "fetch",
+        "startTime": 9407,
+        "duration": 262,
+        "transferSize": 551
+      },
+      {
+        "name": "http://127.0.0.1:3005/auth/login?_rsc=5CB68i4pnAekjehf",
+        "initiatorType": "fetch",
+        "startTime": 9410,
+        "duration": 264,
+        "transferSize": 561
+      },
+      {
+        "name": "http://127.0.0.1:3005/api/reviews?limit=24",
+        "initiatorType": "fetch",
+        "startTime": 9863,
+        "duration": 2341,
+        "transferSize": 101368
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop?_rsc=5CB68i4pnAekjehf",
+        "initiatorType": "fetch",
+        "startTime": 10007,
+        "duration": 177,
+        "transferSize": 550
+      },
+      {
+        "name": "http://127.0.0.1:3005/manifesto?_rsc=5CB68i4pnAekjehf",
+        "initiatorType": "fetch",
+        "startTime": 10060,
+        "duration": 175,
+        "transferSize": 554
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/2ruy7kt5mjx25.css",
+        "initiatorType": "link",
+        "startTime": 10092,
+        "duration": 205,
+        "transferSize": 1463
+      },
+      {
+        "name": "http://127.0.0.1:3005/?_rsc=yIp22O3xgPPxC28X",
+        "initiatorType": "fetch",
+        "startTime": 10129,
+        "duration": 199,
+        "transferSize": 2413
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/0t8q5h_m0iwvx.css",
+        "initiatorType": "link",
+        "startTime": 10135,
+        "duration": 221,
+        "transferSize": 1057
+      },
+      {
+        "name": "http://127.0.0.1:3005/?_rsc=8nTjltbQWvg6NcbE",
+        "initiatorType": "fetch",
+        "startTime": 10138,
+        "duration": 275,
+        "transferSize": 1865
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1_88q75ditvd_.css",
+        "initiatorType": "link",
+        "startTime": 10309,
+        "duration": 182,
+        "transferSize": 1538
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop?_rsc=j92W4uwEyrymIlok",
+        "initiatorType": "fetch",
+        "startTime": 10326,
+        "duration": 187,
+        "transferSize": 2421
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1qrp0e3lxbg1t.css",
+        "initiatorType": "link",
+        "startTime": 10451,
+        "duration": 229,
+        "transferSize": 1074
+      },
+      {
+        "name": "http://127.0.0.1:3005/manifesto?_rsc=h5JyQYy3Z1qoNyCG",
+        "initiatorType": "fetch",
+        "startTime": 10464,
+        "duration": 262,
+        "transferSize": 2917
+      },
+      {
+        "name": "http://127.0.0.1:3005/cart?_rsc=tv1EpzyQCJ26ZvsT",
+        "initiatorType": "fetch",
+        "startTime": 10649,
+        "duration": 274,
+        "transferSize": 1927
+      },
+      {
+        "name": "http://127.0.0.1:3005/auth/login?_rsc=BEyRC1Qs0NCcUkTZ",
+        "initiatorType": "fetch",
+        "startTime": 10680,
+        "duration": 309,
+        "transferSize": 1960
+      },
+      {
+        "name": "http://127.0.0.1:3005/api/auth/session",
+        "initiatorType": "fetch",
+        "startTime": 10930,
+        "duration": 245,
+        "transferSize": 315
+      },
+      {
+        "name": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=98001&CVER=22&X-HTTP-Session-Id=gsessionid&zx=7w0bjxru64h0&t=1",
+        "initiatorType": "fetch",
+        "startTime": 11349,
+        "duration": 602,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1a4p2myed3a2i.js",
+        "initiatorType": "script",
+        "startTime": 11407,
+        "duration": 372,
+        "transferSize": 8069
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/3dqx83zram-4-.js",
+        "initiatorType": "script",
+        "startTime": 11428,
+        "duration": 310,
+        "transferSize": 4035
+      }
+    ]
+  },
+  "valueless-bitches": {
+    "events": {
+      "fetchCalls": [
+        {
+          "url": "/api/analytics/visit",
+          "method": "POST",
+          "start": 7274,
+          "provider": "LayoutWrapper",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/1k5e1my859ux2.js:8:94551 -> at iw (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:101652) -> at ug (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:125794)",
+          "duration": 659,
+          "status": 200
+        },
+        {
+          "url": "/api/health",
+          "method": "GET",
+          "start": 7333,
+          "provider": "NetworkStatusProvider",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:30051 -> at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:30817 -> at iw (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:101652)",
+          "duration": 415,
+          "status": 200
+        },
+        {
+          "url": "/api/currency",
+          "method": "GET",
+          "start": 7360,
+          "provider": "CurrencyProvider",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:28648 -> at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:28899 -> at iw (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:101652)",
+          "duration": 573,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 7743,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 454,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 7745,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 606,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 7746,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 614,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 7939,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 493,
+          "status": 200
+        },
+        {
+          "url": "/api/auth/session",
+          "method": "DELETE",
+          "start": 7964,
+          "provider": "AuthProvider",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:24354 -> at http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:1:34268",
+          "duration": 470,
+          "status": 200
+        },
+        {
+          "url": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=85075&CVER=22&X-HTTP-Session-Id=gsessionid&zx=4bto2f7lzvw8&t=1",
+          "method": "GET",
+          "start": 8112,
+          "provider": "Firebase Firestore",
+          "stack": "at n.send (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:89728) -> at n.ea (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:100510) -> at eD (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:77714)",
+          "duration": 467,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8394,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 369,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8475,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 292,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8508,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 260,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8557,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 212,
+          "status": 200
+        },
+        {
+          "url": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=Ii3kNY-O391fr3yMCS4IUp5D7q5xn3mLPW5sAOn2odC3e-rXVantaw&VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=rpc&SID=c_XA_XextcHWj3Csf4YH-Q&AID=0&CI=1&TYPE=xmlhttp&zx=nairt35u5fra&t=1",
+          "method": "GET",
+          "start": 8614,
+          "provider": "Firebase Firestore",
+          "stack": "at n.send (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:89728) -> at n.ea (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:100510) -> at eD (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:77748)",
+          "duration": 473,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8860,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 222,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8877,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 422,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8915,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 394,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8949,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 366,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 9118,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 365,
+          "status": 200
+        },
+        {
+          "url": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=Ii3kNY-O391fr3yMCS4IUp5D7q5xn3mLPW5sAOn2odC3e-rXVantaw&VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=rpc&SID=c_XA_XextcHWj3Csf4YH-Q&AID=9&CI=1&TYPE=xmlhttp&zx=aebtg2k9psl&t=1",
+          "method": "GET",
+          "start": 9170,
+          "provider": "Firebase Firestore",
+          "stack": "at n.send (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:89728) -> at n.ea (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:100510) -> at eD (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:77748)",
+          "duration": 1845,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 9477,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 288,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 9523,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 275,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 9600,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 277,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 9863,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 233,
+          "status": 200
+        }
+      ],
+      "storageReads": [
+        {
+          "storageType": "sessionStorage",
+          "key": "gk_visited",
+          "time": 7265,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_theme",
+          "time": 7702,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "firebase:authUser:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 7954,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "firebase:authUser:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 7954,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "firebase:redirectUser:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 7958,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "firebase:redirectUser:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 7958,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "firebase:pendingRedirect:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 7960,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_cart_guest",
+          "time": 8120,
+          "hasValue": true
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gkink_user_currency",
+          "time": 8123,
+          "hasValue": false
+        }
+      ],
+      "storageWrites": [
+        {
+          "storageType": "sessionStorage",
+          "key": "gk_visited",
+          "time": 7268
+        },
+        {
+          "storageType": "localStorage",
+          "key": "__sak",
+          "time": 7711
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "__sak",
+          "time": 7711
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "__sak",
+          "time": 7958
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "__sak",
+          "time": 7959
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_cart_guest",
+          "time": 8120
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_cart_guest",
+          "time": 8363
+        }
+      ],
+      "reflowTriggers": [
+        {
+          "type": "getBoundingClientRect",
+          "time": 7225,
+          "tag": "DIV",
+          "className": "AnnouncementBar-module__tQURPG__announcementViewport"
+        },
+        {
+          "type": "getBoundingClientRect",
+          "time": 7225,
+          "tag": "DIV",
+          "className": "Navbar-module__cRh5nW__inner"
+        },
+        {
+          "type": "getBoundingClientRect",
+          "time": 7715,
+          "tag": "DIV",
+          "className": "AnnouncementBar-module__tQURPG__announcementViewport"
+        },
+        {
+          "type": "getBoundingClientRect",
+          "time": 7715,
+          "tag": "DIV",
+          "className": "Navbar-module__cRh5nW__inner"
+        }
+      ],
+      "lcpCandidates": [
+        {
+          "renderTime": 1372,
+          "loadTime": 0,
+          "startTime": 1372,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar-module__tQURPG__giantWord",
+          "isText": true
+        },
+        {
+          "renderTime": 5040,
+          "loadTime": 0,
+          "startTime": 5040,
+          "size": 24024,
+          "url": "",
+          "tagName": "P",
+          "selector": "P.page-module__w20K9W__desc",
+          "isText": true
+        },
+        {
+          "renderTime": 5104,
+          "loadTime": 4677,
+          "startTime": 5104,
+          "size": 35644,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductCard-module__O-UVIa__image",
+          "isText": false
+        }
+      ],
+      "longTasks": [
+        {
+          "startTime": 575,
+          "duration": 81
+        },
+        {
+          "startTime": 1999,
+          "duration": 515
+        },
+        {
+          "startTime": 2519,
+          "duration": 854
+        },
+        {
+          "startTime": 3379,
+          "duration": 213
+        },
+        {
+          "startTime": 3686,
+          "duration": 52
+        },
+        {
+          "startTime": 3819,
+          "duration": 84
+        },
+        {
+          "startTime": 5170,
+          "duration": 235
+        },
+        {
+          "startTime": 6059,
+          "duration": 182
+        },
+        {
+          "startTime": 6267,
+          "duration": 1444
+        },
+        {
+          "startTime": 7749,
+          "duration": 180
+        },
+        {
+          "startTime": 7963,
+          "duration": 76
+        },
+        {
+          "startTime": 8125,
+          "duration": 71
+        },
+        {
+          "startTime": 8245,
+          "duration": 69
+        },
+        {
+          "startTime": 8363,
+          "duration": 53
+        },
+        {
+          "startTime": 8586,
+          "duration": 133
+        },
+        {
+          "startTime": 8795,
+          "duration": 73
+        },
+        {
+          "startTime": 9135,
+          "duration": 143
+        },
+        {
+          "startTime": 9341,
+          "duration": 76
+        },
+        {
+          "startTime": 9605,
+          "duration": 152
+        },
+        {
+          "startTime": 9951,
+          "duration": 51
+        },
+        {
+          "startTime": 10246,
+          "duration": 763
+        }
+      ],
+      "paints": [
+        {
+          "name": "first-paint",
+          "startTime": 856
+        },
+        {
+          "name": "first-contentful-paint",
+          "startTime": 1372
+        }
+      ]
+    },
+    "nav": {
+      "name": "http://127.0.0.1:3005/shop/valueless-bitches",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 4826.099999904633,
+      "navigationId": 4144,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.1",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "text/html",
+      "contentEncoding": "gzip",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 1.4000000953674316,
+      "domainLookupStart": 1.4000000953674316,
+      "domainLookupEnd": 1.4000000953674316,
+      "connectStart": 1.4000000953674316,
+      "secureConnectionStart": 0,
+      "connectEnd": 1.4000000953674316,
+      "requestStart": 25.59999990463257,
+      "responseStart": 80.09999990463257,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 80.09999990463257,
+      "responseEnd": 1132.5999999046326,
+      "transferSize": 18694,
+      "encodedBodySize": 18394,
+      "decodedBodySize": 189371,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 3861.5,
+      "domContentLoadedEventStart": 3862,
+      "domContentLoadedEventEnd": 3869,
+      "domComplete": 4825.700000047684,
+      "loadEventStart": 4826,
+      "loadEventEnd": 4826.099999904633,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "high"
+      }
+    },
+    "resources": [
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/3z32-ylw2492g.css",
+        "initiatorType": "link",
+        "startTime": 437,
+        "duration": 48,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/07ou0g-eedazb.css",
+        "initiatorType": "link",
+        "startTime": 444,
+        "duration": 42,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/2yub3gg4tk206.css",
+        "initiatorType": "link",
+        "startTime": 446,
+        "duration": 243,
+        "transferSize": 5706
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/0rqmg49wirni2.js",
+        "initiatorType": "link",
+        "startTime": 448,
+        "duration": 122,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/11jq0c2_zavac.js",
+        "initiatorType": "script",
+        "startTime": 451,
+        "duration": 217,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js",
+        "initiatorType": "script",
+        "startTime": 453,
+        "duration": 236,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js",
+        "initiatorType": "script",
+        "startTime": 457,
+        "duration": 228,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/turbopack-0iulbwcwdgo63.js",
+        "initiatorType": "script",
+        "startTime": 459,
+        "duration": 217,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js",
+        "initiatorType": "script",
+        "startTime": 462,
+        "duration": 215,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js",
+        "initiatorType": "script",
+        "startTime": 464,
+        "duration": 266,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1k5e1my859ux2.js",
+        "initiatorType": "script",
+        "startTime": 465,
+        "duration": 254,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/3sqw6ol507_bg.js",
+        "initiatorType": "script",
+        "startTime": 468,
+        "duration": 233,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/2ja1terj277tu.js",
+        "initiatorType": "script",
+        "startTime": 469,
+        "duration": 439,
+        "transferSize": 8640
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/2npflmjk-r0nd.js",
+        "initiatorType": "script",
+        "startTime": 471,
+        "duration": 249,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1hllz6p95kihq.css",
+        "initiatorType": "link",
+        "startTime": 474,
+        "duration": 15,
+        "transferSize": 0
+      },
+      {
+        "name": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap",
+        "initiatorType": "css",
+        "startTime": 600,
+        "duration": 12,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a7331deff4e090b5a02b00f%2F103548%2F100285%2Funisex-oversized-boxy-tee.jpg%3Fcamera_label%3Dfront&w=1200&q=75",
+        "initiatorType": "link",
+        "startTime": 3736,
+        "duration": 440,
+        "transferSize": 22276
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Fimages-api.printify.com%2Fmockup%2F6a4dfb53cc241da70807982c%2F25458%2F98502%2Funisex-heavy-blend-crewneck-sweatshirt.jpg%3Fcamera_label%3Dfront&w=1200&q=75",
+        "initiatorType": "link",
+        "startTime": 3778,
+        "duration": 317,
+        "transferSize": 11038
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FYQwTbbG6ery53s4a2G4F%252F1782923237744_feel-happy-unisex-t-shirt-with-funcky-back-print-883334.webp%3Falt%3Dmedia%26token%3D9893163b-1429-4035-be6b-be492cf300dd&w=1200&q=75",
+        "initiatorType": "link",
+        "startTime": 3782,
+        "duration": 352,
+        "transferSize": 14292
+      },
+      {
+        "name": "http://127.0.0.1:3005/favicon.ico",
+        "initiatorType": "other",
+        "startTime": 4894,
+        "duration": 3876,
+        "transferSize": 264215
+      },
+      {
+        "name": "http://127.0.0.1:3005/api/analytics/visit",
+        "initiatorType": "fetch",
+        "startTime": 7308,
+        "duration": 523,
+        "transferSize": 316
+      },
+      {
+        "name": "http://127.0.0.1:3005/api/currency",
+        "initiatorType": "fetch",
+        "startTime": 7368,
+        "duration": 674,
+        "transferSize": 3205
+      },
+      {
+        "name": "http://127.0.0.1:3005/?_rsc=3VmbizutqFW_tU9P",
+        "initiatorType": "fetch",
+        "startTime": 7745,
+        "duration": 426,
+        "transferSize": 552
+      },
+      {
+        "name": "http://127.0.0.1:3005/cart?_rsc=3VmbizutqFW_tU9P",
+        "initiatorType": "fetch",
+        "startTime": 7746,
+        "duration": 425,
+        "transferSize": 551
+      },
+      {
+        "name": "http://127.0.0.1:3005/auth/login?_rsc=3VmbizutqFW_tU9P",
+        "initiatorType": "fetch",
+        "startTime": 7746,
+        "duration": 426,
+        "transferSize": 561
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop/society-fuckers?_rsc=3VmbizutqFW_tU9P",
+        "initiatorType": "fetch",
+        "startTime": 7939,
+        "duration": 320,
+        "transferSize": 474
+      },
+      {
+        "name": "http://127.0.0.1:3005/api/auth/session",
+        "initiatorType": "fetch",
+        "startTime": 7970,
+        "duration": 290,
+        "transferSize": 315
+      },
+      {
+        "name": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=85075&CVER=22&X-HTTP-Session-Id=gsessionid&zx=4bto2f7lzvw8&t=1",
+        "initiatorType": "fetch",
+        "startTime": 8114,
+        "duration": 435,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1k8l1rl4xa-3r.css",
+        "initiatorType": "link",
+        "startTime": 8384,
+        "duration": 3,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1umn3-xmtj_-5.css",
+        "initiatorType": "link",
+        "startTime": 8386,
+        "duration": 4,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop?_rsc=3VmbizutqFW_tU9P",
+        "initiatorType": "fetch",
+        "startTime": 8409,
+        "duration": 188,
+        "transferSize": 550
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/2ruy7kt5mjx25.css",
+        "initiatorType": "link",
+        "startTime": 8435,
+        "duration": 25,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop/unisex-oversized-boxy-tee?_rsc=3VmbizutqFW_tU9P",
+        "initiatorType": "fetch",
+        "startTime": 8478,
+        "duration": 186,
+        "transferSize": 525
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/0t8q5h_m0iwvx.css",
+        "initiatorType": "link",
+        "startTime": 8501,
+        "duration": 4,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop/unisex-heavy-blend-crewneck-sweatshirt?_rsc=3VmbizutqFW_tU9P",
+        "initiatorType": "fetch",
+        "startTime": 8510,
+        "duration": 186,
+        "transferSize": 536
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop/bhjb?_rsc=3VmbizutqFW_tU9P",
+        "initiatorType": "fetch",
+        "startTime": 8557,
+        "duration": 179,
+        "transferSize": 510
+      },
+      {
+        "name": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=Ii3kNY-O391fr3yMCS4IUp5D7q5xn3mLPW5sAOn2odC3e-rXVantaw&VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=rpc&SID=c_XA_XextcHWj3Csf4YH-Q&AID=0&CI=1&TYPE=xmlhttp&zx=nairt35u5fra&t=1",
+        "initiatorType": "fetch",
+        "startTime": 8647,
+        "duration": 444,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1_88q75ditvd_.css",
+        "initiatorType": "link",
+        "startTime": 8812,
+        "duration": 108,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop/society-fuckers?_rsc=l-Oc51DMKTxkmmKK",
+        "initiatorType": "fetch",
+        "startTime": 8867,
+        "duration": 204,
+        "transferSize": 1670
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop?_rsc=DMIyJXAG3CeD4afC",
+        "initiatorType": "fetch",
+        "startTime": 8885,
+        "duration": 279,
+        "transferSize": 2413
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop?_rsc=peRSP__ipUsFRClA",
+        "initiatorType": "fetch",
+        "startTime": 8919,
+        "duration": 325,
+        "transferSize": 2421
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop/unisex-oversized-boxy-tee?_rsc=l-Oc51DMKTxkmmKK",
+        "initiatorType": "fetch",
+        "startTime": 8958,
+        "duration": 543,
+        "transferSize": 2088
+      },
+      {
+        "name": "http://127.0.0.1:3005/logo.png",
+        "initiatorType": "other",
+        "startTime": 8967,
+        "duration": 282,
+        "transferSize": 300
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop/unisex-heavy-blend-crewneck-sweatshirt?_rsc=l-Oc51DMKTxkmmKK",
+        "initiatorType": "fetch",
+        "startTime": 9122,
+        "duration": 2474,
+        "transferSize": 4802
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop/bhjb?_rsc=l-Oc51DMKTxkmmKK",
+        "initiatorType": "fetch",
+        "startTime": 9481,
+        "duration": 1931,
+        "transferSize": 1758
+      },
+      {
+        "name": "http://127.0.0.1:3005/?_rsc=y49RhFd2Im5W1JtS",
+        "initiatorType": "fetch",
+        "startTime": 9530,
+        "duration": 291,
+        "transferSize": 1865
+      },
+      {
+        "name": "http://127.0.0.1:3005/logo.png",
+        "initiatorType": "other",
+        "startTime": 9583,
+        "duration": 301,
+        "transferSize": 300
+      },
+      {
+        "name": "http://127.0.0.1:3005/cart?_rsc=EZbFeVaEgAIjK2Qj",
+        "initiatorType": "fetch",
+        "startTime": 9604,
+        "duration": 254,
+        "transferSize": 1927
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/39wv8psnipsou.js",
+        "initiatorType": "script",
+        "startTime": 9847,
+        "duration": 38,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/auth/login?_rsc=zyX-TJuKmOSnRWce",
+        "initiatorType": "fetch",
+        "startTime": 9863,
+        "duration": 286,
+        "transferSize": 1960
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1a4p2myed3a2i.js",
+        "initiatorType": "script",
+        "startTime": 9904,
+        "duration": 6,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/3dqx83zram-4-.js",
+        "initiatorType": "script",
+        "startTime": 10157,
+        "duration": 32,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/3szwarg70504l.js",
+        "initiatorType": "script",
+        "startTime": 10159,
+        "duration": 74,
+        "transferSize": 0
+      }
+    ]
+  },
+  "gods-plan": {
+    "events": {
+      "fetchCalls": [
+        {
+          "url": "/api/analytics/visit",
+          "method": "POST",
+          "start": 7189,
+          "provider": "LayoutWrapper",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/1k5e1my859ux2.js:8:94551 -> at iw (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:101652) -> at ug (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:125794)",
+          "duration": 388,
+          "status": 200
+        },
+        {
+          "url": "/api/health",
+          "method": "GET",
+          "start": 7195,
+          "provider": "NetworkStatusProvider",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:30051 -> at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:30817 -> at iw (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:101652)",
+          "duration": 340,
+          "status": 200
+        },
+        {
+          "url": "/api/currency",
+          "method": "GET",
+          "start": 7197,
+          "provider": "CurrencyProvider",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:28648 -> at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:28899 -> at iw (http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js:31:101652)",
+          "duration": 385,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 7503,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 579,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 7512,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 572,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 7512,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 573,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8098,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 452,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8106,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 246,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8116,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 444,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8119,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 531,
+          "status": 200
+        },
+        {
+          "url": "/api/auth/session",
+          "method": "DELETE",
+          "start": 8376,
+          "provider": "AuthProvider",
+          "stack": "at http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js:1:24354 -> at http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:1:34268",
+          "duration": 426,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8540,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 290,
+          "status": 200
+        },
+        {
+          "url": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=46523&CVER=22&X-HTTP-Session-Id=gsessionid&zx=r8sp6fazbtkj&t=1",
+          "method": "GET",
+          "start": 8724,
+          "provider": "Firebase Firestore",
+          "stack": "at n.send (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:89728) -> at n.ea (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:100510) -> at eD (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:77714)",
+          "duration": 479,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8757,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 244,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8795,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 256,
+          "status": 200
+        },
+        {
+          "url": "unknown",
+          "method": "GET",
+          "start": 8828,
+          "provider": "Unknown",
+          "stack": "at n (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:34601) -> at N (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:1:18681) -> at async eC (http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js:2:32259)",
+          "duration": 230,
+          "status": 200
+        },
+        {
+          "url": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=VNbiXLYMy1iOpL8D5zY7cKl8oC8JH7dWm5lX7AopsPVZDGa-0twfHQ&VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=rpc&SID=nvLuX4JHNFK6tw3TX8ubUw&AID=0&CI=1&TYPE=xmlhttp&zx=j5o6u5m4hjdb&t=1",
+          "method": "GET",
+          "start": 9316,
+          "provider": "Firebase Firestore",
+          "stack": "at n.send (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:89728) -> at n.ea (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:100510) -> at eD (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:77748)",
+          "duration": 717,
+          "status": 200
+        },
+        {
+          "url": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=VNbiXLYMy1iOpL8D5zY7cKl8oC8JH7dWm5lX7AopsPVZDGa-0twfHQ&VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=rpc&SID=nvLuX4JHNFK6tw3TX8ubUw&AID=10&CI=1&TYPE=xmlhttp&zx=3n802w3855r3&t=1",
+          "method": "GET",
+          "start": 10113,
+          "provider": "Firebase Firestore",
+          "stack": "at n.send (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:89728) -> at n.ea (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:100510) -> at eD (http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js:2:77748)",
+          "duration": 428,
+          "status": 200
+        }
+      ],
+      "storageReads": [
+        {
+          "storageType": "sessionStorage",
+          "key": "gk_visited",
+          "time": 7188,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_theme",
+          "time": 7350,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_preferred_size",
+          "time": 7695,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_preferred_size",
+          "time": 7696,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gkink_user_currency",
+          "time": 8099,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "firebase:authUser:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 8234,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "firebase:authUser:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 8234,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "firebase:redirectUser:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 8315,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "firebase:redirectUser:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 8316,
+          "hasValue": false
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "firebase:pendingRedirect:AIzaSyALSWuVRWCVXPma2Euyzb56C4nGMGrMDS0:[DEFAULT]",
+          "time": 8317,
+          "hasValue": false
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_cart_guest",
+          "time": 8803,
+          "hasValue": true
+        }
+      ],
+      "storageWrites": [
+        {
+          "storageType": "sessionStorage",
+          "key": "gk_visited",
+          "time": 7189
+        },
+        {
+          "storageType": "localStorage",
+          "key": "__sak",
+          "time": 7379
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "__sak",
+          "time": 7379
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "__sak",
+          "time": 8314
+        },
+        {
+          "storageType": "sessionStorage",
+          "key": "__sak",
+          "time": 8316
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_cart_guest",
+          "time": 8805
+        },
+        {
+          "storageType": "localStorage",
+          "key": "gerkink_cart_guest",
+          "time": 8964
+        }
+      ],
+      "reflowTriggers": [
+        {
+          "type": "getBoundingClientRect",
+          "time": 7180,
+          "tag": "DIV",
+          "className": "AnnouncementBar-module__tQURPG__announcementViewport"
+        },
+        {
+          "type": "getBoundingClientRect",
+          "time": 7181,
+          "tag": "DIV",
+          "className": "Navbar-module__cRh5nW__inner"
+        },
+        {
+          "type": "getBoundingClientRect",
+          "time": 7394,
+          "tag": "DIV",
+          "className": "AnnouncementBar-module__tQURPG__announcementViewport"
+        },
+        {
+          "type": "getBoundingClientRect",
+          "time": 7394,
+          "tag": "DIV",
+          "className": "Navbar-module__cRh5nW__inner"
+        },
+        {
+          "type": "getBoundingClientRect",
+          "time": 10449,
+          "tag": "DIV",
+          "className": "AnnouncementBar-module__tQURPG__announcementViewport"
+        },
+        {
+          "type": "getBoundingClientRect",
+          "time": 10450,
+          "tag": "DIV",
+          "className": "Navbar-module__cRh5nW__inner"
+        }
+      ],
+      "lcpCandidates": [
+        {
+          "renderTime": 1376,
+          "loadTime": 0,
+          "startTime": 1376,
+          "size": 8680,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN.AnnouncementBar-module__tQURPG__giantWord",
+          "isText": true
+        },
+        {
+          "renderTime": 6392,
+          "loadTime": 0,
+          "startTime": 6392,
+          "size": 9570,
+          "url": "",
+          "tagName": "SPAN",
+          "selector": "SPAN",
+          "isText": true
+        },
+        {
+          "renderTime": 6708,
+          "loadTime": 6351,
+          "startTime": 6708,
+          "size": 171599,
+          "url": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75",
+          "tagName": "IMG",
+          "selector": "IMG.ProductDetailClient-module__HT8uQq__carouselMedia",
+          "isText": false
+        }
+      ],
+      "longTasks": [
+        {
+          "startTime": 1522,
+          "duration": 496
+        },
+        {
+          "startTime": 2066,
+          "duration": 835
+        },
+        {
+          "startTime": 2936,
+          "duration": 279
+        },
+        {
+          "startTime": 3554,
+          "duration": 69
+        },
+        {
+          "startTime": 3705,
+          "duration": 211
+        },
+        {
+          "startTime": 3930,
+          "duration": 2418
+        },
+        {
+          "startTime": 6399,
+          "duration": 197
+        },
+        {
+          "startTime": 6599,
+          "duration": 62
+        },
+        {
+          "startTime": 6672,
+          "duration": 706
+        },
+        {
+          "startTime": 7380,
+          "duration": 53
+        },
+        {
+          "startTime": 7436,
+          "duration": 77
+        },
+        {
+          "startTime": 7602,
+          "duration": 468
+        },
+        {
+          "startTime": 8120,
+          "duration": 61
+        },
+        {
+          "startTime": 8369,
+          "duration": 111
+        },
+        {
+          "startTime": 8563,
+          "duration": 56
+        },
+        {
+          "startTime": 8661,
+          "duration": 78
+        },
+        {
+          "startTime": 8832,
+          "duration": 90
+        },
+        {
+          "startTime": 9084,
+          "duration": 53
+        },
+        {
+          "startTime": 9267,
+          "duration": 115
+        },
+        {
+          "startTime": 9439,
+          "duration": 581
+        },
+        {
+          "startTime": 10058,
+          "duration": 218
+        },
+        {
+          "startTime": 10329,
+          "duration": 137
+        }
+      ],
+      "paints": [
+        {
+          "name": "first-paint",
+          "startTime": 1376
+        },
+        {
+          "name": "first-contentful-paint",
+          "startTime": 1376
+        }
+      ]
+    },
+    "nav": {
+      "name": "http://127.0.0.1:3005/shop/gods-plan",
+      "entryType": "navigation",
+      "startTime": 0,
+      "duration": 6597.5,
+      "navigationId": 7234,
+      "initiatorType": "navigation",
+      "deliveryType": "",
+      "nextHopProtocol": "http/1.1",
+      "renderBlockingStatus": "non-blocking",
+      "contentType": "text/html",
+      "contentEncoding": "gzip",
+      "workerStart": 0,
+      "workerRouterEvaluationStart": 0,
+      "workerCacheLookupStart": 0,
+      "workerMatchedSourceType": "",
+      "workerFinalSourceType": "",
+      "redirectStart": 0,
+      "redirectEnd": 0,
+      "fetchStart": 2.0999999046325684,
+      "domainLookupStart": 2.0999999046325684,
+      "domainLookupEnd": 2.0999999046325684,
+      "connectStart": 2.0999999046325684,
+      "secureConnectionStart": 0,
+      "connectEnd": 2.0999999046325684,
+      "requestStart": 24.399999856948853,
+      "responseStart": 64.59999990463257,
+      "firstInterimResponseStart": 0,
+      "finalResponseHeadersStart": 64.59999990463257,
+      "responseEnd": 2580.5,
+      "transferSize": 21257,
+      "encodedBodySize": 20957,
+      "decodedBodySize": 116892,
+      "responseStatus": 200,
+      "serverTiming": [],
+      "unloadEventStart": 0,
+      "unloadEventEnd": 0,
+      "domInteractive": 3608.5999999046326,
+      "domContentLoadedEventStart": 3609.899999856949,
+      "domContentLoadedEventEnd": 3617.2999999523163,
+      "domComplete": 6597.199999809265,
+      "loadEventStart": 6597.5,
+      "loadEventEnd": 6597.5,
+      "type": "navigate",
+      "redirectCount": 0,
+      "activationStart": 0,
+      "criticalCHRestart": 0,
+      "notRestoredReasons": null,
+      "confidence": {
+        "randomizedTriggerRate": 0.4994798,
+        "value": "high"
+      }
+    },
+    "resources": [
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/3z32-ylw2492g.css",
+        "initiatorType": "link",
+        "startTime": 367,
+        "duration": 39,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/07ou0g-eedazb.css",
+        "initiatorType": "link",
+        "startTime": 367,
+        "duration": 40,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/2yub3gg4tk206.css",
+        "initiatorType": "link",
+        "startTime": 367,
+        "duration": 41,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1umn3-xmtj_-5.css",
+        "initiatorType": "link",
+        "startTime": 367,
+        "duration": 42,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/0rqmg49wirni2.js",
+        "initiatorType": "link",
+        "startTime": 368,
+        "duration": 43,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/11jq0c2_zavac.js",
+        "initiatorType": "script",
+        "startTime": 368,
+        "duration": 45,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1zk_88pcow7-4.js",
+        "initiatorType": "script",
+        "startTime": 368,
+        "duration": 53,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/01l32msd8my4u.js",
+        "initiatorType": "script",
+        "startTime": 368,
+        "duration": 51,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/turbopack-0iulbwcwdgo63.js",
+        "initiatorType": "script",
+        "startTime": 368,
+        "duration": 48,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/25l-q53f9yqu8.js",
+        "initiatorType": "script",
+        "startTime": 368,
+        "duration": 49,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/070tmoishju6m.js",
+        "initiatorType": "script",
+        "startTime": 368,
+        "duration": 65,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1k5e1my859ux2.js",
+        "initiatorType": "script",
+        "startTime": 368,
+        "duration": 58,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/3sqw6ol507_bg.js",
+        "initiatorType": "script",
+        "startTime": 369,
+        "duration": 56,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/2npflmjk-r0nd.js",
+        "initiatorType": "script",
+        "startTime": 369,
+        "duration": 57,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/0jp_p-7gmc27r.js",
+        "initiatorType": "script",
+        "startTime": 369,
+        "duration": 529,
+        "transferSize": 16292
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1fzsv9lc5l5hb.js",
+        "initiatorType": "script",
+        "startTime": 369,
+        "duration": 544,
+        "transferSize": 21268
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1hllz6p95kihq.css",
+        "initiatorType": "link",
+        "startTime": 369,
+        "duration": 41,
+        "transferSize": 0
+      },
+      {
+        "name": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap",
+        "initiatorType": "css",
+        "startTime": 419,
+        "duration": 13,
+        "transferSize": 0
+      },
+      {
+        "name": "https://firebasestorage.googleapis.com/v0/b/print-on-demand-895b7.firebasestorage.app/o/products%2FhQ8i7o4ykx3XiAhHuLnm%2F1786552831890_Porsche%20911%20GT3%20RS%20White%20Oversized%20T-Shirt%20_%20Premium%20Cotton%20Streetwear.jpg?alt=media&token=7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0",
+        "initiatorType": "link",
+        "startTime": 3479,
+        "duration": 1648,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/image?url=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Fprint-on-demand-895b7.firebasestorage.app%2Fo%2Fproducts%252FhQ8i7o4ykx3XiAhHuLnm%252F1786552831890_Porsche%2520911%2520GT3%2520RS%2520White%2520Oversized%2520T-Shirt%2520_%2520Premium%2520Cotton%2520Streetwear.jpg%3Falt%3Dmedia%26token%3D7d615bb5-a81f-4fa5-a0a6-3344c87fcbb0&w=1200&q=75",
+        "initiatorType": "link",
+        "startTime": 3488,
+        "duration": 567,
+        "transferSize": 23342
+      },
+      {
+        "name": "http://127.0.0.1:3005/api/analytics/visit",
+        "initiatorType": "fetch",
+        "startTime": 7192,
+        "duration": 220,
+        "transferSize": 316
+      },
+      {
+        "name": "http://127.0.0.1:3005/api/currency",
+        "initiatorType": "fetch",
+        "startTime": 7198,
+        "duration": 336,
+        "transferSize": 3205
+      },
+      {
+        "name": "http://127.0.0.1:3005/?_rsc=9NTRWGgstujEvzI8",
+        "initiatorType": "fetch",
+        "startTime": 7512,
+        "duration": 277,
+        "transferSize": 552
+      },
+      {
+        "name": "http://127.0.0.1:3005/cart?_rsc=9NTRWGgstujEvzI8",
+        "initiatorType": "fetch",
+        "startTime": 7512,
+        "duration": 277,
+        "transferSize": 551
+      },
+      {
+        "name": "http://127.0.0.1:3005/auth/login?_rsc=9NTRWGgstujEvzI8",
+        "initiatorType": "fetch",
+        "startTime": 7513,
+        "duration": 289,
+        "transferSize": 561
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop?_rsc=9NTRWGgstujEvzI8",
+        "initiatorType": "fetch",
+        "startTime": 8099,
+        "duration": 263,
+        "transferSize": 550
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1k8l1rl4xa-3r.css",
+        "initiatorType": "link",
+        "startTime": 8102,
+        "duration": 103,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop/society-fuckers?_rsc=9NTRWGgstujEvzI8",
+        "initiatorType": "fetch",
+        "startTime": 8106,
+        "duration": 226,
+        "transferSize": 474
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/2ruy7kt5mjx25.css",
+        "initiatorType": "link",
+        "startTime": 8109,
+        "duration": 97,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/?_rsc=vbL716iccsS0kS66",
+        "initiatorType": "fetch",
+        "startTime": 8116,
+        "duration": 269,
+        "transferSize": 2413
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/0t8q5h_m0iwvx.css",
+        "initiatorType": "link",
+        "startTime": 8118,
+        "duration": 89,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/?_rsc=9tQO4uoKapSw3XZt",
+        "initiatorType": "fetch",
+        "startTime": 8120,
+        "duration": 274,
+        "transferSize": 1865
+      },
+      {
+        "name": "http://127.0.0.1:3005/api/auth/session",
+        "initiatorType": "fetch",
+        "startTime": 8382,
+        "duration": 190,
+        "transferSize": 315
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop/society-fuckers?_rsc=Cq7VK_fEVL3eDXbv",
+        "initiatorType": "fetch",
+        "startTime": 8549,
+        "duration": 208,
+        "transferSize": 1669
+      },
+      {
+        "name": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=46523&CVER=22&X-HTTP-Session-Id=gsessionid&zx=r8sp6fazbtkj&t=1",
+        "initiatorType": "fetch",
+        "startTime": 8734,
+        "duration": 356,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1_88q75ditvd_.css",
+        "initiatorType": "link",
+        "startTime": 8749,
+        "duration": 47,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/shop?_rsc=6eyGdfkeX5dNcxfo",
+        "initiatorType": "fetch",
+        "startTime": 8758,
+        "duration": 226,
+        "transferSize": 2421
+      },
+      {
+        "name": "http://127.0.0.1:3005/cart?_rsc=9ARWzfmDCSnb-2C1",
+        "initiatorType": "fetch",
+        "startTime": 8801,
+        "duration": 216,
+        "transferSize": 1927
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/39wv8psnipsou.js",
+        "initiatorType": "script",
+        "startTime": 8825,
+        "duration": 37,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/auth/login?_rsc=2aCyz_YPEQ9tM5ED",
+        "initiatorType": "fetch",
+        "startTime": 8829,
+        "duration": 191,
+        "transferSize": 1960
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/1a4p2myed3a2i.js",
+        "initiatorType": "script",
+        "startTime": 9100,
+        "duration": 35,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/3dqx83zram-4-.js",
+        "initiatorType": "script",
+        "startTime": 9162,
+        "duration": 29,
+        "transferSize": 0
+      },
+      {
+        "name": "http://127.0.0.1:3005/_next/static/chunks/3szwarg70504l.js",
+        "initiatorType": "script",
+        "startTime": 9168,
+        "duration": 28,
+        "transferSize": 0
+      },
+      {
+        "name": "https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=VNbiXLYMy1iOpL8D5zY7cKl8oC8JH7dWm5lX7AopsPVZDGa-0twfHQ&VER=8&database=projects%2Fprint-on-demand-895b7%2Fdatabases%2F(default)&RID=rpc&SID=nvLuX4JHNFK6tw3TX8ubUw&AID=0&CI=1&TYPE=xmlhttp&zx=j5o6u5m4hjdb&t=1",
+        "initiatorType": "fetch",
+        "startTime": 9323,
+        "duration": 399,
+        "transferSize": 0
+      }
+    ]
+  }
+}

@@ -1,6 +1,5 @@
 .pageWrapper {
-  min-height: 100vh;
-  padding-top: 68px;
+  min-height: calc(100vh - var(--site-header-height, 82px));
   position: relative;
   overflow: hidden;
 }
@@ -598,7 +597,7 @@
 
 .paymentTabBtn:hover {
   border-color: var(--text-muted);
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .paymentTabBtnActive {
@@ -637,7 +636,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--border);
   gap: 1rem;
 }
 
@@ -656,7 +655,7 @@
   gap: 0.6rem;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.88rem;
-  color: #fff;
+  color: var(--text-primary);
   font-weight: 600;
   text-align: right;
   word-break: break-all;
@@ -842,8 +841,8 @@
 }
 
 .summaryReceipt {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1.5rem;
   display: flex;
@@ -865,6 +864,30 @@
 .receiptVal {
   font-weight: 700;
   font-family: 'JetBrains Mono', monospace;
-  color: #fff;
+  color: var(--text-primary);
+}
+
+/* ── Light Mode Overrides ── */
+[data-theme="light"] .bankDetailsBox {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .summaryReceipt {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+}
+
+[data-theme="light"] .copyPillBtn {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+  color: #475569;
+}
+
+[data-theme="light"] .copyPillBtn:hover {
+  background: #0F172A;
+  color: #FFFFFF;
+  border-color: #0F172A;
 }
 

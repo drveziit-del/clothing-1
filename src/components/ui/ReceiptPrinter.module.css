@@ -168,3 +168,47 @@
   font-size: 0.75rem;
   line-height: 1.45;
 }
+
+/* ─── Light Mode Overrides ─── */
+[data-theme="light"] .machine {
+  border: 1px solid #CBD5E1;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%);
+  box-shadow:
+    0 20px 40px -15px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .screen {
+  border: 1px solid #CBD5E1;
+  background: #F8FAFC;
+  color: #0F172A;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.04),
+    0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] .statusRow {
+  border-top: 1px solid #E2E8F0;
+}
+
+[data-theme="light"] .statusLabelText {
+  color: #475569;
+}
+
+[data-theme="light"] .paperSlot {
+  border: 1px solid #CBD5E1;
+  background: #E2E8F0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .outputBlurShadow {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .paperMotionContainer {
+  box-shadow:
+    0 15px 35px -5px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
+}

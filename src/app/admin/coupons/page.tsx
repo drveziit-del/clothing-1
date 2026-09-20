@@ -57,6 +57,7 @@ export default function AdminCouponsPage() {
 
   useEffect(() => {
     fetchCoupons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional deps (audit)
   }, []);
 
   async function handleCreateCoupon(e: React.FormEvent) {

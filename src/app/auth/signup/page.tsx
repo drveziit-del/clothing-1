@@ -2,16 +2,16 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { signUpWithEmail, signInWithGoogle } from '@/lib/firebase/auth';
 import { useAuth } from '@/context/AuthContext';
 import { useRoast } from '@/hooks/useRoast';
 import { signUpSchema } from '@/lib/utils/validation';
+import { getSafeRedirectUrl } from '@/lib/utils/redirect';
 import { SIGNUP_ROASTS } from '@/lib/utils/roasts';
 import styles from '../login/page.module.css';
 
 function SignupContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useRoast();
   const { firebaseUser, loading: authLoading } = useAuth();
@@ -22,7 +22,7 @@ function SignupContent() {
   const [roast, setRoast] = useState(SIGNUP_ROASTS[0]);
   const [refCode, setRefCode] = useState('');
 
-  const redirect = searchParams.get('redirect') ?? '/';
+  const redirect = getSafeRedirectUrl(searchParams.get('redirect'));
 
   useEffect(() => {
     if (!authLoading && firebaseUser && !loading && !googleLoading) {
@@ -132,20 +132,36 @@ function SignupContent() {
         <div className={styles.divider}><span>or</span></div>
 
         <form onSubmit={handleSubmit} noValidate className={styles.form}>
-          {errors.form && <p className={styles.formError}>{errors.form}</p>}
+          {errors.form && <p className={styles.formError} role="alert">{errors.form}</p>}
 
           <div>
             <label htmlFor="displayName" className="input-label">Name</label>
-            <input id="displayName" name="displayName" type="text" autoComplete="name"
-              className="input" placeholder="What do people call you?" />
-            {errors.displayName && <span className={styles.fieldError}>{errors.displayName}</span>}
+            <input
+              id="displayName"
+              name="displayName"
+              type="text"
+              autoComplete="name"
+              className="input"
+              placeholder="What do people call you?"
+              aria-invalid={errors.displayName ? 'true' : 'false'}
+              aria-describedby={errors.displayName ? 'name-error' : undefined}
+            />
+            {errors.displayName && <span id="name-error" role="alert" className={styles.fieldError}>{errors.displayName}</span>}
           </div>
 
           <div>
             <label htmlFor="email" className="input-label">Email</label>
-            <input id="email" name="email" type="email" autoComplete="email"
-              className="input" placeholder="you@example.com" />
-            {errors.email && <span className={styles.fieldError}>{errors.email}</span>}
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              className="input"
+              placeholder="you@example.com"
+              aria-invalid={errors.email ? 'true' : 'false'}
+              aria-describedby={errors.email ? 'email-error' : undefined}
+            />
+            {errors.email && <span id="email-error" role="alert" className={styles.fieldError}>{errors.email}</span>}
           </div>
 
           <div>
@@ -158,6 +174,8 @@ function SignupContent() {
                 autoComplete="new-password"
                 className="input"
                 placeholder="Min 8 chars, 1 uppercase, 1 number"
+                aria-invalid={errors.password ? 'true' : 'false'}
+                aria-describedby={errors.password ? 'pw-error' : undefined}
               />
               <button
                 type="button"
@@ -178,7 +196,7 @@ function SignupContent() {
                 )}
               </button>
             </div>
-            {errors.password && <span className={styles.fieldError}>{errors.password}</span>}
+            {errors.password && <span id="pw-error" role="alert" className={styles.fieldError}>{errors.password}</span>}
           </div>
 
           <button type="submit" disabled={loading} className="btn btn-primary btn-full btn-lg">

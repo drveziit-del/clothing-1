@@ -107,7 +107,7 @@ export default function DisclaimerPage() {
             <h2 className={styles.sectionTitle}>5. Contact Legal Support</h2>
             <p className={styles.bodyText}>
               If you have any questions or legal inquiries regarding this disclaimer, please reach out via email at{' '}
-              <span className={styles.emphasis}>gerkinkofficial@gmail.com</span> or through our{' '}
+              <span className={styles.emphasis}>support@gerkink.shop</span> or through our{' '}
               <Link href="/contact" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>
                 Contact Page
               </Link>.

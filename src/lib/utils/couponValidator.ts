@@ -1,3 +1,4 @@
+import 'server-only';
 import { adminDb } from '@/lib/firebase/admin';
 
 export interface CouponValidationResult {
@@ -18,7 +19,13 @@ export async function validateCoupon(
   subtotal: number,
   tax: number
 ): Promise<CouponValidationResult> {
-  const cleanCode = code.trim();
+  if (!code || typeof code !== 'string') {
+    return { valid: false, discount: 0, error: 'Please enter a coupon code.' };
+  }
+
+  const cleanCode = code.trim().toUpperCase();
+  const safeSubtotal = Math.max(0, typeof subtotal === 'number' && !isNaN(subtotal) ? subtotal : 0);
+  const safeTax = Math.max(0, typeof tax === 'number' && !isNaN(tax) ? tax : 0);
 
   // 1. Check user-specific coupon first
   let couponSnap = await adminDb.collection('coupons')
@@ -45,7 +52,22 @@ export async function validateCoupon(
   const couponDoc = couponSnap.docs[0];
   const couponData = couponDoc.data();
 
-  // 3. Check max uses for global coupons
+  // 3. Document-level active check (defends against disabled user-specific coupons)
+  if (couponData.isActive === false) {
+    return { valid: false, discount: 0, error: 'This coupon is currently inactive.' };
+  }
+
+  // 4. Ownership verification for user-specific coupons
+  if (!couponData.isGlobal && couponData.userId && couponData.userId !== userId) {
+    return { valid: false, discount: 0, error: 'This coupon is not valid for your account.' };
+  }
+
+  // 5. Single-use verification
+  if (!couponData.isGlobal && couponData.isUsed) {
+    return { valid: false, discount: 0, error: 'This coupon has already been used.' };
+  }
+
+  // 6. Check max uses for global coupons
   if (couponData.isGlobal && couponData.maxUses) {
     const timesUsed = couponData.timesUsed || 0;
     if (timesUsed >= couponData.maxUses) {
@@ -53,19 +75,22 @@ export async function validateCoupon(
     }
   }
 
-  // 4. Expiry check (supports Firestore Timestamp and ISO/string dates)
+  // 7. Expiry check (supports Firestore Timestamp and ISO/string dates)
   if (couponData.expiresAt) {
     const expiryDate = typeof couponData.expiresAt?.toDate === 'function'
       ? couponData.expiresAt.toDate()
       : new Date(couponData.expiresAt);
-    if (!Number.isNaN(expiryDate.getTime()) && expiryDate < new Date()) {
+    if (Number.isNaN(expiryDate.getTime())) {
+      return { valid: false, discount: 0, error: 'This coupon has an invalid expiration date configuration.' };
+    }
+    if (expiryDate < new Date()) {
       return { valid: false, discount: 0, error: 'This coupon has expired.' };
     }
   }
 
-  // 5. Check min spend subtotal
+  // 8. Check min spend subtotal
   const minSpend = couponData.minSubtotal ?? 0;
-  if (minSpend > 0 && subtotal < minSpend) {
+  if (minSpend > 0 && safeSubtotal < minSpend) {
     return {
       valid: false,
       discount: 0,
@@ -73,16 +98,19 @@ export async function validateCoupon(
     };
   }
 
-  // 6. Calculate discount — no magic-value fallbacks; coupons must have an explicit value.
+  // 9. Calculate discount — no magic-value fallbacks; coupons must have an explicit value.
   const couponType = couponData.type || 'percentage';
   const couponVal = couponData.value ?? 0;
   if (couponVal <= 0) {
     return { valid: false, discount: 0, error: 'Coupon has no value configured.' };
   }
+  if (couponType === 'percentage' && couponVal > 100) {
+    return { valid: false, discount: 0, error: 'Invalid coupon discount configuration.' };
+  }
   const appliesTo = couponData.appliesTo || (couponVal >= 100 ? 'grand_total' : 'subtotal');
   const baseAmount = (appliesTo === 'grand_total' || (couponType === 'percentage' && couponVal >= 100))
-    ? (subtotal + tax)
-    : subtotal;
+    ? (safeSubtotal + safeTax)
+    : safeSubtotal;
 
   let discount = 0;
   if (couponType === 'percentage') {
@@ -91,7 +119,7 @@ export async function validateCoupon(
     discount = couponVal;
   }
 
-  discount = Math.min(discount, subtotal + tax);
+  discount = Math.min(discount, safeSubtotal + safeTax);
 
   return {
     valid: true,

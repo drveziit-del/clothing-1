@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { adminAuth } from '@/lib/firebase/admin';
 import { syncProductsFromPrintify } from '@/lib/printify/sync';
 import { cookies } from 'next/headers';

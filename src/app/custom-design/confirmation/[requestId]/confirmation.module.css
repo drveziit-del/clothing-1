@@ -1,0 +1,180 @@
+.pageWrapper {
+  min-height: 100vh;
+  background: var(--bg, #07090e);
+  color: var(--text-primary, #f3f4f6);
+  padding: 4rem 1.5rem 6rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  max-width: 680px;
+  width: 100%;
+  background: var(--surface-1, #0d1117);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+  text-align: center;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  padding-bottom: 2rem;
+  margin-bottom: 2rem;
+}
+
+.paymentConfirmedPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #2ed573;
+  background: rgba(46, 213, 115, 0.1);
+  border: 1px solid rgba(46, 213, 115, 0.3);
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  margin-bottom: 1rem;
+}
+
+.requestNumberBadge {
+  display: block;
+  font-family: monospace;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--accent, #ff6b6b);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.studioNotice {
+  font-size: 0.95rem;
+  color: #9ca3af;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* ─── Summary Card ────────────────────────────────────────── */
+.summaryCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.9rem;
+}
+
+.summaryRow:last-child {
+  border-bottom: none;
+}
+
+.summaryLabel {
+  color: var(--text-secondary, #9ca3af);
+}
+
+.summaryVal {
+  font-weight: 600;
+  color: #f3f4f6;
+}
+
+.paidBadge {
+  color: #2ed573;
+  font-weight: 800;
+}
+
+/* ─── Status Timeline ─────────────────────────────────────── */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.timelineItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.timelineItemActive {
+  background: rgba(255, 107, 107, 0.08);
+  border-color: var(--accent, #ff6b6b);
+}
+
+.timelineItemCompleted {
+  opacity: 0.85;
+}
+
+.timelineIcon {
+  font-size: 1.1rem;
+  width: 24px;
+  text-align: center;
+}
+
+.timelineText {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Actions ─────────────────────────────────────────────── */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.viewRequestBtn {
+  display: block;
+  text-align: center;
+  background: var(--accent, #ff6b6b);
+  color: #fff;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.viewRequestBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 107, 107, 0.3);
+}
+
+.homeLink {
+  text-align: center;
+  color: var(--text-secondary, #9ca3af);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.homeLink:hover {
+  color: #fff;
+}

@@ -147,11 +147,13 @@ export default function PrebookClient({ product }: PrebookClientProps) {
     }
   }, [firebaseUser, email, name]);
 
-  // Load public bank details on mount
+  // Load bank details once prebook order is initialized
   useEffect(() => {
+    if (!prebookOrderData?.orderId) return;
+
     async function loadBankDetails() {
       try {
-        const res = await fetch('/api/settings/bank-details');
+        const res = await fetch(`/api/settings/bank-details?orderId=${encodeURIComponent(prebookOrderData.orderId)}`);
         if (res.ok) {
           const data = await res.json();
           setBankDetails(data);
@@ -161,7 +163,7 @@ export default function PrebookClient({ product }: PrebookClientProps) {
       }
     }
     loadBankDetails();
-  }, []);
+  }, [prebookOrderData?.orderId]);
 
   // Variants grouping
   const colors = useMemo(() => {
@@ -185,7 +187,7 @@ export default function PrebookClient({ product }: PrebookClientProps) {
       }
     }
     return safeImages[0] || '/logo.png';
-  }, [safeVariants, safeImages, selectedVariant?.color]);
+  }, [safeVariants, safeImages, selectedVariant]);
 
   const handleCopy = (text: string, key: string) => {
     if (!text) return;
@@ -339,7 +341,7 @@ export default function PrebookClient({ product }: PrebookClientProps) {
           </h1>
 
           <p className={styles.subheading}>
-            Secure your priority manufacturing slot by authorizing the escrow deposit of{' '}
+            Secure your priority manufacturing slot by authorizing the allocation deposit of{' '}
             <strong>{formatPrice(prebookFee)}</strong>. 100% of this deposit is credited toward your final piece upon allocation approval.
           </p>
         </div>
@@ -706,6 +708,7 @@ export default function PrebookClient({ product }: PrebookClientProps) {
                               style={{ background: v.colorHex ?? 'var(--fog)' }}
                               title={color}
                               aria-label={`Select color ${color}`}
+                              aria-pressed={selectedVariant?.color === color}
                             />
                           );
                         })}
@@ -726,6 +729,7 @@ export default function PrebookClient({ product }: PrebookClientProps) {
                               disabled={!v?.available}
                               className={`${styles.sizeBtn} ${selectedVariant?.size === size ? styles.sizeBtnActive : ''}`}
                               onClick={() => v && setSelectedVariant(v)}
+                              aria-pressed={selectedVariant?.size === size}
                             >
                               {size}
                             </button>

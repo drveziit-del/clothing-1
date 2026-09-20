@@ -17,6 +17,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/custom-design`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/shop/society-fuckers`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
@@ -29,6 +35,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/review`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/manifesto`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
@@ -37,11 +49,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     {
       url: `${baseUrl}/owners`,
       lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/referral`,
+      lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.6,
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/contact`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/shipping`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/refund`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
@@ -53,13 +83,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.4,
     },
     {
-      url: `${baseUrl}/refund`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.4,
-    },
-    {
-      url: `${baseUrl}/shipping`,
+      url: `${baseUrl}/privacy`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.4,
@@ -70,18 +94,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly',
       priority: 0.4,
     },
-    {
-      url: `${baseUrl}/privacy`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.4,
-    },
-    {
-      url: `${baseUrl}/referral`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
   ];
 
   try {
@@ -91,14 +103,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .where('isPublished', '==', true)
       .get();
 
-    const productRoutes = snapshot.docs.map((doc) => {
+    const productRoutes: MetadataRoute.Sitemap = snapshot.docs.map((doc) => {
       const data = doc.data();
-      const updatedAt = data.updatedAt ? data.updatedAt.toDate() : new Date();
+      const updatedAt =
+        data.updatedAt && typeof data.updatedAt.toDate === 'function'
+          ? data.updatedAt.toDate()
+          : data.updatedAt
+          ? new Date(data.updatedAt)
+          : new Date();
+
+      const validImages = Array.isArray(data.images)
+        ? data.images.filter(
+            (img: unknown): img is string => typeof img === 'string' && img.startsWith('http')
+          )
+        : undefined;
+
       return {
         url: `${baseUrl}/shop/${data.slug || doc.id}`,
         lastModified: updatedAt,
         changeFrequency: 'daily' as const,
         priority: 0.8,
+        images: validImages && validImages.length > 0 ? validImages : undefined,
       };
     });
 
@@ -108,3 +133,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return staticRoutes;
   }
 }
+

@@ -1,4 +1,4 @@
-.page { padding-top: 68px; min-height: 100vh; }
+.page { min-height: calc(100vh - var(--site-header-height, 82px)); }
 
 .inner {
   max-width: 1440px;
@@ -26,7 +26,7 @@
 .channels { margin-top: 1rem; }
 .channelNote { font-size: 0.8rem; font-style: italic; color: var(--text-muted); display: block; }
 .emailContainer {
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;

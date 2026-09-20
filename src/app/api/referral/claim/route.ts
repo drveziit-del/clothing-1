@@ -1,3 +1,5 @@
+import 'server-only';
+import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { refundRazorpayPayment } from '@/lib/razorpay/client';
@@ -205,7 +207,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Valid claim amount is required' }, { status: 400 });
     }
     const claimAmount = Math.round(requestedAmount * 100) / 100;
-    const couponCode = `GERK-${Math.round(claimAmount)}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    const couponSuffix = crypto.randomBytes(4).toString('hex').toUpperCase();
+    const couponCode = `GERK-${Math.round(claimAmount)}-${couponSuffix}`;
 
     try {
       await adminDb.runTransaction(async (transaction) => {

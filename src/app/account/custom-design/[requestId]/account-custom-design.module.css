@@ -1,0 +1,390 @@
+.pageWrapper {
+  min-height: 100vh;
+  background: var(--bg, #07090e);
+  color: var(--text-primary, #f3f4f6);
+  padding: 3rem 1.5rem 6rem;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #9ca3af);
+  margin-bottom: 2rem;
+}
+
+.breadcrumb a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: #fff;
+}
+
+.headerCard {
+  background: var(--surface-1, #0d1117);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.requestTitle {
+  font-size: 1.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.requestMeta {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #9ca3af);
+}
+
+.statusPill {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.9rem;
+  border-radius: 9999px;
+  background: rgba(255, 107, 107, 0.15);
+  color: var(--accent, #ff6b6b);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.statusPillNeedsInfo {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.statusPillApproved {
+  background: rgba(46, 213, 115, 0.15);
+  color: #2ed573;
+  border-color: rgba(46, 213, 115, 0.3);
+}
+
+/* ─── Information Required Banner ─────────────────────────── */
+.alertBanner {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.alertTitle {
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #f59e0b;
+  margin-bottom: 0.5rem;
+}
+
+.alertText {
+  font-size: 0.9rem;
+  color: #f3f4f6;
+  line-height: 1.5;
+}
+
+/* ─── Approval Banner ─────────────────────────────────────── */
+.approvalBanner {
+  background: rgba(46, 213, 115, 0.08);
+  border: 1px solid #2ed573;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.approvalTitle {
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #2ed573;
+  margin-bottom: 0.5rem;
+}
+
+.approveBtn {
+  margin-top: 1rem;
+  background: #2ed573;
+  color: #000;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.8rem 1.75rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.approveBtn:hover {
+  transform: translateY(-2px);
+}
+
+/* ─── Detail Grid ─────────────────────────────────────────── */
+.detailGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--surface-1, #0d1117);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 0.75rem;
+}
+
+.specRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.specLabel {
+  color: var(--text-secondary, #9ca3af);
+}
+
+.specVal {
+  font-weight: 600;
+}
+
+.descriptionBox {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  margin-top: 0.5rem;
+}
+
+.fileList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.fileLink {
+  color: var(--accent, #ff6b6b);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.fileLink:hover {
+  text-decoration: underline;
+}
+
+/* ─── Communication / Chat Box ────────────────────────────── */
+.chatBox {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.message {
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 85%;
+}
+
+.messageCustomer {
+  align-self: flex-end;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.25);
+}
+
+.messageAdmin {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.messageHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  margin-bottom: 0.35rem;
+  color: var(--text-secondary, #9ca3af);
+}
+
+.messageSender {
+  font-weight: 700;
+  color: #fff;
+}
+
+.messageBody {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.replyForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.replyTextarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 0.85rem;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.sendBtn {
+  align-self: flex-end;
+  background: var(--accent, #ff6b6b);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* ─── History Timeline ────────────────────────────────────── */
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.historyItem {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #9ca3af);
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.historyTime {
+  font-family: monospace;
+  color: #6b7280;
+  margin-right: 0.5rem;
+}
+
+/* ─── Price & Credit Calculation ──────────────────────────── */
+.priceCreditBox {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.priceCreditRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #d1d5db;
+}
+
+.priceCreditTotal {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #fff;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 0.65rem;
+  margin-top: 0.25rem;
+}
+
+/* ─── Final Payment Pending Banner ────────────────────────── */
+.finalPaymentBanner {
+  background: rgba(234, 179, 8, 0.08);
+  border: 1px solid #eab308;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.finalPaymentTitle {
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #eab308;
+  margin-bottom: 0.5rem;
+}
+
+.awaitingInstructions {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed rgba(234, 179, 8, 0.4);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #d1d5db;
+}
+
+.instructionsDot {
+  color: #eab308;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}

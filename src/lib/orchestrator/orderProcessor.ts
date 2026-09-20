@@ -1,6 +1,9 @@
+import 'server-only';
 import { adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import crypto from 'crypto';
 import { processReferral } from '@/lib/referral/engine';
+import { allocateCustomerNumber } from '@/lib/customer/sequence';
 import { createOrder as createPrintifyOrder } from '@/lib/printify/client';
 import { sendOrderConfirmationEmailsOnce } from '@/lib/email/sender';
 import { normalizeCountryCode, normalizeRegionCode } from '@/lib/utils/isoCodes';
@@ -62,14 +65,131 @@ export async function enqueueOrderProcessing(orderId: string): Promise<string> {
   return jobRef.id;
 }
 
-export async function processOrderJob(jobId: string, orderId: string, currentAttempt = 1): Promise<void> {
+export interface ClaimResult {
+  claimed: boolean;
+  reason?: string;
+  leaseToken?: string;
+  version?: number;
+}
+
+/**
+ * Transactional job claiming with lease and version protection.
+ * Guarantees:
+ * 1. Two workers can NEVER successfully claim the same job simultaneously.
+ * 2. Active unexpired leases are protected against concurrent theft.
+ * 3. Expired leases (stalled/crashed workers) are safely reclaimable by bumping version.
+ * 4. Completed jobs are strictly unclaimable.
+ */
+export async function claimOrderJob(
+  jobId: string,
+  workerId: string,
+  leaseDurationMs: number = 5 * 60 * 1000
+): Promise<ClaimResult> {
+  const jobRef = adminDb.collection('order_jobs').doc(jobId);
+  const now = Date.now();
+  const leaseToken = `${workerId}_${crypto.randomUUID()}`;
+
+  return await adminDb.runTransaction(async (transaction) => {
+    const jobDoc = await transaction.get(jobRef);
+    if (!jobDoc.exists) {
+      return { claimed: false, reason: 'JOB_NOT_FOUND' };
+    }
+
+    const jobData = jobDoc.data()!;
+    const status = jobData.status;
+
+    if (status === 'completed') {
+      return { claimed: false, reason: 'JOB_ALREADY_COMPLETED' };
+    }
+
+    const currentVersion = Number(jobData.version ?? 0);
+    const leaseExpiresAtMs = jobData.leaseExpiresAtMs ? Number(jobData.leaseExpiresAtMs) : 0;
+
+    // Active lease check: another worker holds an unexpired lock
+    if (status === 'processing' && leaseExpiresAtMs > now && jobData.lockedBy !== workerId) {
+      return {
+        claimed: false,
+        reason: `JOB_ACTIVELY_LOCKED_UNTIL_${new Date(leaseExpiresAtMs).toISOString()}`,
+      };
+    }
+
+    const newVersion = currentVersion + 1;
+    const newLeaseExpiresAtMs = now + leaseDurationMs;
+
+    transaction.update(jobRef, {
+      status: 'processing',
+      lockedBy: workerId,
+      leaseToken,
+      leaseExpiresAtMs: newLeaseExpiresAtMs,
+      version: newVersion,
+      claimedAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    return {
+      claimed: true,
+      leaseToken,
+      version: newVersion,
+    };
+  });
+}
+
+/**
+ * Transactionally completes an order processing job, verifying leaseToken ownership.
+ */
+export async function completeOrderJob(
+  jobId: string,
+  leaseToken?: string
+): Promise<boolean> {
+  const jobRef = adminDb.collection('order_jobs').doc(jobId);
+  return await adminDb.runTransaction(async (transaction) => {
+    const doc = await transaction.get(jobRef);
+    if (!doc.exists) return false;
+    const data = doc.data()!;
+    if (leaseToken && data.leaseToken && data.leaseToken !== leaseToken) {
+      console.warn(`[OrderOrchestrator] completeOrderJob lease mismatch for job ${jobId}`);
+      return false;
+    }
+    transaction.update(jobRef, {
+      status: 'completed',
+      lockedBy: null,
+      leaseToken: null,
+      leaseExpiresAtMs: 0,
+      completedAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+    return true;
+  });
+}
+
+export async function processOrderJob(
+  jobId: string,
+  orderId: string,
+  currentAttempt = 1,
+  workerId?: string
+): Promise<void> {
   const MAX_RETRIES = 3;
+  const actualWorkerId = workerId || `worker_${crypto.randomUUID()}`;
   const jobRef = adminDb.collection('order_jobs').doc(jobId);
   const orderRef = adminDb.collection('orders').doc(orderId);
 
+  // 0. Claim the job transactionally with lease/version protection
+  const claim = await claimOrderJob(jobId, actualWorkerId);
+  if (!claim.claimed) {
+    console.log(`[OrderOrchestrator] Worker ${actualWorkerId} could not claim job ${jobId}: ${claim.reason}. Skipping.`);
+    return;
+  }
+
   const orderDoc = await orderRef.get();
   if (!orderDoc.exists) {
-    await jobRef.update({ status: 'failed', lastError: 'Order document missing', updatedAt: FieldValue.serverTimestamp() });
+    await jobRef.update({
+      status: 'failed',
+      lastError: 'Order document missing',
+      lockedBy: null,
+      leaseToken: null,
+      leaseExpiresAtMs: 0,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
     return;
   }
 
@@ -77,31 +197,71 @@ export async function processOrderJob(jobId: string, orderId: string, currentAtt
   const order: Order = {
     id: orderId,
     ...orderData,
-    createdAt: orderData.createdAt?.toDate() ?? new Date(),
+    createdAt: orderData.createdAt?.toDate?.() ?? new Date(),
   } as Order;
 
-  await jobRef.update({ status: 'processing', updatedAt: FieldValue.serverTimestamp() });
-
-  // 1. Referral Commission Processing
-  try {
-    await processReferral(order);
-    await appendOrderHistory(orderId, 'referral_processed', 'system');
-  } catch (refErr: any) {
-    console.error(`[OrderOrchestrator] Referral processing error for order ${orderId}:`, refErr);
+  // 1. Customer Number Allocation (Founding 500 Campaign Sequence)
+  let customerAllocated = typeof orderData.customerNumber === 'number';
+  if (!customerAllocated) {
+    try {
+      const alloc = await allocateCustomerNumber(orderId);
+      if (alloc) {
+        customerAllocated = true;
+        await appendOrderHistory(orderId, 'customer_number_allocated', 'system', {
+          customerNumber: alloc.customerNumber,
+          isFounding500: alloc.isFounding500,
+        });
+      }
+    } catch (seqErr: any) {
+      console.error(`[OrderOrchestrator] Customer number allocation error for order ${orderId}:`, seqErr);
+    }
   }
 
-  // 2. Email Receipt Sender
+  // Strictly enforce: Never mark an order fulfilled if customer-number allocation failed!
+  if (!customerAllocated) {
+    console.error(`[OrderOrchestrator] Halting fulfillment: customer-number allocation failed for order ${orderId}`);
+    await jobRef.update({
+      status: 'failed',
+      lastError: 'Customer number allocation failed - fulfillment halted to preserve campaign sequence integrity',
+      lockedBy: null,
+      leaseToken: null,
+      leaseExpiresAtMs: 0,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+    await appendOrderHistory(orderId, 'fulfillment_halted_missing_customer_number', 'system');
+    return;
+  }
+
+  // 2. Referral Commission Processing (Idempotent via doc referral_${order.id})
+  if (!orderData.referralProcessed) {
+    try {
+      await processReferral(order);
+      await orderRef.update({ referralProcessed: true });
+      await appendOrderHistory(orderId, 'referral_processed', 'system');
+    } catch (refErr: any) {
+      console.error(`[OrderOrchestrator] Referral processing error for order ${orderId}:`, refErr);
+    }
+  }
+
+  // 3. Email Receipt Sender (Idempotent via emailSent flag)
   if (!orderData.emailSent) {
     try {
       await sendOrderConfirmationEmailsOnce(orderId, order);
       await orderRef.update({ emailSent: true });
-      await appendOrderHistory(orderId, 'confirmation_email_sent', 'system', { email: order.userEmail });
+      await appendOrderHistory(orderId, 'confirmation_email_sent', 'system', { email: order.userEmail || null });
     } catch (emailErr: any) {
       console.error(`[OrderOrchestrator] Email sending error for order ${orderId}:`, emailErr);
     }
   }
 
-  // 3. Printify Automated Order Submission (with exponential backoff retry tracking)
+  // 4. Printify Automated Order Submission
+  // Check if order was already submitted to Printify
+  if (orderData.printifyOrderId || orderData.status === 'in_production' || orderData.status === 'delivered') {
+    console.log(`[OrderOrchestrator] Order ${orderId} already submitted to Printify (${orderData.printifyOrderId}). Completing job.`);
+    await completeOrderJob(jobId, claim.leaseToken);
+    return;
+  }
+
   const shopId = process.env.PRINTIFY_SHOP_ID;
   if (shopId && order.shippingAddress && order.shippingAddress.street && order.shippingAddress.city) {
     const printifyItems = (order.items || []).filter(
@@ -135,13 +295,17 @@ export async function processOrderJob(jobId: string, orderId: string, currentAtt
           },
         });
 
+        const currentSnap = await orderRef.get();
+        const curStatus = currentSnap.data()?.status;
+        const shouldUpdateStatus = !['shipped', 'delivered', 'cancelled'].includes(curStatus);
+
         await orderRef.update({
           printifyOrderId: printifyOrder.id,
-          status:          'in_production',
+          ...(shouldUpdateStatus ? { status: 'in_production' } : {}),
           updatedAt:       FieldValue.serverTimestamp(),
         });
 
-        await jobRef.update({ status: 'completed', updatedAt: FieldValue.serverTimestamp() });
+        await completeOrderJob(jobId, claim.leaseToken);
         await appendOrderHistory(orderId, 'printify_order_submitted', 'system', { printifyOrderId: printifyOrder.id });
         return;
       } catch (printifyErr: any) {
@@ -151,24 +315,30 @@ export async function processOrderJob(jobId: string, orderId: string, currentAtt
         if (currentAttempt < MAX_RETRIES) {
           const backoffDelayMs = Math.pow(2, currentAttempt) * 1000; // 2s, 4s, 8s backoff
           await jobRef.update({
-            attemptCount: FieldValue.increment(1),
-            status:       'retrying',
-            lastError:    errMsg,
-            updatedAt:    FieldValue.serverTimestamp(),
+            attemptCount:     FieldValue.increment(1),
+            status:           'retrying',
+            lastError:        errMsg,
+            lockedBy:         null,
+            leaseToken:       null,
+            leaseExpiresAtMs: 0,
+            updatedAt:        FieldValue.serverTimestamp(),
           });
           await appendOrderHistory(orderId, 'printify_submission_retry_scheduled', 'system', { attempt: currentAttempt + 1, backoffMs: backoffDelayMs });
 
           // Synchronous await delay instead of setTimeout in serverless
           await new Promise((resolve) => setTimeout(resolve, backoffDelayMs));
-          return processOrderJob(jobId, orderId, currentAttempt + 1);
+          return processOrderJob(jobId, orderId, currentAttempt + 1, actualWorkerId);
         }
 
         await orderRef.update({ status: 'queued_for_printify', updatedAt: FieldValue.serverTimestamp() });
         await jobRef.update({
-          attemptCount: FieldValue.increment(1),
-          status:       'failed',
-          lastError:    errMsg,
-          updatedAt:    FieldValue.serverTimestamp(),
+          attemptCount:     FieldValue.increment(1),
+          status:           'failed',
+          lastError:        errMsg,
+          lockedBy:         null,
+          leaseToken:       null,
+          leaseExpiresAtMs: 0,
+          updatedAt:        FieldValue.serverTimestamp(),
         });
         await appendOrderHistory(orderId, 'printify_submission_failed_max_retries', 'system', { error: errMsg });
         return;
@@ -176,7 +346,7 @@ export async function processOrderJob(jobId: string, orderId: string, currentAtt
     }
   }
 
-  await jobRef.update({ status: 'completed', updatedAt: FieldValue.serverTimestamp() });
+  await completeOrderJob(jobId, claim.leaseToken);
 }
 
 /**
@@ -191,14 +361,36 @@ export async function sweepStuckJobs(maxAgeMs: number = 10 * 60 * 1000): Promise
   let requeued = 0;
 
   try {
-    const snap = await adminDb
-      .collection('order_jobs')
-      .where('status', 'in', ['pending', 'retrying', 'processing'])
-      .where('updatedAt', '<', cutoff)
-      .limit(10)
-      .get();
+    let docs: FirebaseFirestore.QueryDocumentSnapshot[] = [];
+    try {
+      const snap = await adminDb
+        .collection('order_jobs')
+        .where('status', 'in', ['pending', 'retrying', 'processing'])
+        .where('updatedAt', '<', cutoff)
+        .limit(10)
+        .get();
+      docs = snap.docs;
+    } catch (queryErr: any) {
+      // If composite index is building or not yet created, fall back to single-field filter with in-memory cutoff
+      if (queryErr?.code === 9 || String(queryErr?.message || '').includes('index')) {
+        const fallbackSnap = await adminDb
+          .collection('order_jobs')
+          .where('status', 'in', ['pending', 'retrying', 'processing'])
+          .limit(30)
+          .get();
 
-    for (const doc of snap.docs) {
+        docs = fallbackSnap.docs.filter((d) => {
+          const raw = d.data()?.updatedAt;
+          if (!raw) return true;
+          const u = typeof raw.toDate === 'function' ? raw.toDate() : new Date(raw);
+          return u < cutoff;
+        }).slice(0, 10);
+      } else {
+        throw queryErr;
+      }
+    }
+
+    for (const doc of docs) {
       const job = doc.data();
       const orderId = String(job.orderId || doc.id);
       const jobRef = adminDb.collection('order_jobs').doc(doc.id);

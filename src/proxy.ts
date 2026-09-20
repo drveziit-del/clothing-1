@@ -6,7 +6,7 @@ const AUTH_PATHS   = ['/auth/login', '/auth/signup'];
 const ADMIN_PREFIX = '/admin';
 const AUTH_PREFIX  = ['/checkout', '/account', '/referral'];
 
-function isPublic(pathname: string): boolean {
+function _isPublic(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) return true;
   if (pathname.startsWith('/shop/')) return true;
   if (pathname.startsWith('/api/payment/webhook')) return true;

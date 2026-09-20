@@ -63,17 +63,17 @@ const DEFAULT_COPYWRITING = {
 };
 
 const DEFAULT_BANK_DETAILS = {
-  bankName: 'Wise Payments Ltd / JPMorgan Chase Bank, N.A.',
-  accountHolder: 'GERKINK GLOBAL ENTERPRISES LLC',
-  accountNumber: '9876543210',
-  routingNumber: '026073150',
-  swiftBic: 'WISEUS33XXX',
+  bankName: '',
+  accountHolder: '',
+  accountNumber: '',
+  routingNumber: '',
+  swiftBic: '',
   bankCountry: 'United States',
   currency: 'USD',
-  wiseEmail: 'treasury@gerkink.shop',
-  wiseTag: '@gerkink-treasury',
-  referenceInstructions: 'Please include your Allocation Order ID (e.g. PREBOOK-XXXXXX) in the wire reference or memo.',
-  supportNotice: 'Wire transfers and Wise payments are audited and confirmed by our treasury desk within 2 to 6 hours.',
+  wiseEmail: '',
+  wiseTag: '',
+  referenceInstructions: '',
+  supportNotice: '',
 };
 
 type Tab = 'roasts' | 'copywriting' | 'bank';
@@ -85,6 +85,13 @@ export default function AdminSettingsPage() {
   const [newRoast, setNewRoast] = useState('');
   const [savingRoasts, setSavingRoasts] = useState(false);
 
+  // Announcement Bar dynamic controls
+  const [announcementGiantText, setAnnouncementGiantText] = useState('LOOK AT ME FOLKS');
+  const [announcementCapsuleTag, setAnnouncementCapsuleTag] = useState('LOOK AT ME FOLKS');
+  const [announcementCapsuleMessage, setAnnouncementCapsuleMessage] = useState('NEW DROP JUST LANDED');
+  const [announcementCapsuleLink, setAnnouncementCapsuleLink] = useState('/shop');
+  const [announcementEnabled, setAnnouncementEnabled] = useState(true);
+
   // Shipping config state
   const [standardShippingFee, setStandardShippingFee] = useState(15);
   const [freeShippingThreshold, setFreeShippingThreshold] = useState(100);
@@ -95,6 +102,8 @@ export default function AdminSettingsPage() {
 
   // Bank & Wise state
   const [bankDetails, setBankDetails] = useState(DEFAULT_BANK_DETAILS);
+  const [bankLoaded, setBankLoaded] = useState(false);
+  const [bankLoadError, setBankLoadError] = useState<string | null>(null);
   const [savingBank, setSavingBank] = useState(false);
 
   useEffect(() => {
@@ -107,7 +116,16 @@ export default function AdminSettingsPage() {
         const roastSnap = await getDoc(doc(db, 'settings', 'global'));
         if (roastSnap.exists()) {
           const data = roastSnap.data();
-          if (data.roastMessages) setRoastMessages(data.roastMessages);
+          if (data.announcementMessages && Array.isArray(data.announcementMessages)) {
+            setRoastMessages(data.announcementMessages);
+          } else if (data.roastMessages && Array.isArray(data.roastMessages)) {
+            setRoastMessages(data.roastMessages);
+          }
+          if (typeof data.announcementGiantText === 'string') setAnnouncementGiantText(data.announcementGiantText);
+          if (typeof data.announcementCapsuleTag === 'string') setAnnouncementCapsuleTag(data.announcementCapsuleTag);
+          if (typeof data.announcementCapsuleMessage === 'string') setAnnouncementCapsuleMessage(data.announcementCapsuleMessage);
+          if (typeof data.announcementCapsuleLink === 'string') setAnnouncementCapsuleLink(data.announcementCapsuleLink);
+          if (typeof data.announcementEnabled === 'boolean') setAnnouncementEnabled(data.announcementEnabled);
           if (typeof data.standardShippingFee === 'number') setStandardShippingFee(data.standardShippingFee);
           if (typeof data.freeShippingThreshold === 'number') setFreeShippingThreshold(data.freeShippingThreshold);
         }
@@ -118,19 +136,20 @@ export default function AdminSettingsPage() {
         }
 
         // Bank details are AES-256-GCM encrypted at rest by the admin API;
-        // this public endpoint returns them decrypted for editing.
+        // this endpoint returns them decrypted for editing.
         try {
           const bankRes = await fetch('/api/settings/bank-details');
-          if (bankRes.ok) {
-            const bankData = await bankRes.json();
-            setBankDetails(prev => ({ ...prev, ...bankData }));
+          if (!bankRes.ok) {
+            throw new Error(`Failed to load bank details (HTTP ${bankRes.status})`);
           }
-        } catch {
-          console.warn('Falling back to direct Firestore read for bank details');
-          const bankSnap = await getDoc(doc(db, 'settings', 'bank_details'));
-          if (bankSnap.exists()) {
-            setBankDetails(prev => ({ ...prev, ...bankSnap.data() }));
-          }
+          const bankData = await bankRes.json();
+          setBankDetails(prev => ({ ...prev, ...bankData }));
+          setBankLoaded(true);
+          setBankLoadError(null);
+        } catch (bankErr: any) {
+          console.error('Failed to load decrypted bank details:', bankErr);
+          setBankLoaded(false);
+          setBankLoadError(bankErr?.message || 'Failed to load bank details from server');
         }
       } catch (err) {
         console.error('Error loading settings:', err);
@@ -155,10 +174,20 @@ export default function AdminSettingsPage() {
       const res = await fetch('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roastMessages, standardShippingFee, freeShippingThreshold }),
+        body: JSON.stringify({
+          roastMessages,
+          announcementMessages: roastMessages,
+          announcementGiantText,
+          announcementCapsuleTag,
+          announcementCapsuleMessage,
+          announcementCapsuleLink,
+          announcementEnabled,
+          standardShippingFee,
+          freeShippingThreshold,
+        }),
       });
       if (!res.ok) throw new Error();
-      toast('Settings saved. The roasts live on.', 'success');
+      toast('Announcements & Ticker saved. Live site updated.', 'success');
     } catch {
       toast('Save failed. Even the settings page judges you.', 'error');
     } finally {
@@ -184,6 +213,7 @@ export default function AdminSettingsPage() {
   };
 
   const handleSaveBankDetails = async () => {
+    if (!bankLoaded || savingBank) return;
     setSavingBank(true);
     try {
       const res = await fetch('/api/admin/settings/bank-details', {
@@ -259,7 +289,7 @@ export default function AdminSettingsPage() {
           onClick={() => setActiveTab('roasts')}
           className={`${styles.tabBtn} ${activeTab === 'roasts' ? styles.tabActive : ''}`}
         >
-          Roasts &amp; General
+          📢 Announcements &amp; Ticker
         </button>
         <button
           onClick={() => setActiveTab('copywriting')}
@@ -277,10 +307,46 @@ export default function AdminSettingsPage() {
 
       {activeTab === 'roasts' && (
         <section className={adminStyles.section}>
-          <h2 className={adminStyles.sectionTitle}>Roast Messages</h2>
+          <h2 className={adminStyles.sectionTitle}>Announcement &amp; Ticker Messages</h2>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-            These rotate in the ego ticker and appear throughout the site.
+            These messages continuously scroll horizontally in the coral pink announcement bar directly under the navbar and across site tickers in real time.
           </p>
+
+          {/* Quick preset templates */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              style={{ fontSize: '0.72rem', padding: '0.3rem 0.65rem' }}
+              onClick={() => setRoastMessages(prev => [...prev, '✦ LIMITED DROP: PEASANT PREMIUM 2.0 CAPSULE IS LIVE'])}
+            >
+              + Drop Notice
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              style={{ fontSize: '0.72rem', padding: '0.3rem 0.65rem' }}
+              onClick={() => setRoastMessages(prev => [...prev, '✦ RESTOCK: ALL HOODIE SIZES [S–3XL] NOW IN STOCK'])}
+            >
+              + Restock Alert
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              style={{ fontSize: '0.72rem', padding: '0.3rem 0.65rem' }}
+              onClick={() => setRoastMessages(prev => [...prev, '✦ SHIPPING: WORLDWIDE 21-DAY CUSTOM PRINTED DISPATCH'])}
+            >
+              + Shipping Notice
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              style={{ fontSize: '0.72rem', padding: '0.3rem 0.65rem' }}
+              onClick={() => setRoastMessages(prev => [...prev, '✦ REFERRAL REWARDS: EARN $100 CASH PER 10 CLIENT PURCHASES'])}
+            >
+              + Referral Milestone
+            </button>
+          </div>
 
           <div className={styles.roastList}>
             {roastMessages.map((msg, i) => (
@@ -297,10 +363,10 @@ export default function AdminSettingsPage() {
                       return next;
                     });
                   }}
-                  maxLength={200}
-                  placeholder="Roast message"
+                  maxLength={300}
+                  placeholder="Announcement or roast message"
                 />
-                <button onClick={() => removeRoast(i)} className={styles.removeBtn} aria-label="Remove roast">×</button>
+                <button onClick={() => removeRoast(i)} className={styles.removeBtn} aria-label="Remove message">×</button>
               </div>
             ))}
           </div>
@@ -309,13 +375,96 @@ export default function AdminSettingsPage() {
             <input
               type="text"
               className="input"
-              placeholder="Add a new roast (keep it brutal)"
+              placeholder="Add custom announcement text (e.g. ✦ FLASH RESTOCK ✦ 240GSM TEES LIVE)"
               value={newRoast}
               onChange={(e) => setNewRoast(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addRoast()}
-              maxLength={200}
+              maxLength={300}
             />
             <button onClick={addRoast} className="btn btn-secondary btn-sm">Add</button>
+          </div>
+
+          <div className={styles.dividerLine} />
+
+          {/* ── Liquid Glass & Header Configuration ── */}
+          <h2 className={adminStyles.sectionTitle} style={{ marginTop: '1.5rem' }}>Liquid Glass &amp; Typography Settings</h2>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+            Customize the background oversized text and the centered translucent Liquid Glass button.
+          </p>
+
+          <div className={styles.inputRow} style={{ marginBottom: '1rem' }}>
+            <div>
+              <label className="input-label">Background Giant Text (Coral Pink)</label>
+              <input
+                type="text"
+                className="input"
+                value={announcementGiantText}
+                onChange={(e) => setAnnouncementGiantText(e.target.value)}
+                placeholder="e.g. LOOK AT ME FOLKS"
+                maxLength={100}
+              />
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.3rem' }}>
+                Oversized background text layer that appears behind the moving marquee.
+              </span>
+            </div>
+            <div>
+              <label className="input-label">Liquid Glass Pill Tag</label>
+              <input
+                type="text"
+                className="input"
+                value={announcementCapsuleTag}
+                onChange={(e) => setAnnouncementCapsuleTag(e.target.value)}
+                placeholder="e.g. LOOK AT ME FOLKS or ALERT"
+                maxLength={50}
+              />
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.3rem' }}>
+                The category/status tag shown inside the glass capsule pill.
+              </span>
+            </div>
+          </div>
+
+          <div className={styles.inputRow}>
+            <div>
+              <label className="input-label">Liquid Glass Message</label>
+              <input
+                type="text"
+                className="input"
+                value={announcementCapsuleMessage}
+                onChange={(e) => setAnnouncementCapsuleMessage(e.target.value)}
+                placeholder="e.g. NEW DROP JUST LANDED"
+                maxLength={100}
+              />
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.3rem' }}>
+                Headline text shown inside the centered button.
+              </span>
+            </div>
+            <div>
+              <label className="input-label">Liquid Glass Destination Link</label>
+              <input
+                type="text"
+                className="input"
+                value={announcementCapsuleLink}
+                onChange={(e) => setAnnouncementCapsuleLink(e.target.value)}
+                placeholder="e.g. /shop or /shop/valueless-bitches"
+                maxLength={200}
+              />
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.3rem' }}>
+                Where the user navigates when clicking the capsule button.
+              </span>
+            </div>
+          </div>
+
+          <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <input
+              type="checkbox"
+              id="announcementEnabled"
+              checked={announcementEnabled}
+              onChange={(e) => setAnnouncementEnabled(e.target.checked)}
+              style={{ accentColor: 'var(--coral-200)', width: '16px', height: '16px', cursor: 'pointer' }}
+            />
+            <label htmlFor="announcementEnabled" style={{ fontSize: '0.82rem', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}>
+              Show Announcement Bar on Website
+            </label>
           </div>
 
           <div className={styles.dividerLine} />
@@ -610,14 +759,22 @@ export default function AdminSettingsPage() {
             </div>
             <button
               onClick={handleSaveBankDetails}
-              disabled={savingBank}
+              disabled={savingBank || !bankLoaded}
               className="btn btn-primary"
             >
-              {savingBank ? 'Saving Treasury Details...' : 'Save Treasury Details'}
+              {savingBank ? 'Saving Treasury Details...' : !bankLoaded ? 'Treasury Details Unavailable' : 'Save Treasury Details'}
             </button>
           </div>
 
           <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {!bankLoaded && (
+              <div style={{ padding: '0.85rem 1rem', background: 'rgba(255, 107, 107, 0.1)', border: '1px solid rgba(255, 107, 107, 0.3)', borderRadius: '6px', color: '#ff6b6b', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>⚠️</span>
+                <span>{bankLoadError ? `Error: ${bankLoadError}. Editing and saving are disabled to protect encrypted treasury credentials.` : 'Loading decrypted treasury details from server... Saving is disabled until valid load completes.'}</span>
+              </div>
+            )}
+
+            <fieldset disabled={!bankLoaded || savingBank} style={{ border: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div className={styles.inputRow}>
               <div>
                 <label className="input-label">Bank Name &amp; Entity</label>
@@ -740,14 +897,15 @@ export default function AdminSettingsPage() {
                 onChange={(e) => setBankDetails(prev => ({ ...prev, supportNotice: e.target.value }))}
               />
             </div>
+            </fieldset>
 
             <button
               onClick={handleSaveBankDetails}
-              disabled={savingBank}
+              disabled={savingBank || !bankLoaded}
               className="btn btn-primary"
               style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}
             >
-              {savingBank ? 'Saving Treasury Details...' : 'Save Treasury Details'}
+              {savingBank ? 'Saving Treasury Details...' : !bankLoaded ? 'Treasury Details Unavailable' : 'Save Treasury Details'}
             </button>
           </div>
         </section>

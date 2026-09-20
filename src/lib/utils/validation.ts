@@ -155,7 +155,32 @@ export const updateProductSchema = createProductSchema.partial().extend({
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 
 export const updateSettingsSchema = z.object({
-  roastMessages: z.array(z.string().min(5).max(200)).optional(),
+  roastMessages: z.array(z.string().min(2).max(300)).optional(),
+  announcementMessages: z.array(z.string().min(2).max(300)).optional(),
+  announcementGiantText: z.string().max(100).optional(),
+  announcementCapsuleTag: z.string().max(50).optional(),
+  announcementCapsuleMessage: z.string().max(100).optional(),
+  announcementCapsuleLink: z
+    .string()
+    .max(200)
+    .refine(
+      (val) => {
+        if (!val) return true;
+        const trimmed = val.trim();
+        if (trimmed.startsWith('/') && !trimmed.startsWith('//') && !trimmed.startsWith('/\\')) {
+          return true;
+        }
+        try {
+          const parsed = new URL(trimmed);
+          return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+        } catch {
+          return false;
+        }
+      },
+      { message: 'URL must be a safe internal path (e.g. /shop) or valid HTTP/HTTPS URL' }
+    )
+    .optional(),
+  announcementEnabled: z.boolean().optional(),
   checkoutMessage: z.string().max(200).optional(),
   siteActive: z.boolean().optional(),
   standardShippingFee: z.number().nonnegative().optional(),

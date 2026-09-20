@@ -1,5 +1,6 @@
 import { getFirebaseAuth, getFirestoreDb, getFirestoreModule } from './config';
 import type { User } from '@/types';
+import { getSafeRedirectUrl } from '@/lib/utils/redirect';
 
 // Type-only imports — erased at compile time
 import type { UserCredential } from 'firebase/auth';
@@ -92,13 +93,15 @@ export async function signInWithGoogle(referralCode?: string): Promise<void> {
   const provider = new GoogleAuthProvider();
   provider.addScope('email');
   provider.addScope('profile');
+  provider.setCustomParameters({ prompt: 'select_account' });
 
-  // Persist the intended destination so the redirect fallback (which loses the
-  // current URL) can restore it after sign-in completes.
+  // Persist the intended destination so the redirect fallback can restore it
   if (typeof window !== 'undefined') {
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get('redirect');
-    if (redirect) sessionStorage.setItem('gerkink_redirect', redirect);
+    if (redirect) {
+      sessionStorage.setItem('gerkink_redirect', getSafeRedirectUrl(redirect));
+    }
   }
 
   try {
@@ -108,7 +111,13 @@ export async function signInWithGoogle(referralCode?: string): Promise<void> {
     const idToken = await credential.user.getIdToken();
     await setSessionCookie(idToken);
   } catch (err: any) {
-    if (err?.code === 'auth/popup-blocked' || err?.code === 'auth/cancelled-popup-request') {
+    // If popup fails due to network/adblocker/third-party iframe restrictions,
+    // seamlessly fall back to full redirect OAuth flow
+    if (
+      err?.code === 'auth/popup-blocked' ||
+      err?.code === 'auth/cancelled-popup-request' ||
+      err?.code === 'auth/operation-not-supported-in-this-environment'
+    ) {
       if (referralCode) sessionStorage.setItem('gerkink_referral', referralCode);
       await signInWithRedirect(getFirebaseAuth(), provider);
       return;
@@ -118,25 +127,27 @@ export async function signInWithGoogle(referralCode?: string): Promise<void> {
 }
 
 /**
- * Call this on app init to handle the redirect result after Google sign-in.
- * Returns the credential if a redirect just completed, or null otherwise.
+ * Handles the redirect result if signInWithRedirect fallback was used.
+ * Call this on mount in auth-sensitive pages or layout.
  */
 export async function handleGoogleRedirectResult(): Promise<void> {
   const { getRedirectResult } = require('firebase/auth') as typeof import('firebase/auth');
-
   try {
     const result = await getRedirectResult(getFirebaseAuth());
-    if (result) {
-      const referralCode = sessionStorage.getItem('gerkink_referral');
-      sessionStorage.removeItem('gerkink_referral');
-      await createUserProfile(result, undefined, referralCode ?? undefined);
+    if (result?.user) {
+      // Re-apply referral code if one was saved before the redirect
+      const savedRef = sessionStorage.getItem('gerkink_referral');
+      if (savedRef) {
+        sessionStorage.removeItem('gerkink_referral');
+        await createUserProfile(result, undefined, savedRef);
+      }
 
       // Explicitly set session cookie before redirecting
       const idToken = await result.user.getIdToken();
       await setSessionCookie(idToken);
 
-      // Navigate to the intended destination after sign-in
-      const redirect = sessionStorage.getItem('gerkink_redirect') ?? '/';
+      // Navigate to the intended destination after sign-in (safely restricted to same-origin)
+      const redirect = getSafeRedirectUrl(sessionStorage.getItem('gerkink_redirect'));
       sessionStorage.removeItem('gerkink_redirect');
       window.location.replace(redirect);
     }
@@ -146,6 +157,8 @@ export async function handleGoogleRedirectResult(): Promise<void> {
     sessionStorage.removeItem('gerkink_referral');
   }
 }
+
+export const handleRedirectResult = handleGoogleRedirectResult;
 
 export async function signOut(): Promise<void> {
   const { signOut: firebaseSignOut } = require('firebase/auth') as typeof import('firebase/auth');

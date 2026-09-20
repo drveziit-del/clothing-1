@@ -27,11 +27,11 @@ export async function POST(request: NextRequest) {
   }
 
   let uid: string;
-  let email: string;
+  let _email: string;
   try {
     const decoded = await adminAuth.verifySessionCookie(session, true);
     uid   = decoded.uid;
-    email = decoded.email ?? '';
+    _email = decoded.email ?? '';
   } catch {
     return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
   }

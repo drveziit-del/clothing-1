@@ -1,3 +1,5 @@
+import 'server-only';
+import crypto from 'crypto';
 import type { PaymentGateway } from '@/lib/payment/types';
 
 let cachedAccessToken: { token: string; expiresAt: number } | null = null;
@@ -90,7 +92,7 @@ export class PayPalGateway implements PaymentGateway {
         brand_name: 'GERKINK',
         landing_page: 'BILLING',
         user_action: 'PAY_NOW',
-        shipping_preference: 'SET_PROVIDED_ADDRESS',
+        shipping_preference: shippingAddress ? 'SET_PROVIDED_ADDRESS' : 'NO_SHIPPING',
       },
       ...(shippingAddress ? {
         payer: {
@@ -177,7 +179,7 @@ export class PayPalGateway implements PaymentGateway {
 
   async captureOrder(
     paypalOrderId: string
-  ): Promise<{ captureId: string; status: string; amountValue?: number }> {
+  ): Promise<{ captureId: string; status: string; amountValue?: number; currency?: string }> {
     const token = await getPayPalAccessToken();
     const baseUrl = getPayPalBaseUrl();
 
@@ -202,20 +204,43 @@ export class PayPalGateway implements PaymentGateway {
     const captureId = capture?.id || data.id;
     const status = data.status || capture?.status || 'COMPLETED';
     const amountValue = capture?.amount?.value ? parseFloat(capture.amount.value) : undefined;
+    const currency = capture?.amount?.currency_code || data.purchase_units?.[0]?.amount?.currency_code || 'USD';
 
-    return { captureId, status, amountValue };
+    return { captureId, status, amountValue, currency };
   }
 
   async verifyWebhook(request: Request): Promise<{ valid: boolean; event?: any }> {
+    // 1. Explicit Secret Check for Test/Dev Webhook Bypass
+    // The test webhook bypass is strictly unavailable unless PAYPAL_TEST_WEBHOOK_SECRET is explicitly configured.
+    const testSecret = process.env.PAYPAL_TEST_WEBHOOK_SECRET;
+    const providedTestSecret =
+      request.headers.get('x-paypal-test-secret') ||
+      request.headers.get('x-test-webhook-secret') ||
+      request.headers.get('x-test-webhook');
+
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      testSecret &&
+      testSecret.trim().length > 0 &&
+      providedTestSecret
+    ) {
+      const testBuf = Buffer.from(testSecret.trim());
+      const provBuf = Buffer.from(providedTestSecret.trim());
+      if (testBuf.length === provBuf.length && crypto.timingSafeEqual(testBuf, provBuf)) {
+        try {
+          const raw = await request.text();
+          return { valid: true, event: JSON.parse(raw) };
+        } catch {
+          return { valid: false };
+        }
+      }
+    }
+
+    // 2. Official PayPal Transmission Verification
     const webhookId = process.env.PAYPAL_WEBHOOK_ID;
     if (!webhookId) {
-      if (process.env.NODE_ENV === 'production') {
-        console.error('[PayPalGateway] CRITICAL: PAYPAL_WEBHOOK_ID is missing in production. Rejecting unverified webhook.');
-        return { valid: false };
-      }
-      console.warn('[PayPalGateway] PAYPAL_WEBHOOK_ID is not set in development mode. Webhook signature check skipped.');
-      const body = await request.json();
-      return { valid: true, event: body };
+      console.error('[PayPalGateway] CRITICAL: PAYPAL_WEBHOOK_ID is missing. Rejecting unverified webhook.');
+      return { valid: false };
     }
 
     const authAlgo = request.headers.get('paypal-auth-algo');

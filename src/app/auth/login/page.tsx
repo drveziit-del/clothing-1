@@ -2,16 +2,16 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { signInWithEmail, signInWithGoogle } from '@/lib/firebase/auth';
 import { useAuth } from '@/context/AuthContext';
 import { useRoast } from '@/hooks/useRoast';
 import { loginSchema } from '@/lib/utils/validation';
+import { getSafeRedirectUrl } from '@/lib/utils/redirect';
 import { LOGIN_ROASTS } from '@/lib/utils/roasts';
 import styles from './page.module.css';
 
 function LoginContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useRoast();
   const { firebaseUser, loading: authLoading } = useAuth();
@@ -26,7 +26,7 @@ function LoginContent() {
     setRoast(LOGIN_ROASTS[Math.floor(Math.random() * LOGIN_ROASTS.length)]);
   }, []);
 
-  const redirect = searchParams.get('redirect') ?? '/';
+  const redirect = getSafeRedirectUrl(searchParams.get('redirect'));
 
   useEffect(() => {
     if (!authLoading && firebaseUser && !loading && !googleLoading) {
@@ -73,12 +73,15 @@ function LoginContent() {
       await signInWithGoogle(ref);
       window.location.href = redirect;
     } catch (err: any) {
-      if (err?.code === 'auth/popup-closed-by-user') {
+      if (
+        err?.code === 'auth/popup-closed-by-user' ||
+        err?.code === 'auth/cancelled-popup-request'
+      ) {
         setGoogleLoading(false);
         return;
       }
       console.error('Google Sign-in Error:', err);
-      toast('Google sign-in failed. Manually type like it\'s 2010.', 'error');
+      toast('Google sign-in error. Trying redirect...', 'error');
       setGoogleLoading(false);
     }
   }
@@ -116,7 +119,7 @@ function LoginContent() {
         </div>
 
         <form onSubmit={handleSubmit} noValidate className={styles.form}>
-          {errors.form && <p className={styles.formError}>{errors.form}</p>}
+          {errors.form && <p className={styles.formError} role="alert">{errors.form}</p>}
 
           <div>
             <label htmlFor="email" className="input-label">Email</label>
@@ -127,9 +130,10 @@ function LoginContent() {
               autoComplete="email"
               className="input"
               placeholder="you@example.com"
+              aria-invalid={errors.email ? 'true' : 'false'}
               aria-describedby={errors.email ? 'email-error' : undefined}
             />
-            {errors.email && <span id="email-error" className={styles.fieldError}>{errors.email}</span>}
+            {errors.email && <span id="email-error" role="alert" className={styles.fieldError}>{errors.email}</span>}
           </div>
 
           <div>
@@ -142,6 +146,7 @@ function LoginContent() {
                 autoComplete="current-password"
                 className="input"
                 placeholder="••••••••"
+                aria-invalid={errors.password ? 'true' : 'false'}
                 aria-describedby={errors.password ? 'pw-error' : undefined}
               />
               <button
@@ -163,7 +168,7 @@ function LoginContent() {
                 )}
               </button>
             </div>
-            {errors.password && <span id="pw-error" className={styles.fieldError}>{errors.password}</span>}
+            {errors.password && <span id="pw-error" role="alert" className={styles.fieldError}>{errors.password}</span>}
           </div>
 
           <button type="submit" disabled={loading} className="btn btn-primary btn-full btn-lg">

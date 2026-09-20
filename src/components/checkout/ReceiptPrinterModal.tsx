@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useFocusTrap } from '@/lib/utils/useFocusTrap';
 import {
   ReceiptPrinter,
   type ReceiptPrinterStage,
@@ -49,12 +50,12 @@ export default function ReceiptPrinterModal({
   subtotal,
   tax,
   discount,
-  shippingCharge,
-  grandTotal,
+
+
   couponCode,
   shippingAddress,
   customerName,
-  customerEmail,
+
   onVerifyAndComplete,
 }: ReceiptPrinterModalProps) {
   const router = useRouter();
@@ -63,6 +64,7 @@ export default function ReceiptPrinterModal({
   const [finalOrderId, setFinalOrderId] = useState(initialOrderId || '');
   const [receiptDate, setReceiptDate] = useState('');
   const [downloading, setDownloading] = useState(false);
+  const focusTrapRef = useFocusTrap<HTMLDivElement>(isOpen);
 
   useEffect(() => {
     if (initialOrderId) {
@@ -118,6 +120,7 @@ export default function ReceiptPrinterModal({
     return () => {
       isMounted = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional deps (audit)
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -221,7 +224,13 @@ export default function ReceiptPrinterModal({
   };
 
   return (
-    <div className={styles.overlay}>
+    <div
+      ref={focusTrapRef}
+      className={styles.overlay}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="receipt-printer-title"
+    >
       <div className={styles.modalContent}>
         <ReceiptPrinter.Root stage={stage} feedMotion="stepped">
           {/* Printer Machine Top */}
@@ -229,7 +238,7 @@ export default function ReceiptPrinterModal({
             <ReceiptPrinter.Header>
               <div className={styles.printerBrand}>
                 <span className={styles.brandDot} />
-                <span className={styles.brandText}>GERKINK PRINTER</span>
+                <span id="receipt-printer-title" className={styles.brandText}>GERKINK PRINTER</span>
               </div>
               <span className={styles.receiptModelBadge}>GK-TERM 0.0</span>
             </ReceiptPrinter.Header>

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import DataTable from '@/components/admin/DataTable';
-import Modal from '@/components/ui/Modal';
 import styles from '../page.module.css';
 import { useRoast } from '@/hooks/useRoast';
 import { useCurrency } from '@/context/CurrencyContext';
@@ -51,6 +50,7 @@ export default function AdminProductsPage() {
     return () => {
       window.removeEventListener('focus', handleFocus);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional deps (audit)
   }, []);
 
   // Sync products

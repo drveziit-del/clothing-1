@@ -205,7 +205,9 @@ Utilizes Firestore atomic locks via `order_email_locks/{orderId}` to prevent rac
 | `referrals` | `{referralId}` | Affiliate counters, order IDs, milestone status | Owner read; Server write |
 | `coupons` | `{couponId}` | Store discount codes and affiliate rewards | Public validate; Admin write |
 | `settings` | `global` / `copywriting` | Ticker roasts, site text, shipping charges | Public read; Admin write |
-| `reviews` | `{reviewId}` | Live customer reviews & ratings | Public read; Authenticated write |
+| `reviews` | `{reviewId}` | Customer reviews, ratings, verified purchase badges | Public read; Moderated write |
+| `customDesignRequests` | `{requestId}` | Bespoke luxury commissions, specs, FSM status | Owner read; Admin write |
+| `payout_requests` | `{requestId}` | Affiliate $100 claim queue and audit status | Admin read; Server write |
 
 ---
 
@@ -218,22 +220,32 @@ npm run dev
 # Run TypeScript compilation check
 npx tsc --noEmit
 
-# Run Next.js production build (55 routes)
-npx next build
+# Run ESLint quality audit
+npm run lint
 
-# Run 10-Referral Transaction Unit Test
-node scripts/test-ten-referrals.js
+# Run Next.js production build (55+ routes)
+npm run build
 
-# Run Single Referral Engine Unit Test
-node scripts/test-process-referral.js
+# Run Master Phase Verification Suites
+node scripts/test-phase11-admin-reliability.js
+node scripts/test-phase10-ui-accessibility.js
+node scripts/verify-reviews-network.js
+node scripts/test-phase9-e2e-integrity.js
 ```
 
 ---
 
-## 8. Historical Fix & Deployment Log (June – August 2026)
+## 8. Historical Fix & Deployment Log (June – September 2026)
 
 | Date | Subsystem | Description of Fix / Implementation |
 |:---|:---|:---|
+| **2026-09-16** | **Pre-Phase 14: Privacy & Deletion** | Implemented secure `DELETE /api/account` endpoint and Danger Zone UI with cryptographic ID-token reauthentication, typed `DELETE` confirmation, rate limiting, Storage cleanup, review anonymization, and financial/tax audit ledger retention. |
+| **2026-09-16** | **Phase 13: Full Regression** | Master full E2E regression passed 29/29 assertions across 10 architectural domains with zero simulated mutations. |
+| **2026-09-16** | **Phase 12: Docs & Secrets Hygiene** | Certified zero secret leakage, server-only isolation, deployment parity, and Firestore index declarations (126/126 assertions). |
+| **2026-09-16** | **Phase 11: Admin Reliability** | Certified master admin RBAC matrix (42/42), resolved Firestore transaction order in payout rejection to enforce reads-before-writes, verified 5-way payout and wire approval concurrency guards, and certified Custom Design FSM transitions. |
+| **2026-09-16** | **Phase 10: UI & A11y Verification** | Certified 64/64 UI & A11y assertions and live Chrome CDP network audit, confirming 0 review polling loops, 0 lingering requests, 0 React duplicate keys, and 0 console warnings. |
+| **2026-09-13** | **Phase 9: E2E Checkout Flow** | Certified end-to-end purchasing pipelines across Razorpay, PayPal, and Tier 4 bank wire flows. |
+| **2026-09-10** | **Phase 4: Custom Design Atelier** | Implemented 3-step bespoke configurator, FSM state machine transitions, and consultation deposit capture. |
 | **2026-08-11** | **Disclaimer Page** | Created `/disclaimer` page with satirical clauses ("No intention to harm"). |
 | **2026-08-11** | **Referral Program** | Created `/referral` page with $100 per 10 sales & updated Anti-Fraud Rules text. |
 | **2026-08-11** | **Privacy API** | Implemented `DELETE /api/user/delete` for PII and account deletion. |

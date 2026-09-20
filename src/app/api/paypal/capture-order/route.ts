@@ -6,11 +6,13 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { isRateLimited } from '@/lib/utils/rateLimit';
 import { validateCoupon } from '@/lib/utils/couponValidator';
 import { enqueueOrderProcessing, appendOrderHistory } from '@/lib/orchestrator/orderProcessor';
+import crypto from 'crypto';
 import z from 'zod';
 
 const captureSchema = z.object({
   orderId:       z.string().min(1),
   paypalOrderId: z.string().min(1),
+  guestToken:    z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: result.error.issues[0].message }, { status: 400 });
   }
 
-  const { orderId, paypalOrderId } = result.data;
+  const { orderId, paypalOrderId, guestToken } = result.data;
 
   // 3. Fetch order & check idempotency guard
   const orderRef = adminDb.collection('orders').doc(orderId);
@@ -53,7 +55,22 @@ export async function POST(request: NextRequest) {
 
   const orderData = orderDoc.data()!;
   const isGuestOrder = typeof orderData.userId === 'string' && orderData.userId.startsWith('guest_');
-  if (!isGuestOrder) {
+
+  if (isGuestOrder) {
+    const expectedToken = typeof orderData.guestToken === 'string' ? orderData.guestToken : '';
+    const providedToken = typeof guestToken === 'string' ? guestToken : '';
+
+    if (!expectedToken || !providedToken || expectedToken.length < 20) {
+      return NextResponse.json({ error: 'Guest authorization token required' }, { status: 401 });
+    }
+
+    const expectedBuf = Buffer.from(expectedToken, 'utf-8');
+    const providedBuf = Buffer.from(providedToken, 'utf-8');
+
+    if (expectedBuf.length !== providedBuf.length || !crypto.timingSafeEqual(expectedBuf, providedBuf)) {
+      return NextResponse.json({ error: 'Invalid guest authorization token' }, { status: 403 });
+    }
+  } else {
     if (!uid) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }

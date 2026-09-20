@@ -60,7 +60,7 @@ async function runTest() {
   // 2. Simulate 10 Orders with Referral Code
   console.log('\n2. Simulating 10 orders placed with referral code:', testRefCode);
 
-  const MIN_ORDER_FOR_REFERRAL = 100;
+  const _MIN_ORDER_FOR_REFERRAL = 100;
   const COMMISSION_PER_10_REFERRALS = 100;
 
   for (let i = 1; i <= 10; i++) {
@@ -92,7 +92,7 @@ async function runTest() {
       if (refDoc.exists) return;
 
       const freshAffiliateDoc = await transaction.get(affiliateDoc.ref);
-      const globalSettingsDoc = await transaction.get(settingsRef);
+      const _globalSettingsDoc = await transaction.get(settingsRef);
 
       const currentCount = freshAffiliateDoc.data()?.referralCount ?? 0;
       const newCount = currentCount + 1;

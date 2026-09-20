@@ -7,31 +7,87 @@ import { CurrencyProvider } from "@/context/CurrencyContext";
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
 import RoastToast from "@/components/ui/RoastToast";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
+import { NetworkStatusProvider } from "@/context/NetworkStatusContext";
+import NetworkStatusPill from "@/components/ui/NetworkStatusPill";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://gerkink.shop'),
-  title: "GERKINK",
+  title: {
+    default: "GERKINK | Unconventional Streetwear, Custom Designs & Rare Luxury",
+    template: "%s",
+  },
+  description:
+    "Shop GERKINK streetwear, create a custom design, or explore Society Fu*kers — rare, limited pieces for people who dress on their own terms.",
+  keywords: [
+    "luxury streetwear",
+    "unconventional streetwear",
+    "custom designs",
+    "rare luxury",
+    "GERKINK",
+    "custom clothing",
+    "Society Fuckers",
+    "Valueless Bitches",
+    "heavyweight streetwear",
+    "designer apparel",
+  ],
+  authors: [{ name: "GERKINK", url: "https://gerkink.shop" }],
+  creator: "GERKINK",
+  publisher: "GERKINK",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: "/",
+  },
   icons: {
-    icon: "/logo.png",
+    icon: [
+      { url: "/logo.png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
     shortcut: "/logo.png",
     apple: "/logo.png",
   },
-  description:
-    "Two collections. Zero apologies. Society Fuckers & Valueless Bitches — buy the world's most provocative luxury streetwear from GERKINK and wear your worth.",
-  keywords: ["luxury streetwear", "provocative fashion", "GERKINK", "Society Fuckers", "Valueless Bitches"],
   openGraph: {
-    title: "GERKINK",
-    description: "You dress like your personality — boring as f*ck. Fix it.",
     type: "website",
-    images: [{ url: "/logo.png", width: 800, height: 800 }],
+    locale: "en_US",
+    url: "https://gerkink.shop",
+    siteName: "GERKINK",
+    title: "GERKINK | Unconventional Streetwear, Custom Designs & Rare Luxury",
+    description:
+      "Shop GERKINK streetwear, create a custom design, or explore Society Fu*kers — rare, limited pieces for people who dress on their own terms.",
+    images: [
+      {
+        url: "/logo.png",
+        width: 800,
+        height: 800,
+        alt: "GERKINK Luxury Streetwear",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "GERKINK",
-    description: "Luxury streetwear that roasts you into buying.",
+    site: "@gerkinkshop",
+    creator: "@gerkinkshop",
+    title: "GERKINK | Unconventional Streetwear, Custom Designs & Rare Luxury",
+    description:
+      "Shop GERKINK streetwear, create a custom design, or explore Society Fu*kers — rare, limited pieces for people who dress on their own terms.",
     images: ["/logo.png"],
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  category: "clothing",
+  classification: "Luxury Streetwear",
 };
 
 export default function RootLayout({
@@ -45,7 +101,8 @@ export default function RootLayout({
     "name": "GERKINK",
     "url": "https://gerkink.shop",
     "logo": "https://gerkink.shop/logo.png",
-    "description": "Two collections. Zero apologies. Society Fuckers & Valueless Bitches — wear your worth or stay basic.",
+    "description":
+      "Shop GERKINK streetwear, create a custom design, or explore Society Fu*kers — rare, limited pieces for people who dress on their own terms.",
     "sameAs": [
       "https://www.instagram.com/gerkink.shop",
       "https://x.com/gerkinkshop",
@@ -58,12 +115,20 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "GERKINK",
-    "url": "https://gerkink.shop"
+    "url": "https://gerkink.shop",
+    "description":
+      "Shop GERKINK streetwear, create a custom design, or explore Society Fu*kers — rare, limited pieces for people who dress on their own terms."
   };
 
   return (
     <html lang="en" data-theme="dark" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://firebasestorage.googleapis.com" />
+        <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
+        <link rel="preconnect" href="https://images-api.printify.com" />
+        <link rel="dns-prefetch" href="https://images-api.printify.com" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema).replace(/</g, '\\u003c') }}
@@ -79,8 +144,11 @@ export default function RootLayout({
           <AuthProvider>
             <CurrencyProvider>
               <CartProvider>
-                <LayoutWrapper>{children}</LayoutWrapper>
-                <RoastToast />
+                <NetworkStatusProvider>
+                  <LayoutWrapper>{children}</LayoutWrapper>
+                  <NetworkStatusPill />
+                  <RoastToast />
+                </NetworkStatusProvider>
               </CartProvider>
             </CurrencyProvider>
           </AuthProvider>

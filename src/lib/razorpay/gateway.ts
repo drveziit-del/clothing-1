@@ -1,6 +1,6 @@
 import 'server-only';
 import type { PaymentGateway } from '@/lib/payment/types';
-import { createRazorpayOrder, getRazorpay } from './client';
+import { createRazorpayOrder } from './client';
 import crypto from 'crypto';
 
 export class RazorpayGateway implements PaymentGateway {
@@ -19,25 +19,10 @@ export class RazorpayGateway implements PaymentGateway {
   }
 
   async verifyWebhook(request: Request): Promise<{ valid: boolean; event?: any }> {
-    let secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
     if (!secret) {
-      secret = process.env.RAZORPAY_KEY_SECRET;
-      if (secret) {
-        console.warn('[RazorpayGateway] RAZORPAY_WEBHOOK_SECRET unset — falling back to KEY_SECRET. Configure the dedicated webhook secret.');
-      }
-    }
-
-    if (!secret) {
-      if (process.env.NODE_ENV === 'production') {
-        console.error('[RazorpayGateway] No webhook secret configured in production — rejecting webhook.');
-        return { valid: false };
-      }
-      console.warn('[RazorpayGateway] No webhook secret set — dev-only unsigned passthrough.');
-      try {
-        return { valid: true, event: JSON.parse(await request.text()) };
-      } catch {
-        return { valid: false };
-      }
+      console.error('[RazorpayGateway] RAZORPAY_WEBHOOK_SECRET is not configured — rejecting webhook.');
+      return { valid: false };
     }
 
     const signature = request.headers.get('x-razorpay-signature');

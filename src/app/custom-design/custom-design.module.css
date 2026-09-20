@@ -1,0 +1,1215 @@
+.pageWrapper {
+  min-height: 100vh;
+  background: var(--bg, #07090e);
+  color: var(--text-primary, #f3f4f6);
+  padding: 3.5rem 1.25rem 6rem;
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+/* ─── Hero Section (Phase 2) ─────────────────────────────── */
+.hero {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding: 1.5rem 1rem 0;
+}
+
+.badgeWrap {
+  margin-bottom: 1rem;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent, #ff6b6b);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  background: rgba(255, 107, 107, 0.08);
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-weight: 700;
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 4.5vw, 3.4rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.heroTitleAccent {
+  color: var(--accent, #ff6b6b);
+  display: block;
+}
+
+.heroSubtitle {
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+  color: var(--text-secondary, #9ca3af);
+  max-width: 600px;
+  margin: 0 auto 1.75rem;
+  line-height: 1.55;
+}
+
+.heroCtaRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.heroCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--accent, #ff6b6b);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.85rem 1.85rem;
+  border-radius: 6px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.heroCtaBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 107, 107, 0.35);
+  background: #ff5252;
+}
+
+.heroPrepaymentNote {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+/* ─── Process Protocol (Phase 3) ─────────────────────────── */
+.processSection {
+  margin-bottom: 3.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2.25rem 0;
+}
+
+.processHeader {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.processMeta {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--accent, #ff6b6b);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.processTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin-top: 0.25rem;
+}
+
+.processStrip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+}
+
+.processStep {
+  flex: 1;
+  min-width: 120px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 1rem 0.85rem;
+  text-align: center;
+}
+
+.processStepNumber {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--accent, #ff6b6b);
+  font-weight: 800;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.processStepName {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25rem;
+  color: #fff;
+}
+
+.processStepDesc {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #9ca3af);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.processArrow {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.9rem;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .processStrip {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .processArrow {
+    display: none;
+  }
+  .processStep {
+    text-align: left;
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+  .processStepNumber {
+    margin-bottom: 0;
+  }
+  .processStepName {
+    margin-bottom: 0;
+    min-width: 75px;
+  }
+}
+
+/* ─── 3-Step Stepper Progress Bar ────────────────────────── */
+.stepperContainer {
+  margin-bottom: 2.5rem;
+}
+
+.stepperTrack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  padding: 0.5rem 1.5rem;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  color: #6b7280;
+}
+
+.stepIndicatorNumber {
+  font-family: monospace;
+  font-weight: 800;
+  font-size: 0.8rem;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  color: #9ca3af;
+}
+
+.stepIndicatorLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stepIndicatorActive {
+  background: rgba(255, 107, 107, 0.12);
+  color: #fff;
+}
+
+.stepIndicatorActive .stepIndicatorNumber {
+  background: var(--accent, #ff6b6b);
+  color: #fff;
+}
+
+.stepIndicatorCompleted {
+  color: #d1d5db;
+}
+
+.stepIndicatorCompleted .stepIndicatorNumber {
+  background: rgba(46, 213, 115, 0.18);
+  color: #2ed573;
+}
+
+.stepDivider {
+  color: rgba(255, 255, 255, 0.15);
+  font-size: 0.85rem;
+  user-select: none;
+}
+
+@media (max-width: 480px) {
+  .stepperTrack {
+    padding: 0.4rem 0.85rem;
+    gap: 0.5rem;
+  }
+  .stepIndicator {
+    padding: 0.35rem 0.5rem;
+  }
+  .stepIndicatorLabel {
+    font-size: 0.75rem;
+  }
+}
+
+/* ─── Configurator Shell ─────────────────────────────────── */
+.configuratorShell {
+  background: #0d1117;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: clamp(1.5rem, 3vw, 2.75rem);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+}
+
+.stepPane {
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stepHeader {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 1.25rem;
+}
+
+.stepHeaderCenter {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 1.5rem;
+}
+
+.stepBadge {
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--accent, #ff6b6b);
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.stepTitle {
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35rem;
+}
+
+.stepSubtitle {
+  font-size: 0.92rem;
+  color: var(--text-secondary, #9ca3af);
+  margin: 0;
+}
+
+/* ─── Form Fields (Step 01) ──────────────────────────────── */
+.fieldSection {
+  margin-bottom: 2rem;
+}
+
+.fieldLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #e5e7eb;
+}
+
+.fieldSubLabel {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.fieldDescription {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #9ca3af);
+  margin: -0.25rem 0 0.75rem;
+}
+
+.requiredAsterisk {
+  color: var(--accent, #ff6b6b);
+  margin-left: 0.2rem;
+}
+
+.selectWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.nativeSelect {
+  width: 100%;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 0.85rem 2.5rem 0.85rem 1rem;
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.nativeSelect:focus {
+  outline: none;
+  border-color: var(--accent, #ff6b6b);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.selectArrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 0.7rem;
+  pointer-events: none;
+}
+
+/* ─── File Upload (Step 01) ──────────────────────────────── */
+.uploadDropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.uploadDropzone:hover,
+.uploadDropzoneDragging {
+  border-color: var(--accent, #ff6b6b);
+  background: rgba(255, 107, 107, 0.04);
+}
+
+.uploadGlyph {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.uploadPrompt {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25rem;
+  color: #f3f4f6;
+}
+
+.browseLink {
+  font-size: 0.85rem;
+  color: var(--accent, #ff6b6b);
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  text-decoration: underline;
+}
+
+.uploadFormatNotice {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+.uploadedChipsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.uploadedChip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 0.55rem 0.85rem;
+}
+
+.uploadedChipPreview {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.chipThumbnail, .chipDocIcon {
+  line-height: 1;
+}
+
+.uploadedChipMeta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.uploadedChipName {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.uploadedChipSize {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-family: monospace;
+  flex-shrink: 0;
+}
+
+.uploadedChipRemove {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.uploadedChipRemove:hover {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+}
+
+.addMoreFilesBtn {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  color: #9ca3af;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.85rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.25rem;
+}
+
+.addMoreFilesBtn:hover {
+  border-color: var(--accent, #ff6b6b);
+  color: #fff;
+}
+
+/* ─── Idea Description (Step 01) ─────────────────────────── */
+.charCounter {
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: #9ca3af;
+}
+
+.ideaTextarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.2s ease;
+}
+
+.ideaTextarea:focus {
+  outline: none;
+  border-color: var(--accent, #ff6b6b);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.fieldHint {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0.35rem 0 0;
+}
+
+/* ─── Optional Garment Details (Step 01) ──────────────────── */
+.optionalSection {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.optionalHeading {
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25rem;
+  color: #e5e7eb;
+}
+
+.optionalSub {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin: 0 0 1.25rem;
+}
+
+.twoColumnGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .twoColumnGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fieldSectionCompact {
+  margin-bottom: 1rem;
+}
+
+.fieldLabelSmall {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  margin-bottom: 0.4rem;
+}
+
+.textInput, .textInputSub {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.textInputSub {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.textInput:focus, .textInputSub:focus {
+  outline: none;
+  border-color: var(--accent, #ff6b6b);
+}
+
+.notesTextarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.notesTextarea:focus {
+  outline: none;
+  border-color: var(--accent, #ff6b6b);
+}
+
+/* ─── Action Bars ────────────────────────────────────────── */
+.stepActionBar {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 1.5rem;
+  margin-top: 1rem;
+}
+
+.stepNavigationRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 1.5rem;
+  margin-top: 2rem;
+}
+
+.primaryActionBtn {
+  background: var(--accent, #ff6b6b);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.85rem 2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.primaryActionBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 107, 107, 0.35);
+  background: #ff5252;
+}
+
+.secondaryActionBtn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #d1d5db;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.85rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.secondaryActionBtn:hover {
+  border-color: #fff;
+  color: #fff;
+}
+
+/* ─── Pricing Page (Step 02) ─────────────────────────────── */
+.pricingCardsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 720px) {
+  .pricingCardsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pricingCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 2rem 1.75rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.pricingCard:hover {
+  border-color: rgba(255, 107, 107, 0.4);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.pricingCardActive {
+  background: rgba(255, 107, 107, 0.04);
+  border-color: var(--accent, #ff6b6b);
+  box-shadow: 0 0 24px rgba(255, 107, 107, 0.15);
+}
+
+.pricingCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.pricingTierLabel {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+.pricingSubhead {
+  display: block;
+  font-size: 0.72rem;
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent, #ff6b6b);
+  margin-top: 0.25rem;
+}
+
+.pricingPriceWrap {
+  display: flex;
+  align-items: baseline;
+}
+
+.pricingCurrency {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-right: 0.1rem;
+}
+
+.pricingAmount {
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+}
+
+.pricingDesc {
+  font-size: 0.88rem;
+  color: var(--text-secondary, #9ca3af);
+  line-height: 1.45;
+  margin: 0 0 1.5rem;
+  min-height: 42px;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem;
+  flex: 1;
+}
+
+.featureList li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: #d1d5db;
+  margin-bottom: 0.65rem;
+}
+
+.checkGlyph {
+  color: #2ed573;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.planSelectBtn {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.planSelectBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.planSelectBtnActive {
+  background: var(--accent, #ff6b6b);
+  border-color: var(--accent, #ff6b6b);
+  color: #fff;
+}
+
+/* ─── Review & Submit (Step 03) ──────────────────────────── */
+.reviewLayout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 840px) {
+  .reviewLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summaryCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 1.75rem;
+}
+
+.summaryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.summaryBadge {
+  font-family: monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--accent, #ff6b6b);
+}
+
+.editStepLink {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.editStepLink:hover {
+  color: #fff;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.summaryLabel {
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.summaryVal {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: right;
+}
+
+.summaryPriceVal {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #fff;
+  font-family: monospace;
+}
+
+.summaryDescPreview {
+  font-size: 0.85rem;
+  color: #d1d5db;
+  font-style: italic;
+  margin: 0;
+  max-width: 240px;
+  text-align: right;
+  line-height: 1.35;
+}
+
+.summarySpecsGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.75rem 0;
+}
+
+.summarySpecTag {
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  color: #9ca3af;
+}
+
+.summaryDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 1.25rem 0;
+}
+
+.backLinkBtn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.75rem 0;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.backLinkBtn:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* ─── Sticky Payment Box (Step 03) ───────────────────────── */
+.paymentBox {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 1.75rem;
+  position: sticky;
+  top: 6rem;
+}
+
+.policyNotice {
+  background: rgba(255, 107, 107, 0.04);
+  border: 1px solid rgba(255, 107, 107, 0.25);
+  border-radius: 6px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.policyNoticeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--accent, #ff6b6b);
+  margin-bottom: 0.5rem;
+}
+
+.policyNoticeAmount {
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+.policyNoticeText {
+  font-size: 0.8rem;
+  color: #d1d5db;
+  line-height: 1.45;
+  margin: 0 0 1rem;
+}
+
+.policyCheckboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.policyCheckboxInput {
+  margin-top: 0.2rem;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent, #ff6b6b);
+  flex-shrink: 0;
+}
+
+.policyCheckboxText {
+  font-size: 0.82rem;
+  color: #fff;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.paymentErrorBox {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.paymentErrorTitle {
+  display: block;
+  font-size: 0.82rem;
+  color: #ef4444;
+  letter-spacing: 0.04em;
+}
+
+.paymentErrorText {
+  font-size: 0.78rem;
+  color: #d1d5db;
+  margin: 0.25rem 0 0.75rem;
+  line-height: 1.4;
+}
+
+.retryPaymentBtn {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.45rem 0.85rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.paymentTriggerWrap {
+  margin-top: 1rem;
+}
+
+.authGateBox {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.authGateTitle {
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.authGateText {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #9ca3af);
+  line-height: 1.45;
+  margin-bottom: 1rem;
+}
+
+.authGateBtn {
+  display: block;
+  background: var(--accent, #ff6b6b);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1rem;
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.authGateBtn:hover {
+  background: #ff5252;
+}
+
+.policyRequiredPrompt {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  text-align: center;
+  padding: 0.5rem 0;
+  line-height: 1.4;
+}
+
+.paypalIntegrationArea {
+  margin-top: 0.5rem;
+}
+
+.paypalAuthorizationNote {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.gatewayMissingNotice {
+  font-size: 0.8rem;
+  color: var(--accent, #ff6b6b);
+  text-align: center;
+  padding: 1rem;
+}
+
+.missingReqsNotice {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.missingReqsNotice strong {
+  color: #f59e0b;
+  font-size: 0.85rem;
+  display: block;
+}
+
+.backToStep1Btn {
+  display: inline-block;
+  background: #f59e0b;
+  color: #000;
+  font-weight: 800;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.5rem 0.85rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.backToStep1Btn:hover {
+  transform: translateY(-1px);
+}

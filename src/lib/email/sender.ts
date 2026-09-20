@@ -1,3 +1,4 @@
+import 'server-only';
 import nodemailer from 'nodemailer';
 import { adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -13,6 +14,15 @@ function escapeHtml(str: string | undefined | null): string {
     .replace(/'/g, '&#039;');
 }
 
+function sanitizeErrorMessage(msg: unknown): string {
+  if (!msg) return 'Unknown delivery error';
+  const str = String(msg);
+  return str
+    .replace(/(password|pass|secret|token|key)=([^\s&;]+)/gi, '$1=[REDACTED]')
+    .replace(/:([^\s@:]+)@/g, ':[REDACTED]@')
+    .slice(0, 500);
+}
+
 export interface PayoutAlertDetails {
   userName: string;
   userEmail: string;
@@ -26,7 +36,7 @@ export interface PayoutAlertDetails {
  * Logs to Firestore fallback if SMTP details are missing or fail.
  */
 export async function sendAdminPayoutAlert(details: PayoutAlertDetails): Promise<void> {
-  const adminEmail = process.env.ADMIN_EMAIL || 'gerkinkofficial@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL || 'support@gerkink.shop';
   const subject = `💸 [ACTION REQUIRED] New Affiliate Payout Request - $${details.amount.toFixed(2)} USD`;
   const dateStr = new Date().toLocaleString('en-US', { timeZone: 'UTC' }) + ' UTC';
 
@@ -141,7 +151,7 @@ export async function sendAdminPayoutAlert(details: PayoutAlertDetails): Promise
       subject,
       html: htmlBody,
       status: 'failed_smtp_delivery',
-      errorMessage: err.message,
+      errorMessage: sanitizeErrorMessage(err.message),
       createdAt: FieldValue.serverTimestamp(),
     });
   }
@@ -156,7 +166,7 @@ export interface PrebookAlertDetails {
 }
 
 export async function sendAdminPrebookNotification(details: PrebookAlertDetails): Promise<void> {
-  const adminEmail = process.env.ADMIN_EMAIL || 'gerkinkofficial@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL || 'support@gerkink.shop';
   const escapedProductTitle = escapeHtml(details.productTitle);
   const subject = `🔥 [PRE-BOOKING PAID] Custom Request for ${escapedProductTitle}`;
   const dateStr = new Date().toLocaleString('en-US', { timeZone: 'UTC' }) + ' UTC';
@@ -272,7 +282,7 @@ export async function sendAdminPrebookNotification(details: PrebookAlertDetails)
       subject,
       html: htmlBody,
       status: 'failed_smtp_delivery',
-      errorMessage: err.message,
+      errorMessage: sanitizeErrorMessage(err.message),
       createdAt: FieldValue.serverTimestamp(),
     });
   }
@@ -296,7 +306,7 @@ export async function sendOrderConfirmationEmail(order: Order): Promise<void> {
           × ${item.quantity}
         </td>
         <td style="padding: 10px 0; border-bottom: 1px solid #1f2937; text-align: right; color: #238636; font-weight: bold;">
-          $${(item.price * item.quantity).toFixed(2)} USD
+          $${((Number(item.price) || 0) * (Number(item.quantity) || 1)).toFixed(2)} USD
         </td>
       </tr>
     `;
@@ -354,20 +364,20 @@ export async function sendOrderConfirmationEmail(order: Order): Promise<void> {
         <table style="width: 100%; margin-top: 16px; font-size: 14px;">
           <tr>
             <td style="padding: 4px 0; color: #8b949e;">Subtotal:</td>
-            <td style="padding: 4px 0; text-align: right; color: #c9d1d9;">$${order.subtotal.toFixed(2)} USD</td>
+            <td style="padding: 4px 0; text-align: right; color: #c9d1d9;">$${(Number(order.subtotal) || 0).toFixed(2)} USD</td>
           </tr>
           <tr>
             <td style="padding: 4px 0; color: #8b949e;">Tax:</td>
-            <td style="padding: 4px 0; text-align: right; color: #c9d1d9;">$${order.tax.toFixed(2)} USD</td>
+            <td style="padding: 4px 0; text-align: right; color: #c9d1d9;">$${(Number(order.tax) || 0).toFixed(2)} USD</td>
           </tr>
           ${order.discount ? `
           <tr>
             <td style="padding: 4px 0; color: #ff6b6b;">Discount:</td>
-            <td style="padding: 4px 0; text-align: right; color: #ff6b6b;">-$${order.discount.toFixed(2)} USD</td>
+            <td style="padding: 4px 0; text-align: right; color: #ff6b6b;">-$${(Number(order.discount) || 0).toFixed(2)} USD</td>
           </tr>` : ''}
           <tr style="font-size: 16px; font-weight: bold;">
             <td style="padding: 12px 0 0; color: #f3f4f6; border-top: 1px solid #21262d;">Grand Total:</td>
-            <td style="padding: 12px 0 0; text-align: right; color: #238636; border-top: 1px solid #21262d;">$${order.total.toFixed(2)} USD</td>
+            <td style="padding: 12px 0 0; text-align: right; color: #238636; border-top: 1px solid #21262d;">$${(Number(order.total) || 0).toFixed(2)} USD</td>
           </tr>
         </table>
       </div>
@@ -424,6 +434,7 @@ export async function sendOrderConfirmationEmail(order: Order): Promise<void> {
     await adminDb.collection('system_emails').add({
       to: customerEmail,
       subject,
+      html: htmlBody,
       status: 'sent',
       createdAt: FieldValue.serverTimestamp(),
     });
@@ -434,14 +445,14 @@ export async function sendOrderConfirmationEmail(order: Order): Promise<void> {
       subject,
       html: htmlBody,
       status: 'failed_smtp_delivery',
-      errorMessage: err.message,
+      errorMessage: sanitizeErrorMessage(err.message),
       createdAt: FieldValue.serverTimestamp(),
     });
   }
 }
 
 export async function sendAdminOrderNotification(order: Order): Promise<void> {
-  const adminEmail = process.env.ADMIN_EMAIL || 'gerkinkofficial@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL || 'support@gerkink.shop';
   const subject = `🔔 NEW ORDER - GERKINK #${order.id.slice(0, 8).toUpperCase()}`;
 
   const itemsHtml = order.items.map((item) => {
@@ -458,7 +469,7 @@ export async function sendAdminOrderNotification(order: Order): Promise<void> {
           × ${item.quantity}
         </td>
         <td style="padding: 10px 0; border-bottom: 1px solid #1f2937; text-align: right; color: #238636; font-weight: bold;">
-          $${(item.price * item.quantity).toFixed(2)} USD
+          $${((Number(item.price) || 0) * (Number(item.quantity) || 1)).toFixed(2)} USD
         </td>
       </tr>
     `;
@@ -526,20 +537,20 @@ export async function sendAdminOrderNotification(order: Order): Promise<void> {
         <table style="width: 100%; margin-top: 16px; font-size: 14px;">
           <tr>
             <td style="padding: 4px 0; color: #8b949e;">Subtotal:</td>
-            <td style="padding: 4px 0; text-align: right; color: #c9d1d9;">$${order.subtotal.toFixed(2)} USD</td>
+            <td style="padding: 4px 0; text-align: right; color: #c9d1d9;">$${(Number(order.subtotal) || 0).toFixed(2)} USD</td>
           </tr>
           <tr>
             <td style="padding: 4px 0; color: #8b949e;">Tax:</td>
-            <td style="padding: 4px 0; text-align: right; color: #c9d1d9;">$${order.tax.toFixed(2)} USD</td>
+            <td style="padding: 4px 0; text-align: right; color: #c9d1d9;">$${(Number(order.tax) || 0).toFixed(2)} USD</td>
           </tr>
           ${order.discount ? `
           <tr>
             <td style="padding: 4px 0; color: #ff6b6b;">Discount:</td>
-            <td style="padding: 4px 0; text-align: right; color: #ff6b6b;">-$${order.discount.toFixed(2)} USD</td>
+            <td style="padding: 4px 0; text-align: right; color: #ff6b6b;">-$${(Number(order.discount) || 0).toFixed(2)} USD</td>
           </tr>` : ''}
           <tr style="font-size: 16px; font-weight: bold;">
             <td style="padding: 12px 0 0; color: #f3f4f6; border-top: 1px solid #21262d;">Grand Total:</td>
-            <td style="padding: 12px 0 0; text-align: right; color: #238636; border-top: 1px solid #21262d;">$${order.total.toFixed(2)} USD</td>
+            <td style="padding: 12px 0 0; text-align: right; color: #238636; border-top: 1px solid #21262d;">$${(Number(order.total) || 0).toFixed(2)} USD</td>
           </tr>
         </table>
       </div>
@@ -585,6 +596,7 @@ export async function sendAdminOrderNotification(order: Order): Promise<void> {
     await adminDb.collection('system_emails').add({
       to: adminEmail,
       subject,
+      html: htmlBody,
       status: 'sent',
       createdAt: FieldValue.serverTimestamp(),
     });
@@ -595,7 +607,7 @@ export async function sendAdminOrderNotification(order: Order): Promise<void> {
       subject,
       html: htmlBody,
       status: 'failed_smtp_delivery',
-      errorMessage: err.message,
+      errorMessage: sanitizeErrorMessage(err.message),
       createdAt: FieldValue.serverTimestamp(),
     });
   }
@@ -645,7 +657,7 @@ export async function sendOrderConfirmationEmailsOnce(orderId: string, order: Or
   
   const confirmationSent = results[0].status === 'fulfilled';
   if (confirmationSent) {
-    adminDb.collection('orders').doc(orderId).update({ emailSent: true }).catch((err) => {
+    adminDb.collection('orders').doc(orderId).set({ emailSent: true }, { merge: true }).catch((err) => {
       console.error(`[EMAIL-LOCK] Failed to set emailSent flag for order ${orderId}:`, err);
     });
   }
@@ -664,7 +676,7 @@ export interface ContactMessageDetails {
  * Logs to Firestore fallback if SMTP details are missing or fail.
  */
 export async function sendAdminContactMessage(details: ContactMessageDetails): Promise<void> {
-  const adminEmail = process.env.ADMIN_EMAIL || 'gerkinkofficial@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL || 'support@gerkink.shop';
   const escapedName = escapeHtml(details.name);
   const escapedEmail = escapeHtml(details.email);
   const escapedMessage = escapeHtml(details.message);
@@ -756,7 +768,7 @@ export async function sendAdminContactMessage(details: ContactMessageDetails): P
       subject,
       html: htmlBody,
       status: 'failed_smtp_delivery',
-      errorMessage: err.message,
+      errorMessage: sanitizeErrorMessage(err.message),
       createdAt: FieldValue.serverTimestamp(),
     });
   }
@@ -841,6 +853,7 @@ export async function sendPayoutStatusEmail(details: PayoutStatusDetails): Promi
     await adminDb.collection('system_emails').add({
       to: details.userEmail,
       subject,
+      html: htmlBody,
       status: 'sent',
       createdAt: FieldValue.serverTimestamp(),
     });
@@ -851,8 +864,550 @@ export async function sendPayoutStatusEmail(details: PayoutStatusDetails): Promi
       subject,
       html: htmlBody,
       status: 'failed_smtp_delivery',
-      errorMessage: err.message,
+      errorMessage: sanitizeErrorMessage(err.message),
       createdAt: FieldValue.serverTimestamp(),
     });
+  }
+}
+
+export interface ReviewRequestDetails {
+  orderId: string;
+  userEmail: string;
+  userName?: string;
+  productId: string;
+  productTitle: string;
+  reviewUrl: string;
+}
+
+/**
+ * Sends a post-delivery review request email inviting the customer to leave verified feedback.
+ */
+export async function sendPostDeliveryReviewRequestEmail(details: ReviewRequestDetails): Promise<void> {
+  const subject = `★ GERKINK Wants Your Verdict — ${details.productTitle}`;
+  const escapedName = escapeHtml(details.userName || 'Customer');
+  const escapedTitle = escapeHtml(details.productTitle);
+  const reviewLink = details.reviewUrl;
+
+  const htmlBody = `
+    <div style="font-family: 'Inter', sans-serif; background-color: #07090e; color: #f3f4f6; padding: 36px 24px; border-radius: 12px; max-width: 580px; margin: 0 auto; border: 1px solid #1f2937;">
+      <p style="font-family: monospace; color: #ff6b6b; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">
+        VERIFIED CUSTOMER INVITATION
+      </p>
+
+      <h2 style="color: #ffffff; font-size: 24px; font-weight: 900; margin: 0 0 16px 0; letter-spacing: -0.03em;">
+        How does it look in public, ${escapedName}?
+      </h2>
+
+      <p style="font-size: 15px; line-height: 1.6; color: #c9d1d9; margin-bottom: 24px;">
+        You bought <strong>${escapedTitle}</strong>. You received it. Now tell us whether it deserved the space in your wardrobe.
+      </p>
+
+      <div style="background-color: #0d1117; padding: 24px; border-radius: 8px; border: 1px solid #21262d; text-align: center; margin: 28px 0;">
+        <div style="color: #ff6b6b; font-size: 28px; letter-spacing: 4px; margin-bottom: 16px;">
+          ★ ★ ★ ★ ★
+        </div>
+        <p style="font-size: 13px; color: #8b949e; margin-bottom: 20px;">
+          Candid thoughts on fabric weight, collar lock, sizing, and reaction from strangers.
+        </p>
+        <a href="${reviewLink}" style="display: inline-block; background-color: #ff6b6b; color: #07090e; font-weight: 800; font-size: 14px; text-decoration: none; padding: 14px 28px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.08em;">
+          Leave Your Verified Review →
+        </a>
+      </div>
+
+      <p style="font-size: 12px; color: #8b949e; line-height: 1.5; text-align: center; border-top: 1px solid #1f2937; padding-top: 20px; margin-top: 32px;">
+        This single-use link is cryptographically tied to Order #${details.orderId.slice(0, 8)}.<br/>
+        GERKINK · Provocative Luxury Streetwear.
+      </p>
+    </div>
+  `;
+
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASSWORD;
+
+  if (!user || !pass || !host) {
+    console.log('[sendPostDeliveryReviewRequestEmail] SMTP not configured. Storing in system_emails collection...');
+    await adminDb.collection('system_emails').add({
+      to: details.userEmail,
+      subject,
+      html: htmlBody,
+      reviewUrl: reviewLink,
+      status: 'pending_smtp_config',
+      createdAt: FieldValue.serverTimestamp(),
+    });
+    return;
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user, pass },
+    });
+    await transporter.sendMail({
+      from: `"GERKINK" <${user}>`,
+      to: details.userEmail,
+      subject,
+      html: htmlBody,
+    });
+    await adminDb.collection('system_emails').add({
+      to: details.userEmail,
+      subject,
+      html: htmlBody,
+      reviewUrl: reviewLink,
+      status: 'sent',
+      createdAt: FieldValue.serverTimestamp(),
+    });
+  } catch (err: any) {
+    console.error('Failed to send review request email:', err.message);
+    await adminDb.collection('system_emails').add({
+      to: details.userEmail,
+      subject,
+      html: htmlBody,
+      reviewUrl: reviewLink,
+      status: 'failed_smtp_delivery',
+      errorMessage: sanitizeErrorMessage(err.message),
+      createdAt: FieldValue.serverTimestamp(),
+    });
+  }
+}
+
+/**
+ * Ensures a post-delivery review request email is sent AT MOST ONCE per order.
+ * Uses atomic Firestore `.create()` on `review_email_locks/{orderId}` to prevent duplicate email spam.
+ */
+export async function sendPostDeliveryReviewRequestEmailOnce(details: ReviewRequestDetails): Promise<boolean> {
+  if (!details.orderId) {
+    console.warn('[REVIEW-EMAIL-LOCK] Missing orderId, skipping review invitation dispatch.');
+    return false;
+  }
+
+  const lockRef = adminDb.collection('review_email_locks').doc(details.orderId);
+  try {
+    await lockRef.create({
+      orderId: details.orderId,
+      productId: details.productId,
+      userEmail: details.userEmail,
+      sentAt: FieldValue.serverTimestamp(),
+    });
+    console.log(`[REVIEW-EMAIL-LOCK] Lock acquired for order ${details.orderId}. Dispatching review invitation...`);
+  } catch (err: any) {
+    const errStr = String(err?.message || err?.details || err || '').toLowerCase();
+    const isAlreadyExists =
+      err?.code === 6 ||
+      err?.code === '6' ||
+      err?.code === 'already-exists' ||
+      errStr.includes('already') ||
+      errStr.includes('exists');
+
+    if (isAlreadyExists) {
+      console.log(`[REVIEW-EMAIL-LOCK] 🛑 BLOCKED duplicate review request for order ${details.orderId} (Lock already exists).`);
+      return false;
+    }
+    console.error(`[REVIEW-EMAIL-LOCK] Error creating review email lock for order ${details.orderId}:`, err);
+    return false;
+  }
+
+  await sendPostDeliveryReviewRequestEmail(details);
+  return true;
+}
+
+export const CUSTOM_DESIGN_STUDIO_EMAIL = process.env.CUSTOM_DESIGN_ALERT_EMAIL || 'custom@gerkink.shop';
+
+export interface CustomDesignEmailDetails {
+  type: 'request_submitted' | 'needs_information' | 'design_ready' | 'approval_received' | 'status_updated' | 'customer_message';
+  requestId: string;
+  requestNumber: string;
+  customerEmail: string;
+  customerName: string;
+  productType?: string;
+  plan?: string;
+  prepaymentAmount?: number;
+  message?: string;
+  newStatus?: string;
+  description?: string;
+  preferredSize?: string;
+  preferredColor?: string;
+  productPreference?: string;
+  additionalNotes?: string;
+  uploads?: Array<{ originalName: string; size: number; storagePath?: string }>;
+  paymentReference?: string;
+}
+
+export async function sendCustomDesignNotification(details: CustomDesignEmailDetails): Promise<void> {
+  const planLabel = details.plan === 'better_quality' || details.plan === 'priority' ? 'Better Quality' : 'Regular';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gerkink.shop';
+  const adminUrl = `${appUrl}/admin/custom-designs/${details.requestId}`;
+  const accountUrl = `${appUrl}/account/custom-design/${details.requestId}`;
+
+  interface OutboundMail {
+    to: string;
+    subject: string;
+    html: string;
+    type: string;
+  }
+
+  const outboundMails: OutboundMail[] = [];
+
+  if (details.type === 'request_submitted') {
+    // 1. Customer Confirmation Receipt Email
+    const custSubject = `[CONFIRMED] Custom Request #${details.requestNumber} Received — $${details.prepaymentAmount || 15} USD`;
+    const custHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #07090e; color: #f3f4f6; padding: 32px; border-radius: 8px; max-width: 600px; margin: 0 auto; border: 1px solid #1f2937;">
+        <div style="border-bottom: 2px solid #ff6b6b; padding-bottom: 16px; margin-bottom: 24px;">
+          <span style="font-size: 11px; letter-spacing: 2px; color: #ff6b6b; font-weight: 700; text-transform: uppercase;">GERKINK CUSTOM STUDIO</span>
+          <h2 style="margin: 8px 0 0 0; font-size: 22px; color: #ffffff; text-transform: uppercase;">CUSTOM DESIGN REQUEST RECEIVED</h2>
+        </div>
+
+        <p style="font-size: 14px; color: #9ca3af; margin-bottom: 20px;">
+          Hello ${escapeHtml(details.customerName || 'Valued Customer')},
+        </p>
+
+        <div style="font-size: 14px; line-height: 1.6; color: #e5e7eb;">
+          <p>Thank you for submitting your custom design concept to GERKINK.</p>
+          <p>Your non-refundable prepayment of <strong>$${details.prepaymentAmount || 15} USD</strong> for the <strong>${planLabel}</strong> custom review tier has been confirmed.</p>
+          <p>Our studio team is currently reviewing your uploaded files and concept. You will be notified as your request progresses.</p>
+        </div>
+
+        <div style="background-color: #0d1117; padding: 16px; border-radius: 6px; border: 1px solid #21262d; margin: 24px 0;">
+          <table style="width: 100%; font-size: 13px; color: #c9d1d9; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 4px 0; color: #8b949e; width: 140px;">Request Number:</td>
+              <td style="padding: 4px 0; font-weight: 600; font-family: monospace;">#${details.requestNumber}</td>
+            </tr>
+            ${details.productType ? `
+            <tr>
+              <td style="padding: 4px 0; color: #8b949e;">Product Type:</td>
+              <td style="padding: 4px 0; font-weight: 600;">${details.productType}</td>
+            </tr>
+            ` : ''}
+            <tr>
+              <td style="padding: 4px 0; color: #8b949e;">Prepayment:</td>
+              <td style="padding: 4px 0; font-weight: 600; color: #2ed573;">$${details.prepaymentAmount || 15} USD PAID ✓</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="text-align: center; margin: 28px 0;">
+          <a href="${accountUrl}" style="display: inline-block; background-color: #ff6b6b; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">
+            VIEW YOUR REQUEST →
+          </a>
+        </div>
+
+        <p style="font-size: 12px; color: #8b949e; line-height: 1.5; text-align: center; border-top: 1px solid #1f2937; padding-top: 20px; margin-top: 32px;">
+          GERKINK · Provocative Luxury Streetwear.<br/>
+          This email was sent to ${escapeHtml(details.customerEmail)}.
+        </p>
+      </div>
+    `;
+    outboundMails.push({
+      to: details.customerEmail,
+      subject: custSubject,
+      html: custHtml,
+      type: 'request_submitted_customer',
+    });
+
+    // 2. GERKINK Atelier Studio Intake Email (sent to custom@gerkink.shop)
+    const studioSubject = `🎨 [NEW CUSTOM REQUEST] #${details.requestNumber} — ${details.productType || 'Custom Piece'} ($${details.prepaymentAmount || 15} USD Paid)`;
+    const uploadsListHtml = details.uploads && details.uploads.length > 0
+      ? details.uploads.map((u) => `<li>${escapeHtml(u.originalName)} (${(u.size / 1024 / 1024).toFixed(2)} MB)</li>`).join('')
+      : '<li>No files uploaded</li>';
+
+    const studioHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #07090e; color: #f3f4f6; padding: 32px; border-radius: 8px; max-width: 600px; margin: 0 auto; border: 1px solid #1f2937;">
+        <div style="border-bottom: 2px solid #ff6b6b; padding-bottom: 16px; margin-bottom: 24px;">
+          <span style="font-size: 11px; letter-spacing: 2px; color: #ff6b6b; font-weight: 700; text-transform: uppercase;">GERKINK ATELIER DESK</span>
+          <h2 style="margin: 8px 0 0 0; font-size: 22px; color: #ffffff; text-transform: uppercase;">NEW CUSTOM DESIGN INTAKE</h2>
+        </div>
+
+        <div style="background-color: #0d1117; padding: 18px; border-radius: 8px; border: 1px solid #21262d; margin-bottom: 24px;">
+          <table style="width: 100%; font-size: 13px; color: #c9d1d9; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e; width: 140px;">Request Number:</td>
+              <td style="padding: 6px 0; font-weight: 700; font-family: monospace; color: #ff6b6b;">#${details.requestNumber}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Customer:</td>
+              <td style="padding: 6px 0; font-weight: 600;">${escapeHtml(details.customerName)} (${escapeHtml(details.customerEmail)})</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Garment Type:</td>
+              <td style="padding: 6px 0; font-weight: 600;">${escapeHtml(details.productType || 'Custom')}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Prepayment Level:</td>
+              <td style="padding: 6px 0; font-weight: 700;">${planLabel} ($${details.prepaymentAmount || 15} USD)</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Prepayment Status:</td>
+              <td style="padding: 6px 0; font-weight: 700; color: #2ed573;">$${details.prepaymentAmount || 15} USD PAID ✓</td>
+            </tr>
+            ${details.paymentReference ? `
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Capture Reference:</td>
+              <td style="padding: 6px 0; font-family: monospace;">${escapeHtml(details.paymentReference)}</td>
+            </tr>
+            ` : ''}
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Preferred Size:</td>
+              <td style="padding: 6px 0;">${escapeHtml(details.preferredSize || 'Not specified')}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Preferred Color:</td>
+              <td style="padding: 6px 0;">${escapeHtml(details.preferredColor || 'Not specified')}</td>
+            </tr>
+            ${details.productPreference ? `
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Fit &amp; Finishing:</td>
+              <td style="padding: 6px 0;">${escapeHtml(details.productPreference)}</td>
+            </tr>
+            ` : ''}
+            ${details.additionalNotes ? `
+            <tr>
+              <td style="padding: 6px 0; color: #8b949e;">Additional Notes:</td>
+              <td style="padding: 6px 0;">${escapeHtml(details.additionalNotes)}</td>
+            </tr>
+            ` : ''}
+          </table>
+        </div>
+
+        <h3 style="font-size: 14px; text-transform: uppercase; color: #ff6b6b; margin: 0 0 8px 0;">Customer Idea / Concept Description</h3>
+        <div style="background-color: #161b22; padding: 16px; border-radius: 6px; border-left: 3px solid #ff6b6b; margin-bottom: 24px; font-size: 14px; line-height: 1.6; color: #f3f4f6; white-space: pre-wrap;">
+          ${escapeHtml(details.description || 'No description provided')}
+        </div>
+
+        <h3 style="font-size: 14px; text-transform: uppercase; color: #8b949e; margin: 0 0 8px 0;">Uploaded Artwork Files (${details.uploads?.length || 0})</h3>
+        <ul style="color: #c9d1d9; font-size: 13px; margin: 0 0 24px 0; padding-left: 20px; line-height: 1.6;">
+          ${uploadsListHtml}
+        </ul>
+
+        <div style="text-align: center; margin: 28px 0;">
+          <a href="${adminUrl}" style="display: inline-block; background-color: #ff6b6b; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">
+            OPEN IN ADMIN STUDIO →
+          </a>
+        </div>
+
+        <p style="font-size: 12px; color: #8b949e; line-height: 1.5; text-align: center; border-top: 1px solid #1f2937; padding-top: 20px; margin-top: 32px;">
+          Dispatched to GERKINK Custom Atelier Desk (<a href="mailto:${CUSTOM_DESIGN_STUDIO_EMAIL}" style="color: #8b949e;">${CUSTOM_DESIGN_STUDIO_EMAIL}</a>).
+        </p>
+      </div>
+    `;
+    outboundMails.push({
+      to: CUSTOM_DESIGN_STUDIO_EMAIL,
+      subject: studioSubject,
+      html: studioHtml,
+      type: 'request_submitted_studio',
+    });
+  } else if (details.type === 'customer_message') {
+    // Alert to custom@gerkink.shop when customer sends a message
+    const subject = `💬 [STUDIO DIALOGUE] Request #${details.requestNumber} — Message from ${details.customerName}`;
+    const html = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #07090e; color: #f3f4f6; padding: 32px; border-radius: 8px; max-width: 600px; margin: 0 auto; border: 1px solid #1f2937;">
+        <div style="border-bottom: 2px solid #ff6b6b; padding-bottom: 16px; margin-bottom: 24px;">
+          <span style="font-size: 11px; letter-spacing: 2px; color: #ff6b6b; font-weight: 700; text-transform: uppercase;">GERKINK ATELIER DESK</span>
+          <h2 style="margin: 8px 0 0 0; font-size: 22px; color: #ffffff; text-transform: uppercase;">CUSTOMER MESSAGE RECEIVED</h2>
+        </div>
+
+        <p style="font-size: 14px; color: #c9d1d9; margin-bottom: 16px;">
+          <strong>${escapeHtml(details.customerName)}</strong> (${escapeHtml(details.customerEmail)}) sent a message regarding custom request <strong>#${details.requestNumber}</strong>:
+        </p>
+
+        <div style="background-color: #161b22; padding: 18px; border-radius: 6px; border-left: 3px solid #ff6b6b; margin: 18px 0; font-size: 14px; line-height: 1.6; color: #f3f4f6; white-space: pre-wrap;">
+          ${escapeHtml(details.message || '')}
+        </div>
+
+        <div style="text-align: center; margin: 28px 0;">
+          <a href="${adminUrl}" style="display: inline-block; background-color: #ff6b6b; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">
+            REPLY IN ADMIN STUDIO →
+          </a>
+        </div>
+
+        <p style="font-size: 12px; color: #8b949e; line-height: 1.5; text-align: center; border-top: 1px solid #1f2937; padding-top: 20px; margin-top: 32px;">
+          Dispatched to GERKINK Custom Atelier Desk (${CUSTOM_DESIGN_STUDIO_EMAIL}).
+        </p>
+      </div>
+    `;
+    outboundMails.push({
+      to: CUSTOM_DESIGN_STUDIO_EMAIL,
+      subject,
+      html,
+      type: 'customer_message_studio',
+    });
+  } else if (details.type === 'approval_received') {
+    // Alert to custom@gerkink.shop when customer approves design proof
+    const subject = `✦ [DESIGN APPROVED] Request #${details.requestNumber} Approved by ${details.customerName}`;
+    const html = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #07090e; color: #f3f4f6; padding: 32px; border-radius: 8px; max-width: 600px; margin: 0 auto; border: 1px solid #1f2937;">
+        <div style="border-bottom: 2px solid #2ed573; padding-bottom: 16px; margin-bottom: 24px;">
+          <span style="font-size: 11px; letter-spacing: 2px; color: #2ed573; font-weight: 700; text-transform: uppercase;">GERKINK ATELIER DESK</span>
+          <h2 style="margin: 8px 0 0 0; font-size: 22px; color: #ffffff; text-transform: uppercase;">DESIGN PROOF APPROVED</h2>
+        </div>
+
+        <p style="font-size: 14px; color: #c9d1d9; line-height: 1.6;">
+          Customer <strong>${escapeHtml(details.customerName)}</strong> (${escapeHtml(details.customerEmail)}) has officially approved the design proof for request <strong>#${details.requestNumber}</strong>.
+        </p>
+
+        <p style="font-size: 14px; color: #c9d1d9; line-height: 1.6;">
+          Status is now <strong>${escapeHtml(details.newStatus || 'APPROVED')}</strong>.
+        </p>
+
+        <div style="text-align: center; margin: 28px 0;">
+          <a href="${adminUrl}" style="display: inline-block; background-color: #2ed573; color: #000000; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">
+            VIEW IN ADMIN STUDIO →
+          </a>
+        </div>
+
+        <p style="font-size: 12px; color: #8b949e; line-height: 1.5; text-align: center; border-top: 1px solid #1f2937; padding-top: 20px; margin-top: 32px;">
+          Dispatched to GERKINK Custom Atelier Desk (${CUSTOM_DESIGN_STUDIO_EMAIL}).
+        </p>
+      </div>
+    `;
+    outboundMails.push({
+      to: CUSTOM_DESIGN_STUDIO_EMAIL,
+      subject,
+      html,
+      type: 'approval_received_studio',
+    });
+  } else {
+    // Customer status updates (needs_information, design_ready, status_updated)
+    let subject = `Custom Design #${details.requestNumber} — GERKINK`;
+    let headline = 'Custom Design Update';
+    let bodyContent = '';
+
+    if (details.type === 'needs_information') {
+      subject = `[ACTION REQUIRED] Studio Inquiry for Request #${details.requestNumber}`;
+      headline = 'WE NEED SOMETHING FROM YOU';
+      bodyContent = `
+        <p>The GERKINK studio team has a question regarding your custom design request:</p>
+        <div style="background-color: #161b22; padding: 16px; border-left: 3px solid #ff6b6b; margin: 16px 0; font-style: italic;">
+          "${escapeHtml(details.message || 'Please check your account for details.')}"
+        </div>
+        <p>Please log in to your account to review and reply so we can continue crafting your piece.</p>
+      `;
+    } else if (details.type === 'design_ready') {
+      subject = `[APPROVAL REQUIRED] Design Concept Ready for Request #${details.requestNumber}`;
+      headline = 'YOUR DESIGN IS READY FOR APPROVAL';
+      bodyContent = `
+        <p>Your custom design preparation is complete and awaiting your sign-off.</p>
+        <p>Please review the design artwork and specifications in your account and confirm approval to advance to production.</p>
+      `;
+    } else {
+      subject = `Status Update: Custom Request #${details.requestNumber} is now ${details.newStatus}`;
+      headline = `STATUS: ${details.newStatus || 'UPDATED'}`;
+      bodyContent = `<p>Your custom design request has moved to <strong>${details.newStatus}</strong>.</p>`;
+    }
+
+    const custHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #07090e; color: #f3f4f6; padding: 32px; border-radius: 8px; max-width: 600px; margin: 0 auto; border: 1px solid #1f2937;">
+        <div style="border-bottom: 2px solid #ff6b6b; padding-bottom: 16px; margin-bottom: 24px;">
+          <span style="font-size: 11px; letter-spacing: 2px; color: #ff6b6b; font-weight: 700; text-transform: uppercase;">GERKINK CUSTOM STUDIO</span>
+          <h2 style="margin: 8px 0 0 0; font-size: 22px; color: #ffffff; text-transform: uppercase;">${headline}</h2>
+        </div>
+
+        <p style="font-size: 14px; color: #9ca3af; margin-bottom: 20px;">
+          Hello ${escapeHtml(details.customerName || 'Valued Customer')},
+        </p>
+
+        <div style="font-size: 14px; line-height: 1.6; color: #e5e7eb;">
+          ${bodyContent}
+        </div>
+
+        <div style="background-color: #0d1117; padding: 16px; border-radius: 6px; border: 1px solid #21262d; margin: 24px 0;">
+          <table style="width: 100%; font-size: 13px; color: #c9d1d9; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 4px 0; color: #8b949e; width: 140px;">Request Number:</td>
+              <td style="padding: 4px 0; font-weight: 600; font-family: monospace;">#${details.requestNumber}</td>
+            </tr>
+            ${details.productType ? `
+            <tr>
+              <td style="padding: 4px 0; color: #8b949e;">Product Type:</td>
+              <td style="padding: 4px 0; font-weight: 600;">${details.productType}</td>
+            </tr>
+            ` : ''}
+          </table>
+        </div>
+
+        <div style="text-align: center; margin: 28px 0;">
+          <a href="${accountUrl}" style="display: inline-block; background-color: #ff6b6b; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">
+            VIEW IN ACCOUNT →
+          </a>
+        </div>
+
+        <p style="font-size: 12px; color: #8b949e; line-height: 1.5; text-align: center; border-top: 1px solid #1f2937; padding-top: 20px; margin-top: 32px;">
+          GERKINK · Provocative Luxury Streetwear.<br/>
+          This email was sent to ${escapeHtml(details.customerEmail)}.
+        </p>
+      </div>
+    `;
+    outboundMails.push({
+      to: details.customerEmail,
+      subject,
+      html: custHtml,
+      type: details.type,
+    });
+  }
+
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASSWORD;
+
+  if (!user || !pass || !host) {
+    console.log('[sendCustomDesignNotification] SMTP not configured. Writing to system_emails collection...');
+    for (const mail of outboundMails) {
+      await adminDb.collection('system_emails').add({
+        to: mail.to,
+        subject: mail.subject,
+        html: mail.html,
+        type: mail.type,
+        requestId: details.requestId,
+        status: 'pending_smtp_config',
+        createdAt: FieldValue.serverTimestamp(),
+      });
+    }
+    return;
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user, pass },
+    });
+
+    for (const mail of outboundMails) {
+      await transporter.sendMail({
+        from: `"GERKINK Custom Studio" <${user}>`,
+        to: mail.to,
+        subject: mail.subject,
+        html: mail.html,
+      });
+
+      await adminDb.collection('system_emails').add({
+        to: mail.to,
+        subject: mail.subject,
+        html: mail.html,
+        type: mail.type,
+        requestId: details.requestId,
+        status: 'sent',
+        createdAt: FieldValue.serverTimestamp(),
+      });
+    }
+  } catch (err: any) {
+    console.error('[sendCustomDesignNotification] Failed to send email:', err.message);
+    for (const mail of outboundMails) {
+      await adminDb.collection('system_emails').add({
+        to: mail.to,
+        subject: mail.subject,
+        type: mail.type,
+        requestId: details.requestId,
+        status: 'failed',
+        error: sanitizeErrorMessage(err.message),
+        createdAt: FieldValue.serverTimestamp(),
+      });
+    }
   }
 }

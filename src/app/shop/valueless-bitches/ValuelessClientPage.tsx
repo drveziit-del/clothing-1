@@ -5,7 +5,6 @@ import ProductGrid from '@/components/shop/ProductGrid';
 import ProductFilters from '@/components/shop/ProductFilters';
 import type { Product } from '@/types';
 import type { SortKey } from '@/components/shop/ProductFilters';
-import styles from './page.module.css';
 
 // Client component for filtering/sorting
 export function ValuelessClientPage({ products }: { products: Product[] }) {

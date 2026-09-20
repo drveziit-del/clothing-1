@@ -1,3 +1,4 @@
+import 'server-only';
 import { adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { appendOrderHistory } from './orderProcessor';
@@ -18,7 +19,6 @@ export async function releaseExpiredPendingOrders(): Promise<{ releasedCount: nu
 
     for (const doc of expiredQuery.docs) {
       const orderId = doc.id;
-      const data = doc.data();
 
       try {
         await adminDb.runTransaction(async (transaction) => {

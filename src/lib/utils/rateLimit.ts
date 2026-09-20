@@ -48,7 +48,7 @@ export function isRateLimited(
   const key = `${keyPrefix}_${ip}`;
   const now = Date.now();
 
-  let tracker = trackers.get(key);
+  const tracker = trackers.get(key);
 
   if (!tracker) {
     trackers.set(key, {

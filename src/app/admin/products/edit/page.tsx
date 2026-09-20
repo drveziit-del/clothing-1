@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useRoast } from '@/hooks/useRoast';
-import { getFirestoreDb, getFirebaseStorage, getFirestoreModule, getStorageModule } from '@/lib/firebase/config';
+import { getFirebaseStorage, getStorageModule } from '@/lib/firebase/config';
 import styles from '../../page.module.css';
 import productStyles from '../../../shop/[productId]/ProductDetailClient.module.css';
 
@@ -126,10 +126,8 @@ function EditProductForm() {
 
   // Visual Editor preview states
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
-  const [descOpen, setDescOpen] = useState(true);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [commitmentOpen, setCommitmentOpen] = useState(false);
-  const [faqOpen, setFaqOpen] = useState<Record<number, boolean>>({});
   const [activeUgcIndex, setActiveUgcIndex] = useState(0);
   const ugcSliderRef = useRef<HTMLDivElement>(null);
 
@@ -236,6 +234,7 @@ function EditProductForm() {
       });
     });
     setVariantsList(nextList);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasVariants, variantsColors, variantsSizes, price]);
 
   // Set default selected variant once product/variants load
@@ -249,6 +248,7 @@ function EditProductForm() {
     } else {
       setSelectedVariant(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variantsList]);
 
   // Fetch product on mount or id change
@@ -343,6 +343,7 @@ function EditProductForm() {
     };
 
     fetchProduct();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   // File Upload Helper
@@ -368,11 +369,11 @@ function EditProductForm() {
     return new Promise<string>((resolve, reject) => {
       uploadTask.on(
         'state_changed',
-        (snapshot) => {
+        (snapshot: any) => {
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setUploadProgress((prev) => ({ ...prev, [file.name]: Math.round(progress) }));
         },
-        (error) => {
+        (error: any) => {
           console.error('Upload failed:', error);
           toast(`Upload failed for ${file.name}`, 'error');
           setUploadProgress((prev) => {
@@ -413,7 +414,7 @@ function EditProductForm() {
       if (url.includes('firebasestorage.googleapis.com')) {
         const { ref, deleteObject } = getStorageModule();
         const storageRef = ref(getFirebaseStorage(), url);
-        await deleteObject(storageRef).catch((err) => {
+        await deleteObject(storageRef).catch((err: any) => {
           console.warn('Could not delete object from Storage (might not exist):', err);
         });
       }

@@ -329,14 +329,59 @@ export interface PayoutRequest {
 
 
 // --- Reviews ---
+export type ReviewStatus = 'pending' | 'approved' | 'rejected' | 'flagged';
+export type FitFeedback = 'runs_small' | 'true_to_size' | 'runs_large';
+
+export interface ReviewMedia {
+  type: 'image' | 'video';
+  url: string;
+  playbackUrl?: string;
+  originalUrl?: string;
+  thumbnailUrl?: string;
+}
+
+export interface OfficialReply {
+  text: string;
+  author: string;
+  createdAt: Date | string;
+}
+
 export interface Review {
   id: string;
-  productId?: string;
+  productId?: string | null;
+  productTitle?: string;
+  orderId?: string;
+  orderItemId?: string;
   userId: string;
   userName: string;
+  userEmailMasked?: string;
   userPhoto?: string;
   rating: number;
+  title?: string;
   text: string;
-  createdAt: Date;
-  updatedAt?: Date;
+  fit?: FitFeedback;
+  media?: ReviewMedia[];
+  verifiedPurchase: boolean;
+  status?: ReviewStatus;
+  approved?: boolean;
+  marketingConsent?: boolean;
+  helpfulCount?: number;
+  reportCount?: number;
+  officialReply?: OfficialReply;
+  createdAt: Date | string;
+  updatedAt?: Date | string;
+  publishedAt?: Date | string;
+}
+
+export interface ProductReviewSummary {
+  averageRating: number;
+  totalReviews: number;
+  verifiedReviewsCount: number;
+  ratingDistribution: { [star: number]: number };
+  fitDistribution: {
+    runs_small: number;
+    true_to_size: number;
+    runs_large: number;
+  };
+  mediaCount: number;
 }

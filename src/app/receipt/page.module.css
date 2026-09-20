@@ -1,10 +1,15 @@
 .page {
-  min-height: 100vh;
-  padding: 4rem 1.25rem 5rem;
+  min-height: calc(100vh - var(--site-header-height, 82px));
+  padding: 2rem 1.25rem 4rem;
   display: flex;
   align-items: center;
   justify-content: center;
   background: radial-gradient(circle at 50% 15%, #18181b 0%, #09090b 80%);
+}
+
+[data-theme="light"] .page {
+  background: radial-gradient(circle at 50% 15%, #FFFFFF 0%, #E2E8F0 85%);
+  color: var(--text-primary);
 }
 
 .container {
@@ -43,6 +48,10 @@
   color: #a1a1aa;
 }
 
+[data-theme="light"] .brandText {
+  color: #475569;
+}
+
 .homeBtn {
   display: inline-flex;
   align-items: center;
@@ -62,6 +71,19 @@
 .homeBtn:hover {
   background: #4b4b53;
   color: #fff;
+}
+
+[data-theme="light"] .homeBtn {
+  background: #FFFFFF;
+  color: #0F172A;
+  border: 1px solid #CBD5E1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .homeBtn:hover {
+  background: #F1F5F9;
+  color: #000;
+  border-color: #94A3B8;
 }
 
 /* Screen Content */
@@ -84,10 +106,18 @@
   margin: 0;
 }
 
+[data-theme="light"] .screenPlanTitle {
+  color: #0F172A;
+}
+
 .screenPlanSub {
   font-size: 0.8rem;
   color: #a1a1aa;
   margin: 0.2rem 0 0;
+}
+
+[data-theme="light"] .screenPlanSub {
+  color: #64748B;
 }
 
 .screenTotalCol {
@@ -100,11 +130,19 @@
   display: block;
 }
 
+[data-theme="light"] .screenTotalLabel {
+  color: #64748B;
+}
+
 .screenTotalValue {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 1.25rem;
   font-weight: 800;
   color: #ffffff;
+}
+
+[data-theme="light"] .screenTotalValue {
+  color: #0F172A;
 }
 
 /* Thermal Paper Slip Styles */
@@ -296,6 +334,19 @@
   background: #3f3f46;
   border-color: #52525b;
   transform: translateY(-1px);
+}
+
+[data-theme="light"] .downloadReceiptBtn {
+  background: #FFFFFF;
+  color: #0F172A;
+  border: 1px solid #CBD5E1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .downloadReceiptBtn:hover {
+  background: #F8FAFC;
+  border-color: #94A3B8;
+  color: #000;
 }
 
 .continueToThankYouBtn {

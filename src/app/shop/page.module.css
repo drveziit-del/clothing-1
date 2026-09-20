@@ -1,6 +1,6 @@
 .page {
-  padding-top: 80px;
-  min-height: 100vh;
+  padding-top: 0;
+  min-height: calc(100vh - var(--site-header-height, 82px));
   background: var(--bg);
   color: var(--text-primary);
   transition: background-color 0.2s ease, color 0.2s ease;

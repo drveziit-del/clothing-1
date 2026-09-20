@@ -1,3 +1,4 @@
+import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
@@ -135,6 +136,30 @@ export async function POST(request: NextRequest) {
         status:    'delivered',
         updatedAt: FieldValue.serverTimestamp(),
       });
+
+      // Dispatch post-delivery review invitation email (at-most-once)
+      const orderData = orderDoc.data();
+      const firstItem = orderData?.items?.[0];
+      if (orderData?.userEmail && firstItem?.productId) {
+        try {
+          const { generateReviewToken } = await import('@/lib/reviews/token');
+          const { sendPostDeliveryReviewRequestEmailOnce } = await import('@/lib/email/sender');
+          const token = generateReviewToken(externalId, firstItem.productId, orderData.userEmail);
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gerkink.shop';
+          const reviewUrl = `${appUrl}/review?token=${encodeURIComponent(token)}`;
+
+          await sendPostDeliveryReviewRequestEmailOnce({
+            orderId: externalId,
+            userEmail: orderData.userEmail,
+            userName: orderData.shippingAddress?.name,
+            productId: firstItem.productId,
+            productTitle: firstItem.title || 'Your Purchase',
+            reviewUrl,
+          });
+        } catch (reviewEmailErr) {
+          console.error('[PrintifyWebhook] Failed to dispatch review invitation:', reviewEmailErr);
+        }
+      }
       break;
     }
   }

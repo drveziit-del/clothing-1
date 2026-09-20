@@ -15,16 +15,26 @@ export default function LoadingScreen() {
   const [roast, setRoast] = useState(LOAD_ROASTS[0]);
 
   useEffect(() => {
+    // If already seen in this session, dismiss immediately
+    try {
+      if (sessionStorage.getItem('gerkink_splash_seen')) {
+        setVisible(false);
+        return;
+      }
+      sessionStorage.setItem('gerkink_splash_seen', '1');
+    } catch (_) {}
+
     setRoast(LOAD_ROASTS[Math.floor(Math.random() * LOAD_ROASTS.length)]);
 
-    // Lock body scroll while splash screen is active, preserving pre-existing value
+    // Lock body scroll briefly during splash animation, preserving original overflow
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
+    // Snappy 450ms splash animation to allow immediate hero discovery and interaction
     const timer = setTimeout(() => {
       setVisible(false);
       document.body.style.overflow = originalOverflow;
-    }, 1800);
+    }, 450);
 
     return () => {
       clearTimeout(timer);

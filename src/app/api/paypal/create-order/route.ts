@@ -173,10 +173,27 @@ export async function POST(request: NextRequest) {
 
   // Await the paypalOrderId write — capture-order depends on this binding for its integrity guard.
   try {
-    await orderRef.update({ paypalOrderId: paypalOrderToken.id });
-  } catch (e) {
+    await orderRef.update({
+      paypalOrderId: paypalOrderToken.id,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+  } catch (e: any) {
     console.error(`[paypal/create-order] CRITICAL: Failed to bind paypalOrderId for order ${orderRef.id}:`, e);
+    // Mark order as failed so stock reservation can expire/release; strictly do NOT return success
+    await orderRef.update({
+      status: 'failed',
+      failureReason: 'Failed to bind PayPal payment gateway identifier',
+      updatedAt: FieldValue.serverTimestamp(),
+    }).catch((markErr) => {
+      console.error(`[paypal/create-order] Failed to mark order ${orderRef.id} as failed:`, markErr);
+    });
+
+    return NextResponse.json(
+      { error: 'Failed to initialize payment binding with order record. Please try again.' },
+      { status: 500 }
+    );
   }
+
   // Timeline history can remain async
   Promise.all([
     appendOrderHistory(orderRef.id, 'order_created_pending', 'customer', { receipt, total }),

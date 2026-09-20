@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import type { Product } from '@/types';
-import { useCurrency } from '@/context/CurrencyContext';
 import ProductCard from '@/components/ui/ProductCard';
 import { BentoGrid, BentoCard } from '@/components/ui/BentoGrid';
 import styles from './SocietyFuckersDetailSections.module.css';
@@ -84,8 +83,8 @@ const TIER_SECTIONS_DATA: Record<number, TierContent> = {
     ],
     faqs: [
       {
-        q: 'Can I pay via sovereign cryptocurrency or escrow wire transfer?',
-        a: 'Yes. We accept Escrow Wire Transfers, Bitcoin, Ethereum, and physical precious metals via our VIP Private Concierge Desk.',
+        q: 'Can I pay via sovereign cryptocurrency or bank wire transfer?',
+        a: 'Yes. We accept Bank Wire Transfers, Bitcoin, Ethereum, and physical precious metals via our VIP Private Concierge Desk.',
       },
       {
         q: 'What is the Certified Destruction Ceremony?',
@@ -224,7 +223,7 @@ const TIER_SECTIONS_DATA: Record<number, TierContent> = {
       },
       {
         q: 'What is the pre-booking allocation policy?',
-        a: 'A $500 escrow deposit reserves your numbered serial position. 100% of this fee is credited toward the final piece balance.',
+        a: 'A $500 allocation deposit reserves your numbered serial position. 100% of this fee is credited toward the final piece balance.',
       },
     ],
   },
@@ -347,7 +346,6 @@ export default function SocietyFuckersDetailSections({
   product,
   recommendedProducts = [],
 }: SocietyFuckersDetailSectionsProps) {
-  const { formatPrice } = useCurrency();
   const [faqOpen, setFaqOpen] = useState<Record<number, boolean>>({});
 
   const tier = product.tier || 1;
@@ -525,10 +523,10 @@ export default function SocietyFuckersDetailSections({
 
           <BentoCard
             colSpan={2}
-            badge="ESCROW & SECURITY"
+            badge="TREASURY VERIFICATION & SECURITY"
             badgeType={tier === 1 ? 'coral' : 'mist'}
             title="Sovereign Allocation Protocol"
-            description="Every Tier allocation includes direct escrow security, bespoke master pattern tailoring, and certified destruction of all master vector blueprint files upon delivery."
+            description="Every Tier allocation includes direct treasury verification, bespoke master pattern tailoring, and certified destruction of all master vector blueprint files upon delivery."
             href={`/contact?subject=VIP Concierge Request — Tier ${tier} (${product.title})`}
             ctaText="Speak with Private VIP Concierge Desk"
           />

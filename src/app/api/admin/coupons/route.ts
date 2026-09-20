@@ -1,3 +1,4 @@
+import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
@@ -68,12 +69,15 @@ export async function POST(request: NextRequest) {
     const value = parseFloat(body.value);
     const isGlobal = Boolean(body.isGlobal);
     const userId = body.userId?.trim() || null;
-    const minSubtotal = body.minSubtotal ? parseFloat(body.minSubtotal) : 0;
-    const maxUses = body.maxUses ? parseInt(body.maxUses, 10) : null;
+    const minSubtotal = body.minSubtotal ? Math.max(0, parseFloat(body.minSubtotal) || 0) : 0;
+    const maxUses = body.maxUses ? Math.max(1, parseInt(body.maxUses, 10)) : null;
     const expiresAt = body.expiresAt ? new Date(body.expiresAt) : null;
 
     if (!code) {
       return NextResponse.json({ error: 'Coupon code is required' }, { status: 400 });
+    }
+    if (!/^[A-Z0-9-_]{3,30}$/.test(code)) {
+      return NextResponse.json({ error: 'Coupon code must be 3-30 characters (letters, numbers, hyphens, underscores)' }, { status: 400 });
     }
     if (isNaN(value) || value <= 0) {
       return NextResponse.json({ error: 'Coupon discount value must be greater than 0' }, { status: 400 });

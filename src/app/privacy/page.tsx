@@ -112,7 +112,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <div className={styles.contactCard} style={{ marginTop: '1rem' }}>
               <p><strong>GERKINK Privacy & Data Protection Desk</strong></p>
-              <p>Email: <a href="mailto:gerkinkofficial@gmail.com">gerkinkofficial@gmail.com</a></p>
+              <p>Email: <a href="mailto:support@gerkink.shop">support@gerkink.shop</a></p>
               <p>Support Portal: <Link href="/contact">Visit Support Center →</Link></p>
             </div>
           </section>

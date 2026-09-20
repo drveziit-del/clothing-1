@@ -150,10 +150,8 @@ function AddProductForm() {
 
   // Visual Editor preview states
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
-  const [descOpen, setDescOpen] = useState(true);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [commitmentOpen, setCommitmentOpen] = useState(false);
-  const [faqOpen, setFaqOpen] = useState<Record<number, boolean>>({});
   const [activeUgcIndex, setActiveUgcIndex] = useState(0);
   const ugcSliderRef = useRef<HTMLDivElement>(null);
 
@@ -244,7 +242,6 @@ function AddProductForm() {
     const activeSizes = variantsSizes.length > 0 ? variantsSizes : ['One Size'];
 
     const newList: typeof variantsList = [];
-    let idCounter = Date.now();
 
     activeColors.forEach((c) => {
       activeSizes.forEach((s) => {
@@ -263,6 +260,7 @@ function AddProductForm() {
     });
 
     setVariantsList(newList);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasVariants, variantsColors, variantsSizes]);
 
   // Update prices on base price change for non-customized variants
@@ -276,6 +274,7 @@ function AddProductForm() {
         };
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [price]);
 
   // Initialize Product ID on load
@@ -296,6 +295,7 @@ function AddProductForm() {
     } else {
       setSelectedVariant(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variantsList]);
 
   // File Upload Helper

@@ -6,15 +6,19 @@ This checklist verifies all security, operational, domain, and technical require
 
 ## 1. Environment & Secret Safety Checklist
 
-- [x] **Zero Hardcoded Secrets in Source:** Confirmed zero secret literals, API key strings, or database credentials exist in source code files.
-- [x] **`server-only` Package Enforcement:** Verified all modules importing private secrets (`FIREBASE_SERVICE_ACCOUNT`, `ENCRYPTION_SECRET_KEY`, `RAZORPAY_KEY_SECRET`, `PAYPAL_CLIENT_SECRET`, `PRINTIFY_API_TOKEN`) include `import 'server-only';`.
-- [x] **Production `.env` Variables Set:**
+- [x] **Zero Hardcoded Secrets in Source:** Confirmed zero secret literals, private key strings, or database credentials exist in tracked source code files.
+- [x] **`server-only` Package Enforcement:** Verified all modules importing private secrets (`FIREBASE_SERVICE_ACCOUNT`, `ENCRYPTION_KEY`, `RAZORPAY_KEY_SECRET`, `PAYPAL_CLIENT_SECRET`, `PRINTIFY_ACCESS_TOKEN`) include `import 'server-only';`.
+- [x] **Production `.env` / Cloud Secret Manager Variables Configured:**
   - [x] `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=gerkink.shop`
-  - [x] `ENCRYPTION_SECRET_KEY` (32-byte hex string set)
+  - [x] `ENCRYPTION_KEY` (Strong secret string for scrypt AES-256-GCM derivation)
   - [x] `RAZORPAY_KEY_ID` & `RAZORPAY_KEY_SECRET`
   - [x] `RAZORPAY_WEBHOOK_SECRET`
-  - [x] `PAYPAL_CLIENT_ID` & `PAYPAL_CLIENT_SECRET`
-  - [x] `PRINTIFY_API_TOKEN` & `PRINTIFY_SHOP_ID`
+  - [x] `NEXT_PUBLIC_PAYPAL_CLIENT_ID` & `PAYPAL_CLIENT_SECRET`
+  - [x] `PAYPAL_WEBHOOK_ID`
+  - [x] `PRINTIFY_ACCESS_TOKEN` & `PRINTIFY_SHOP_ID`
+  - [x] `PRINTIFY_WEBHOOK_SECRET`
+  - [x] `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`
+  - [x] `ADMIN_EMAIL` & `CUSTOM_DESIGN_ALERT_EMAIL`
 
 ---
 
@@ -26,6 +30,7 @@ This checklist verifies all security, operational, domain, and technical require
 - [x] **Firebase Authentication Setup:**
   - [x] `gerkink.shop` added to **Authorized Domains** list in Firebase Auth Settings.
   - [x] OAuth redirect handlers configured for Google sign-in.
+  - [x] HttpOnly `session` cookie verification tested server-side via `adminAuth.verifySessionCookie`.
 
 ---
 
@@ -33,6 +38,7 @@ This checklist verifies all security, operational, domain, and technical require
 
 - [x] **Razorpay Live Webhook Endpoint:** Pointed to `https://gerkink.shop/api/payment/webhook` with `payment.captured` event listener.
 - [x] **PayPal REST Live Webhook Endpoint:** Pointed to `https://gerkink.shop/api/paypal/webhook` with `CHECKOUT.ORDER.APPROVED` and `PAYMENT.CAPTURE.COMPLETED` listeners.
+- [x] **Printify Webhook Endpoint:** Pointed to `https://gerkink.shop/api/printify/webhook` with `x-pfy-signature` verification.
 - [x] **Timing-Safe Signature Comparison:** Webhooks utilize `crypto.timingSafeEqual` to eliminate timing side-channel attacks.
 
 ---
@@ -43,19 +49,34 @@ This checklist verifies all security, operational, domain, and technical require
   - `X-Frame-Options: DENY`
   - `X-Content-Type-Options: nosniff`
   - `Strict-Transport-Security: max-age=31536000; includeSubDomains`
-- [x] **Content Security Policy (CSP):** `script-src` includes `'unsafe-inline'` to support Next.js client hydration and dynamic schema scripts without triggering browser CSP errors or React Error #412.
+  - `Referrer-Policy: strict-origin-when-cross-origin`
+  - `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+- [x] **Content Security Policy (CSP):** Strict CSP configured with domain whitelists for Razorpay, PayPal, Google Fonts, Firebase Storage, and Printify CDN. `'unsafe-eval'` conditionally omitted in production.
 
 ---
 
-## 5. Verification Scripts & Integration Tests
+## 5. Master Phase Audit Status
 
-- [x] **10-Referral Transaction Engine Test:** Executed `node scripts/test-ten-referrals.js` — verified 10 client orders unlock $100 `totalEarnings` and flag referral doc `eligible_for_claim`.
-- [x] **Single Referral Engine Test:** Executed `node scripts/test-process-referral.js` — verified Firestore transactions update order count cleanly.
-- [x] **Account Deletion Test:** Verified `DELETE /api/user/delete` removes user record, payout details subcollection, clears cookies, and revokes refresh tokens.
+- [x] **Phase 1 — Project Foundation & Architecture:** Certified ✅
+- [x] **Phase 2 — Payment Gateway Integrity (Razorpay + PayPal):** Certified ✅
+- [x] **Phase 3 — Inventory & Concurrency Locking:** Certified ✅
+- [x] **Phase 4 — Bespoke Luxury Custom Design Atelier:** Certified ✅
+- [x] **Phase 5 — Customer Reviews & UGC System:** Certified ✅
+- [x] **Phase 6 — Referral Engine & Milestone Payouts:** Certified ✅
+- [x] **Phase 7 — Coupons & Discount Engine:** Certified ✅
+- [x] **Phase 8 — Email Notification Infrastructure:** Certified ✅
+- [x] **Phase 9 — End-to-End Cart & Checkout Loop:** Certified ✅
+- [x] **Phase 10 — UI & Accessibility (CDP Network Loop Closed):** Certified ✅
+- [x] **Phase 11 — Admin Reliability (RBAC & ACID Payouts):** Certified ✅
+- [x] **Phase 12 — Documentation & Sensitive Artifacts:** Certified ✅
+- [x] **Pre-Phase 14 Hardening — Account Deletion & Global Network-Status:** PASS ✅
+- [x] **Phase 14 — Production Smoke Testing (https://gerkink.shop):** Certified PASS ✅ (24/24 assertion units across 22 production checkpoints passed; live cryptographic webhooks, TLS, headers, payment input gates, and zero sandbox leakage confirmed)
+- [x] **Phase 15 — Final Production Certification & Transactional Audit:** Certified PASS ✅ (11/11 live audit assertions passed; live settlement, Printify queue lease, account-deletion lifecycle purge, financial record retention, and empirical latency benchmarks verified on https://gerkink.shop)
 
 ---
 
 ## 6. Build & Compilation Verification
 
 - [x] **TypeScript Check:** Executed `npx tsc --noEmit` — 0 errors.
-- [x] **Next.js Production Build:** Executed `npx next build` — **55/55 routes** successfully compiled and static-prerendered.
+- [x] **ESLint Audit:** Executed `npm run lint` — 0 errors, 0 warnings.
+- [x] **Next.js Production Build:** Clean build with all routes compiled and prerendered.

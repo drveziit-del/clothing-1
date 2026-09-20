@@ -25,9 +25,18 @@ service cloud.firestore {
         && request.resource.data.role == 'user'
         && request.resource.data.referralCount == 0
         && request.resource.data.totalEarnings == 0
-        && !request.resource.data.keys().hasAny(['milestoneReward', 'milestoneAchieved']);
-      // Users can update their own non-sensitive fields only
-      allow update: if (isOwner(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'referralCount', 'totalEarnings'])) || isAdmin();
+        && !request.resource.data.keys().hasAny(['milestoneReward', 'milestoneAchieved', 'customerNumber', 'isFounding500']);
+      // Customers can update their own non-sensitive fields only.
+      // Modifying protected referral, milestone, financial, or role fields is strictly forbidden.
+      allow update: if (isOwner(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'role',
+        'referralCount',
+        'totalEarnings',
+        'milestoneReward',
+        'milestoneAchieved',
+        'customerNumber',
+        'isFounding500'
+      ])) || isAdmin();
       allow delete: if isAdmin();
     }
 
@@ -94,6 +103,14 @@ service cloud.firestore {
     match /reviews/{reviewId} {
       allow read:   if true;  // Public catalog — anyone can see reviews
       allow write:  if false; // Created, updated & deleted securely via /api/reviews
+    }
+
+    // ── Custom Design Requests ───────────────────────────────────────
+    match /customDesignRequests/{requestId} {
+      // Owner can read their own request; Admins can read all
+      allow read:   if (isSignedIn() && resource.data.userId == request.auth.uid) || isAdmin();
+      // Server-only creation and updates via Firebase Admin SDK
+      allow write:  if false;
     }
   }
 }
