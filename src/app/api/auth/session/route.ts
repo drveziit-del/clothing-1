@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     cookieStore.set('session', sessionCookie, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: expiresIn / 1000,
       path: '/',
     });
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     cookieStore.set('is_admin', String(isAdmin), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: expiresIn / 1000,
       path: '/',
     });

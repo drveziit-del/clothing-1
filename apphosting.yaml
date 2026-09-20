@@ -3,7 +3,7 @@
 
 runConfig:
   cpu: 1
-  memoryMiB: 512
+  memoryMiB: 1024
 
 env:
   # ─── Non-secret environment variables ───────────────────────────────────────

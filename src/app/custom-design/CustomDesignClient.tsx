@@ -30,7 +30,7 @@ const PREDEFINED_COLORS = ['Black', 'White', 'Off-White', 'Grey', 'Custom'];
 type Step = 1 | 2 | 3;
 
 export default function CustomDesignClient() {
-  const { user } = useAuth();
+  const { user, firebaseUser } = useAuth();
   const { toast } = useRoast();
   const { isOnline } = useNetworkStatus();
   const router = useRouter();
@@ -136,8 +136,9 @@ export default function CustomDesignClient() {
 
   // Handle Multi-file Upload
   const handleFileUpload = async (files: FileList | File[]) => {
-    if (!user) {
+    if (!user && !firebaseUser) {
       toast('Please sign in to upload your design files.', 'error');
+      router.push('/account?redirect=/custom-design');
       return;
     }
 
@@ -534,13 +535,18 @@ export default function CustomDesignClient() {
                   </p>
                   <span className={styles.browseLink}>or BROWSE FILES</span>
                   <p className={styles.uploadFormatNotice}>
-                    Supported: PNG, JPG, WEBP, PDF, SVG
+                    Supported: PNG, JPG, WEBP, PDF, SVG, HEIC
                   </p>
+                  {!user && !firebaseUser && (
+                    <span style={{ fontSize: '0.75rem', color: '#ff6b6b', marginTop: '0.25rem', letterSpacing: '0.05em' }}>
+                      (Sign in required to upload)
+                    </span>
+                  )}
                   <input
                     ref={fileInputRef}
                     type="file"
                     multiple
-                    accept=".png,.jpg,.jpeg,.webp,.pdf,.svg"
+                    accept=".png,.jpg,.jpeg,.webp,.pdf,.svg,.heic,.heif"
                     className={styles.hiddenFileInput}
                     onChange={(e) => {
                       if (e.target.files) handleFileUpload(e.target.files);

@@ -37,9 +37,9 @@ function parseMultipartFormData(
   let fileName = 'artwork';
   let mimeType = 'application/octet-stream';
 
-  const dispositionMatch = headerBlock.match(/Content-Disposition:.*?filename="([^"]+)"/i);
+  const dispositionMatch = headerBlock.match(/Content-Disposition:.*?(?:filename="([^"]+)"|filename=([^;\r\n]+)|filename\*=(?:UTF-8''|utf-8'')([^;\r\n]+))/i);
   if (dispositionMatch) {
-    fileName = dispositionMatch[1];
+    fileName = decodeURIComponent(dispositionMatch[1] || dispositionMatch[2] || dispositionMatch[3] || 'artwork').trim();
   }
 
   const typeMatch = headerBlock.match(/Content-Type:\s*(\S+)/i);
@@ -81,18 +81,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File exceeds maximum allowed size of 25MB' }, { status: 400 });
     }
 
-    const rawBody = Buffer.from(await request.arrayBuffer());
-    if (rawBody.length > MAX_FILE_SIZE_BYTES) {
-      return NextResponse.json({ error: 'File exceeds maximum allowed size of 25MB' }, { status: 400 });
+    let buffer: Buffer | null = null;
+    let fileName = 'artwork';
+    let mimeType = 'application/octet-stream';
+
+    // Attempt native Next.js/Web API formData parsing first (zero buffer copies, handles all browser encoding)
+    try {
+      const formData = await request.formData();
+      const file = formData.get('file');
+      if (file && typeof file === 'object' && 'arrayBuffer' in file) {
+        const fileObj = file as File;
+        fileName = fileObj.name || 'artwork';
+        mimeType = fileObj.type || 'application/octet-stream';
+        buffer = Buffer.from(await fileObj.arrayBuffer());
+      }
+    } catch {
+      // Fallback: If request.formData() fails, parse raw buffer with robust boundary matching
+      const rawBody = Buffer.from(await request.arrayBuffer());
+      const parsed = parseMultipartFormData(rawBody, contentType);
+      if (parsed) {
+        buffer = parsed.buffer;
+        fileName = parsed.fileName;
+        mimeType = parsed.mimeType;
+      }
     }
 
-    const parsed = parseMultipartFormData(rawBody, contentType);
-
-    if (!parsed || parsed.buffer.length === 0) {
+    if (!buffer || buffer.length === 0) {
       return NextResponse.json({ error: 'No file data found in upload' }, { status: 400 });
     }
 
-    const { buffer, fileName, mimeType } = parsed;
+    if (buffer.length > MAX_FILE_SIZE_BYTES) {
+      return NextResponse.json({ error: 'File exceeds maximum allowed size of 25MB' }, { status: 400 });
+    }
 
     // 2. Strict Magic Byte & Extension Validation
     const validation = validateFileMagicBytes(buffer, fileName, mimeType);
@@ -108,48 +128,40 @@ export async function POST(request: NextRequest) {
 
     // 3. Save to Firebase Admin Storage (Private — zero public ACL)
     const bucketName = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
-    if (bucketName) {
-      try {
-        const bucket = adminStorage.bucket(bucketName);
-        const fileRef = bucket.file(storagePath);
-
-        await fileRef.save(validation.sanitizedBuffer || buffer, {
-          metadata: {
-            contentType: detectedMime,
-            cacheControl: 'private, max-age=3600',
-            metadata: {
-              ownerUid: uid,
-              originalFileName: encodeURIComponent(fileName),
-              uploadedAt: new Date().toISOString(),
-            },
-          },
-        });
-
-        // Note: We deliberately DO NOT call fileRef.makePublic()
-        return NextResponse.json({
-          success: true,
-          fileId,
-          originalName: fileName,
-          mimeType: detectedMime,
-          size: buffer.length,
-          storagePath,
-          url: `/api/custom-design/media?path=${encodeURIComponent(storagePath)}`,
-        });
-      } catch (storageErr: any) {
-        console.error('[custom-design/upload] Storage error:', storageErr?.message || storageErr);
-      }
+    if (!bucketName) {
+      return NextResponse.json({ error: 'Storage bucket configuration missing' }, { status: 500 });
     }
 
-    // Local fallback for dev/testing when bucket is not provisioned
-    return NextResponse.json({
-      success: true,
-      fileId,
-      originalName: fileName,
-      mimeType: detectedMime,
-      size: buffer.length,
-      storagePath,
-      url: `/api/custom-design/media?path=${encodeURIComponent(storagePath)}`,
-    });
+    try {
+      const bucket = adminStorage.bucket(bucketName);
+      const fileRef = bucket.file(storagePath);
+
+      await fileRef.save(validation.sanitizedBuffer || buffer, {
+        metadata: {
+          contentType: detectedMime,
+          cacheControl: 'private, max-age=3600',
+          metadata: {
+            ownerUid: uid,
+            originalFileName: encodeURIComponent(fileName),
+            uploadedAt: new Date().toISOString(),
+          },
+        },
+      });
+
+      // Note: We deliberately DO NOT call fileRef.makePublic()
+      return NextResponse.json({
+        success: true,
+        fileId,
+        originalName: fileName,
+        mimeType: detectedMime,
+        size: buffer.length,
+        storagePath,
+        url: `/api/custom-design/media?path=${encodeURIComponent(storagePath)}`,
+      });
+    } catch (storageErr: any) {
+      console.error('[custom-design/upload] Storage error:', storageErr?.message || storageErr);
+      return NextResponse.json({ error: 'Failed to save artwork to storage' }, { status: 500 });
+    }
   } catch (err: any) {
     console.error('[custom-design/upload] Unhandled upload error:', err);
     return NextResponse.json({ error: err?.message || 'Failed to upload artwork' }, { status: 500 });

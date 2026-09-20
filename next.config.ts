@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
   async headers() {
     // 'unsafe-eval' is required by the Next.js dev overlay but must never ship to production.
     const unsafeEval = process.env.NODE_ENV !== 'production' ? "'unsafe-eval' " : '';
-    const scriptCSP = `script-src 'self' ${unsafeEval}'unsafe-inline' https://checkout.razorpay.com https://*.razorpay.com https://apis.google.com https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com`;
+    const scriptCSP = `script-src 'self' ${unsafeEval}'unsafe-inline' https://checkout.razorpay.com https://*.razorpay.com https://apis.google.com https://www.paypal.com https://*.paypal.com https://*.paypalobjects.com https://static.cloudflareinsights.com`;
 
     return [
       {
@@ -46,7 +46,7 @@ const nextConfig: NextConfig = {
               "font-src 'self' data: https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://images-api.printify.com https://storage.googleapis.com https://cdn.printify.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://lh3.googleusercontent.com https://*.googleusercontent.com https://*.paypalobjects.com https://*.paypal.com",
               "media-src 'self' data: blob: https://storage.googleapis.com https://firebasestorage.googleapis.com https://*.firebasestorage.app https://commondatastorage.googleapis.com",
-              "connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://api.razorpay.com https://*.razorpay.com https://api.printify.com https://open.er-api.com wss://*.firebaseio.com https://*.paypal.com https://*.paypalobjects.com",
+              "connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://api.razorpay.com https://*.razorpay.com https://api.printify.com https://open.er-api.com wss://*.firebaseio.com https://*.paypal.com https://*.paypalobjects.com https://cloudflareinsights.com",
               "frame-src https://checkout.razorpay.com https://*.razorpay.com https://accounts.google.com https://*.firebaseapp.com https://apis.google.com https://gerkink.shop https://*.gerkink.shop https://*.paypal.com https://*.paypalobjects.com",
               "base-uri 'self'",
               "form-action 'self' https://api.razorpay.com https://www.paypal.com",

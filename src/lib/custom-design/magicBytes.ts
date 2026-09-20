@@ -8,7 +8,7 @@ export interface FileValidationResult {
 export const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25MB per file
 export const MAX_FILES_PER_REQUEST = 5;
 
-const ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'pdf', 'svg'];
+const ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'pdf', 'svg', 'heic', 'heif'];
 
 /**
  * Checks if a buffer matches known magic bytes for image/document types.
@@ -30,7 +30,7 @@ export function validateFileMagicBytes(
   const ext = extMatch ? extMatch[1].toLowerCase() : '';
 
   if (!ALLOWED_EXTENSIONS.includes(ext)) {
-    return { valid: false, error: `Extension .${ext} is not supported. Allowed: PNG, JPG, JPEG, WEBP, PDF, SVG` };
+    return { valid: false, error: `Extension .${ext} is not supported. Allowed: PNG, JPG, JPEG, WEBP, PDF, SVG, HEIC, HEIF` };
   }
 
   // 1. PNG: 89 50 4E 47 0D 0A 1A 0A
@@ -128,8 +128,25 @@ export function validateFileMagicBytes(
     return { valid: true, detectedMime: 'image/svg+xml', sanitizedBuffer: buffer };
   }
 
+  // 6. HEIC / HEIF: 'ftyp' at offset 4 with compatible brand 'heic', 'heix', 'mif1', 'msf1', etc.
+  if (
+    buffer.length >= 12 &&
+    buffer[4] === 0x66 && // f
+    buffer[5] === 0x74 && // t
+    buffer[6] === 0x79 && // y
+    buffer[7] === 0x70    // p
+  ) {
+    const brand = buffer.subarray(8, 12).toString('ascii').toLowerCase();
+    if (['heic', 'heix', 'hevc', 'hevx', 'mif1', 'msf1'].includes(brand)) {
+      if (ext !== 'heic' && ext !== 'heif') {
+        return { valid: false, error: 'File content (HEIC/HEIF) does not match extension' };
+      }
+      return { valid: true, detectedMime: 'image/heic' };
+    }
+  }
+
   return {
     valid: false,
-    error: `File signature does not match any allowed format (PNG, JPG, WEBP, PDF, SVG). Declared: ${declaredMimeType}`,
+    error: `File signature does not match any allowed format (PNG, JPG, WEBP, PDF, SVG, HEIC). Declared: ${declaredMimeType}`,
   };
 }
