@@ -2,8 +2,7 @@ import TierPyramid from '@/components/shop/TierPyramid';
 import type { Product } from '@/types';
 import styles from './page.module.css';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 60;
 
 export const metadata = {
   title: 'Society Fu*kers — Tier-Based Luxury ($1K to $10M) — GERKINK',

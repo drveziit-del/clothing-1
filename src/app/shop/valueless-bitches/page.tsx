@@ -3,8 +3,7 @@ import type { Product } from '@/types';
 import { ValuelessClientPage } from './ValuelessClientPage';
 import styles from './page.module.css';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 60;
 
 export const metadata = {
   title: 'Valueless Bi*ches — GERKINK',

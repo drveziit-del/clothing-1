@@ -4,6 +4,10 @@ import ReceiptClient from './ReceiptClient';
 export const metadata = {
   title: 'Order Receipt | GERKINK',
   description: 'Printing your official GERKINK order receipt slip.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function ReceiptPage() {

@@ -3,9 +3,11 @@
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
+import { Suspense } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import GSAPPageTransition from '@/components/animation/GSAPPageTransition';
+import NavigationProgressBar from './NavigationProgressBar';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -65,6 +67,9 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
   return (
     <>
+      <Suspense fallback={null}>
+        <NavigationProgressBar />
+      </Suspense>
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>

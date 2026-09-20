@@ -22,22 +22,20 @@ export default function GSAPPageTransition({ children }: GSAPPageTransitionProps
       return;
     }
 
-    // Smooth transition on route changes (Checkout -> Receipt -> Thank You, etc.)
+    // Subtle, compositor-only micro-transition on route changes (preserves immediate visibility, eliminates blur jank)
     const ctx = gsap.context(() => {
       gsap.fromTo(
         containerRef.current,
         {
-          opacity: 0,
-          y: 10,
-          filter: 'blur(4px)',
+          opacity: 0.94,
+          y: 3,
         },
         {
           opacity: 1,
           y: 0,
-          filter: 'blur(0px)',
-          duration: 0.4,
-          ease: 'power2.out',
-          clearProps: 'filter,transform',
+          duration: 0.16,
+          ease: 'power1.out',
+          clearProps: 'all',
         }
       );
     }, containerRef);

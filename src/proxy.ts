@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const PUBLIC_PATHS = ['/', '/shop', '/manifesto', '/contact', '/owners'];
+const PUBLIC_PATHS = ['/', '/shop', '/manifesto', '/contact', '/owners', '/referral', '/custom-design'];
 const AUTH_PATHS   = ['/auth/login', '/auth/signup'];
 const ADMIN_PREFIX = '/admin';
-const AUTH_PREFIX  = ['/checkout', '/account', '/referral'];
+const AUTH_PREFIX  = ['/checkout', '/account'];
 
 function _isPublic(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) return true;

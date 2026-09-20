@@ -11,7 +11,16 @@ const LOAD_ROASTS = [
 ];
 
 export default function LoadingScreen() {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        if (sessionStorage.getItem('gerkink_splash_seen')) {
+          return false;
+        }
+      } catch (_) {}
+    }
+    return true;
+  });
   const [roast, setRoast] = useState(LOAD_ROASTS[0]);
 
   useEffect(() => {

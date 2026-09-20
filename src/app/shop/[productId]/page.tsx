@@ -1,8 +1,11 @@
+import { cache } from 'react';
 import { notFound, redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { ProductDetailClient } from './ProductDetailClient';
 import type { Product } from '@/types';
 import styles from './page.module.css';
+
+export const revalidate = 60;
 
 interface Props {
   params: Promise<{ productId: string }>;
@@ -10,7 +13,7 @@ interface Props {
 
 import { adminDb } from '@/lib/firebase/admin';
 
-async function getProduct(productId: string): Promise<Product | null> {
+const getProduct = cache(async (productId: string): Promise<Product | null> => {
   try {
     // 1. Try finding by slug first
     const slugSnap = await adminDb
@@ -48,9 +51,9 @@ async function getProduct(productId: string): Promise<Product | null> {
     console.error('Error fetching product detail:', err);
     return null;
   }
-}
+});
 
-async function getRecommendedProducts(section: string, currentId: string): Promise<Product[]> {
+const getRecommendedProducts = cache(async (section: string, currentId: string): Promise<Product[]> => {
   try {
     const snapshot = await adminDb
       .collection('products')
@@ -75,7 +78,7 @@ async function getRecommendedProducts(section: string, currentId: string): Promi
     console.error('Error fetching recommended products:', err);
     return [];
   }
-}
+});
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { productId } = await params;
