@@ -25,7 +25,7 @@ export default function HomePage() {
   // Site Copy State with authoritative defaults
   const [copy, setCopy] = useState({
     heroLine1: 'YOU DRESS LIKE',
-    heroLine2: 'YOUR PERSONALITY—',
+    heroLine2: 'YOUR PERSONALITY',
     heroAccent: 'boring as f*ck.',
     heroSubtext: 'Fix it. Or don\'t. We don\'t care.\nBut you should.',
     heroCta: 'PROVE ME WRONG →',
