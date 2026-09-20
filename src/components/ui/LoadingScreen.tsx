@@ -11,28 +11,21 @@ const LOAD_ROASTS = [
 ];
 
 export default function LoadingScreen() {
-  const [visible, setVisible] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        if (sessionStorage.getItem('gerkink_splash_seen')) {
-          return false;
-        }
-      } catch (_) {}
-    }
-    return true;
-  });
+  const [visible, setVisible] = useState(false);
   const [roast, setRoast] = useState(LOAD_ROASTS[0]);
 
   useEffect(() => {
-    // If already seen in this session, dismiss immediately
+    // If already seen in this session, do not show splash
     try {
       if (sessionStorage.getItem('gerkink_splash_seen')) {
-        setVisible(false);
         return;
       }
       sessionStorage.setItem('gerkink_splash_seen', '1');
-    } catch (_) {}
+    } catch (_) {
+      return;
+    }
 
+    setVisible(true);
     setRoast(LOAD_ROASTS[Math.floor(Math.random() * LOAD_ROASTS.length)]);
 
     // Lock body scroll briefly during splash animation, preserving original overflow

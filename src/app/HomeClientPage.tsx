@@ -4,10 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import EgoTicker from '@/components/ui/EgoTicker';
-import LoadingScreen from '@/components/ui/LoadingScreen';
 import { BentoGrid, BentoCard } from '@/components/ui/BentoGrid';
 import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
 import styles from './page.module.css';
+
+// Dynamically import splash loading screen with ssr: false to guarantee zero hydration mismatch
+const LoadingScreen = dynamic(() => import('@/components/ui/LoadingScreen'), {
+  ssr: false,
+});
 
 // Dynamically import below-the-fold reviews section to reduce critical initial bundle
 const ReviewsSection = dynamic(() => import('@/components/reviews/ReviewsSection'), {
