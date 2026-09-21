@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import type { Product } from '@/types';
 import { ValuelessClientPage } from './ValuelessClientPage';
@@ -124,7 +125,9 @@ export default async function ValuelessBitchesPage() {
 
       {/* ── PRODUCTS & FILTERS BODY ───────────────────────── */}
       <div className={styles.shopBody}>
-        <ValuelessClientPage products={products} />
+        <Suspense fallback={<div className={styles.loadingSkeleton} />}>
+          <ValuelessClientPage products={products} />
+        </Suspense>
       </div>
     </div>
   );

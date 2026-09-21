@@ -266,3 +266,12 @@
 [data-theme="light"] .switchBtnGhost:hover {
   color: #0f172a;
 }
+
+.loadingSkeleton {
+  min-height: 400px;
+  width: 100%;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  opacity: 0.6;
+}
