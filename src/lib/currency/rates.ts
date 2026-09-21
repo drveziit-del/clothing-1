@@ -69,7 +69,7 @@ export async function getExchangeRates(): Promise<Record<string, number>> {
   // Fallback default rates if API is unreachable
   return cachedRates ?? {
     USD: 1,
-    INR: 83.5,
+    INR: 95,
     EUR: 0.92,
     GBP: 0.78,
     CAD: 1.36,

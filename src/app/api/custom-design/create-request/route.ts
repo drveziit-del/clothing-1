@@ -10,6 +10,7 @@ import {
   createCustomDesignSchema,
   PLAN_PRICING,
   CURRENT_POLICY_VERSION,
+  CUSTOM_DESIGN_USD_TO_INR_RATE,
   type CustomDesignRequest,
 } from '@/lib/custom-design/types';
 
@@ -112,12 +113,7 @@ export async function POST(request: NextRequest) {
   if (isIndia) {
     targetCurrency = 'INR';
     targetGateway = 'razorpay';
-    let inrRate = 83.5;
-    try {
-      inrRate = await getRateForCurrency('INR');
-    } catch (rateErr) {
-      console.warn('[custom-design/create-request] Using fallback rate 83.5:', rateErr);
-    }
+    const inrRate = CUSTOM_DESIGN_USD_TO_INR_RATE; // $1 = ₹95
     targetAmount = Math.round(authoritativeUSD * inrRate);
   } else {
     targetCurrency = 'USD';
@@ -227,7 +223,12 @@ export async function POST(request: NextRequest) {
       let amountPaise: number | undefined;
 
       if (targetGateway === 'razorpay') {
-        const rzOrder = await createRazorpayOrder(authoritativeUSD, existingData.requestId, true);
+        const rzOrder = await createRazorpayOrder(
+          authoritativeUSD,
+          existingData.requestId,
+          true,
+          CUSTOM_DESIGN_USD_TO_INR_RATE
+        );
         refreshedRazorpayOrderId = rzOrder.id;
         amountPaise = rzOrder.amount;
       } else {
@@ -296,7 +297,12 @@ export async function POST(request: NextRequest) {
 
   try {
     if (targetGateway === 'razorpay') {
-      const rzOrder = await createRazorpayOrder(authoritativeUSD, requestNumber, true);
+      const rzOrder = await createRazorpayOrder(
+        authoritativeUSD,
+        requestNumber,
+        true,
+        CUSTOM_DESIGN_USD_TO_INR_RATE
+      );
       razorpayOrderId = rzOrder.id;
       amountPaise = rzOrder.amount;
     } else {

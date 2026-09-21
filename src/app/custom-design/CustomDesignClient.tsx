@@ -13,6 +13,7 @@ import {
   type CustomDesignUpload,
   PLAN_PRICING,
   CURRENT_POLICY_VERSION,
+  CUSTOM_DESIGN_USD_TO_INR_RATE,
 } from '@/lib/custom-design/types';
 import { COUNTRIES } from '@/lib/utils/countries';
 import styles from './custom-design.module.css';
@@ -1179,9 +1180,9 @@ export default function CustomDesignClient() {
                       <span className={styles.summaryPriceVal}>
                         {billingCountry === 'IN' ? (
                           <>
-                            ₹{Math.round(currentPlanDetails.amount * 83.5).toLocaleString('en-IN')} INR
+                            ₹{(currentPlanDetails.amount * CUSTOM_DESIGN_USD_TO_INR_RATE).toLocaleString('en-IN')} INR
                             <span className={styles.approxUsdNote}>
-                              (${currentPlanDetails.amount}.00 USD authoritative base)
+                              (${currentPlanDetails.amount}.00 USD authoritative base · $1 = ₹{CUSTOM_DESIGN_USD_TO_INR_RATE})
                             </span>
                           </>
                         ) : (
@@ -1219,7 +1220,7 @@ export default function CustomDesignClient() {
                         <span>NON-REFUNDABLE PREPAYMENT</span>
                         <span className={styles.policyNoticeAmount}>
                           {billingCountry === 'IN'
-                            ? `₹${Math.round(currentPlanDetails.amount * 83.5).toLocaleString('en-IN')} INR`
+                            ? `₹${(currentPlanDetails.amount * CUSTOM_DESIGN_USD_TO_INR_RATE).toLocaleString('en-IN')} INR`
                             : `$${currentPlanDetails.amount}.00 USD`}
                         </span>
                       </div>
@@ -1237,7 +1238,7 @@ export default function CustomDesignClient() {
                         />
                         <span className={styles.policyCheckboxText}>
                           {billingCountry === 'IN'
-                            ? `I understand that the ₹${Math.round(currentPlanDetails.amount * 83.5).toLocaleString('en-IN')} INR ($${currentPlanDetails.amount} USD equivalent) Custom Design prepayment is non-refundable.`
+                            ? `I understand that the ₹${(currentPlanDetails.amount * CUSTOM_DESIGN_USD_TO_INR_RATE).toLocaleString('en-IN')} INR ($${currentPlanDetails.amount} USD equivalent) Custom Design prepayment is non-refundable.`
                             : `I understand that the $${currentPlanDetails.amount} Custom Design prepayment is non-refundable.`}
                         </span>
                       </label>
@@ -1331,7 +1332,7 @@ export default function CustomDesignClient() {
                             onClick={handleRazorpayPayment}
                             disabled={isSubmitting || !isOnline || uploads.length === 0 || !description.trim() || description.trim().length < 10 || !policyAccepted}
                           >
-                            {isSubmitting ? 'PROCESSING...' : `PAY ₹${Math.round(currentPlanDetails.amount * 83.5).toLocaleString('en-IN')} VIA RAZORPAY →`}
+                            {isSubmitting ? 'PROCESSING...' : `PAY ₹${(currentPlanDetails.amount * CUSTOM_DESIGN_USD_TO_INR_RATE).toLocaleString('en-IN')} VIA RAZORPAY →`}
                           </button>
                         </div>
                       ) : paypalClientId ? (

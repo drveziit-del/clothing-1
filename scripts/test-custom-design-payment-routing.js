@@ -164,27 +164,27 @@ async function runPaymentRoutingSuite() {
       if (data.requestId) createdDocIds.push(data.requestId);
 
       const isRazorpay = data.paymentProvider === 'razorpay' || data.gateway === 'razorpay';
-      const hasInrAmount = (data.amountPaise && data.amountPaise >= 100000) || (data.amount && data.amount >= 1000);
+      const isExactInr = data.amount === 1425 && data.amountPaise === 142500;
 
       if (
         res.ok &&
         isRazorpay &&
         data.currency === 'INR' &&
         data.amountUSD === 15 &&
-        hasInrAmount &&
+        isExactInr &&
         data.razorpayOrderId &&
         !data.paypalOrderId
       ) {
-        recordTest('PAY-IN-01', 'India + Basic -> Razorpay + INR', 'PASSED', `Order ${data.razorpayOrderId}, Amount: ₹${data.amount} INR (${data.amountPaise} paise)`);
+        recordTest('PAY-IN-01', 'India + Basic ($15 -> ₹1425 INR at $1=₹95)', 'PASSED', `Order ${data.razorpayOrderId}, Amount: ₹${data.amount} INR (${data.amountPaise} paise)`);
       } else {
-        recordTest('PAY-IN-01', 'India + Basic -> Razorpay + INR', 'FAILED', JSON.stringify(data));
+        recordTest('PAY-IN-01', 'India + Basic ($15 -> ₹1425 INR at $1=₹95)', 'FAILED', JSON.stringify(data));
       }
     } catch (e) {
-      recordTest('PAY-IN-01', 'India + Basic -> Razorpay + INR', 'FAILED', e.message);
+      recordTest('PAY-IN-01', 'India + Basic ($15 -> ₹1425 INR at $1=₹95)', 'FAILED', e.message);
     }
 
     // ─────────────────────────────────────────────────────────────
-    // PAY-IN-02: India + Better Quality ($20) → Razorpay + INR
+    // PAY-IN-02: India + Better Quality ($20) → Razorpay + INR (₹1900 at $1=₹95)
     // ─────────────────────────────────────────────────────────────
     try {
       const res = await fetch(`${BASE_URL}/api/custom-design/create-request`, {
@@ -201,22 +201,22 @@ async function runPaymentRoutingSuite() {
       if (data.requestId) createdDocIds.push(data.requestId);
 
       const isRazorpay = data.paymentProvider === 'razorpay' || data.gateway === 'razorpay';
-      const hasInrAmount = (data.amountPaise && data.amountPaise >= 150000) || (data.amount && data.amount >= 1500);
+      const isExactInr = data.amount === 1900 && data.amountPaise === 190000;
 
       if (
         res.ok &&
         isRazorpay &&
         data.currency === 'INR' &&
         data.amountUSD === 20 &&
-        hasInrAmount &&
+        isExactInr &&
         data.razorpayOrderId
       ) {
-        recordTest('PAY-IN-02', 'India + Better Quality -> Razorpay + INR', 'PASSED', `Order ${data.razorpayOrderId}, Amount: ₹${data.amount} INR (${data.amountPaise} paise)`);
+        recordTest('PAY-IN-02', 'India + Better Quality ($20 -> ₹1900 INR at $1=₹95)', 'PASSED', `Order ${data.razorpayOrderId}, Amount: ₹${data.amount} INR (${data.amountPaise} paise)`);
       } else {
-        recordTest('PAY-IN-02', 'India + Better Quality -> Razorpay + INR', 'FAILED', JSON.stringify(data));
+        recordTest('PAY-IN-02', 'India + Better Quality ($20 -> ₹1900 INR at $1=₹95)', 'FAILED', JSON.stringify(data));
       }
     } catch (e) {
-      recordTest('PAY-IN-02', 'India + Better Quality -> Razorpay + INR', 'FAILED', e.message);
+      recordTest('PAY-IN-02', 'India + Better Quality ($20 -> ₹1900 INR at $1=₹95)', 'FAILED', e.message);
     }
 
     // ─────────────────────────────────────────────────────────────

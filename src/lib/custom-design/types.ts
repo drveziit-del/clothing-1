@@ -85,6 +85,14 @@ export function formatPlanLabel(plan: string | undefined): string {
 
 export const CURRENT_POLICY_VERSION = 'v1_non_refundable_prepayment';
 
+/**
+ * Authoritative USD to INR exchange rate for Custom Design prepayment.
+ * $1 USD = ₹95 INR
+ * - Regular ($15 USD) = ₹1,425 INR
+ * - Better Quality ($20 USD) = ₹1,900 INR
+ */
+export const CUSTOM_DESIGN_USD_TO_INR_RATE = 95;
+
 export type CustomDesignStatus =
   | 'DRAFT'
   | 'PAYMENT_PENDING'

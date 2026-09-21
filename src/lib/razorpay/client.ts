@@ -21,13 +21,14 @@ export function getRazorpay(): Razorpay {
 export async function createRazorpayOrder(
   amountUSD: number,
   receiptId: string,
-  forceINR = false
+  forceINR = false,
+  fixedInrRate?: number
 ): Promise<{ id: string; amount: number; currency: string }> {
   const razorpay = getRazorpay();
 
   if (forceINR) {
     console.log('[Razorpay] Forcing INR order creation for domestic transaction');
-    return createInrOrderFallback(amountUSD, receiptId, razorpay);
+    return createInrOrderFallback(amountUSD, receiptId, razorpay, fixedInrRate);
   }
 
   const amountCents = Math.round(amountUSD * 100);
@@ -48,34 +49,37 @@ export async function createRazorpayOrder(
   } catch (err: any) {
     const errDesc = err?.error?.description || err?.message || '';
     console.warn('[Razorpay] USD order failed, attempting INR fallback:', errDesc);
-    return createInrOrderFallback(amountUSD, receiptId, razorpay);
+    return createInrOrderFallback(amountUSD, receiptId, razorpay, fixedInrRate);
   }
 }
 
 async function createInrOrderFallback(
   amountUSD: number,
   receiptId: string,
-  razorpay: any
+  razorpay: any,
+  fixedInrRate?: number
 ): Promise<{ id: string; amount: number; currency: string }> {
   try {
-    let liveInrRate: number;
-    try {
-      liveInrRate = await getRateForCurrency('INR');
-    } catch (rateErr) {
-      console.warn('[Razorpay] Live rate fetch failed, using fallback rate 83.5:', rateErr);
-      liveInrRate = 83.5; // hardcoded safety net
+    let rateUsed = fixedInrRate;
+    if (!rateUsed) {
+      try {
+        rateUsed = await getRateForCurrency('INR');
+      } catch (rateErr) {
+        console.warn('[Razorpay] Live rate fetch failed, using fallback rate 95:', rateErr);
+        rateUsed = 95; // default rate
+      }
     }
 
-    const amountINR = Math.round(amountUSD * liveInrRate);
+    const amountINR = Math.round(amountUSD * rateUsed);
     const amountPaise = amountINR * 100;
 
-    console.log(`[Razorpay] Creating INR order: $${amountUSD} × ${liveInrRate} = ₹${amountINR} (${amountPaise} paise)`);
+    console.log(`[Razorpay] Creating INR order: $${amountUSD} × ${rateUsed} = ₹${amountINR} (${amountPaise} paise)`);
 
     const order = await razorpay.orders.create({
       amount: amountPaise,
       currency: 'INR',
       receipt: receiptId,
-      notes: { platform: 'gerkink', currency_converted: 'USD_to_INR', rate_used: liveInrRate },
+      notes: { platform: 'gerkink', currency_converted: 'USD_to_INR', rate_used: rateUsed },
     });
 
     return {

@@ -2054,7 +2054,7 @@ function AccountPageContent() {
                     ✦ CUSTOM {req.productType?.toUpperCase()}
                   </span>
                   <span className={req.paymentStatus === 'paid' ? styles.statusBadgePaid : styles.statusBadgeProcessing}>
-                    {req.currency === 'INR' ? `₹${req.prepaymentAmount || 1250}` : `$${req.prepaymentAmount || 15}`} {req.paymentStatus === 'paid' ? 'PAID ✓' : 'PENDING'}
+                    {req.currency === 'INR' ? `₹${req.prepaymentAmount || 1425}` : `$${req.prepaymentAmount || 15}`} {req.paymentStatus === 'paid' ? 'PAID ✓' : 'PENDING'}
                   </span>
                 </div>
               </div>
@@ -2074,7 +2074,7 @@ function AccountPageContent() {
                 <div className={styles.footerPrice}>
                   <span className={styles.totalPriceLabel}>Prepayment</span>
                   <span className={styles.totalPriceAmount}>
-                    {req.currency === 'INR' ? `₹${req.prepaymentAmount || 1250} INR` : `$${req.prepaymentAmount || 15} USD`}
+                    {req.currency === 'INR' ? `₹${req.prepaymentAmount || 1425} INR` : `$${req.prepaymentAmount || 15} USD`}
                   </span>
                 </div>
                 <div className={styles.footerActions}>
