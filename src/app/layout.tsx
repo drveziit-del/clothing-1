@@ -12,6 +12,7 @@ import NetworkStatusPill from "@/components/ui/NetworkStatusPill";
 import { CookieConsentProvider } from "@/context/CookieConsentContext";
 import CookieBanner from "@/components/ui/CookieBanner";
 import CookiePreferencesModal from "@/components/ui/CookiePreferencesModal";
+import { FavoritesProvider } from "@/context/FavoritesContext";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://gerkink.shop'),
@@ -148,13 +149,15 @@ export default function RootLayout({
             <AuthProvider>
               <CurrencyProvider>
                 <CartProvider>
-                  <NetworkStatusProvider>
-                    <LayoutWrapper>{children}</LayoutWrapper>
-                    <NetworkStatusPill />
-                    <RoastToast />
-                    <CookieBanner />
-                    <CookiePreferencesModal />
-                  </NetworkStatusProvider>
+                  <FavoritesProvider>
+                    <NetworkStatusProvider>
+                      <LayoutWrapper>{children}</LayoutWrapper>
+                      <NetworkStatusPill />
+                      <RoastToast />
+                      <CookieBanner />
+                      <CookiePreferencesModal />
+                    </NetworkStatusProvider>
+                  </FavoritesProvider>
                 </CartProvider>
               </CurrencyProvider>
             </AuthProvider>

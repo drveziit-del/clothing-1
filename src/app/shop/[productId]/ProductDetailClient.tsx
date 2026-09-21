@@ -14,6 +14,7 @@ import type { Product, Variant, Review, ProductReviewSummary } from '@/types';
 import { sortSizes, getSmallVariant } from '@/lib/utils/sizes';
 import styles from './ProductDetailClient.module.css';
 import ProductCard from '@/components/ui/ProductCard';
+import { useFavorites } from '@/context/FavoritesContext';
 
 // Dynamically split below-the-fold reviews and conditional collection sections
 const ProductReviewsSection = dynamic(
@@ -163,6 +164,12 @@ export function ProductDetailClient({
   const { toast } = useRoast();
   const { formatPrice } = useCurrency();
   const router = useRouter();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const isFav = isFavorite(product.id);
+
+  const toggleWishlist = () => {
+    toggleFavorite(product.id, product);
+  };
 
   const displayFeatures = useMemo(() => {
     return product.featuresList && product.featuresList.length > 0 ? product.featuresList : [
@@ -858,6 +865,28 @@ export function ProductDetailClient({
                 )}
               </>
             )}
+            <button
+              type="button"
+              className={`${styles.pdpWishlistBtn} ${isFav ? styles.pdpWishlistBtnActive : ''}`}
+              onClick={toggleWishlist}
+              aria-label={isFav ? 'Remove from favourites' : 'Add to favourites'}
+              aria-pressed={isFav}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill={isFav ? "var(--accent)" : "none"}
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              <span>{isFav ? 'SAVED TO FAVOURITES' : 'ADD TO FAVOURITES'}</span>
+            </button>
           </div>
 
           {/* Absurdity Reality Check for Society Fuckers */}
@@ -1222,6 +1251,27 @@ export function ProductDetailClient({
       {product.section !== 'society_fuckers' && (
         <div className={`${styles.mobileStickyBar} ${showStickyBar ? styles.mobileStickyBarOpen : ''}`}>
           <div className={styles.stickyBarInner}>
+            <button
+              type="button"
+              className={`${styles.mobileStickyWishlistBtn} ${isFav ? styles.mobileStickyWishlistBtnActive : ''}`}
+              onClick={toggleWishlist}
+              aria-label={isFav ? 'Remove from favourites' : 'Add to favourites'}
+              aria-pressed={isFav}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill={isFav ? "var(--accent)" : "none"}
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+            </button>
             <div className={styles.stickyBarMeta}>
               {media[0]?.url && (
                 <div className={styles.stickyBarThumb}>

@@ -13,6 +13,8 @@ import { BentoGrid, BentoCard } from '@/components/ui/BentoGrid';
 import DeleteAccountModal from '@/components/account/DeleteAccountModal';
 import styles from './page.module.css';
 import type { Coupon, Referral, Order } from '@/types';
+import { useFavorites } from '@/context/FavoritesContext';
+import ProductCard from '@/components/ui/ProductCard';
 
 function formatFirestoreDate(timestamp: any, fallback = 'Today') {
   if (!timestamp) return fallback;
@@ -54,7 +56,7 @@ function parseFirestoreDate(timestamp: any): Date {
   return isNaN(date.getTime()) ? new Date() : date;
 }
 
-export type AccountTab = 'dashboard' | 'orders' | 'custom_designs' | 'payouts' | 'analytics' | 'rewards' | 'profile';
+export type AccountTab = 'dashboard' | 'orders' | 'custom_designs' | 'favorites' | 'payouts' | 'analytics' | 'rewards' | 'profile';
 
 export default function AccountPage() {
   return (
@@ -70,6 +72,7 @@ function AccountPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useRoast();
+  const { favoriteIds, favoriteProducts, loading: favoritesLoading } = useFavorites();
   const [copied, setCopied] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -118,7 +121,7 @@ function AccountPageContent() {
   // Handle URL tab parameter
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['dashboard', 'orders', 'custom_designs', 'payouts', 'analytics', 'rewards', 'profile'].includes(tabParam)) {
+    if (tabParam && ['dashboard', 'orders', 'custom_designs', 'favorites', 'payouts', 'analytics', 'rewards', 'profile'].includes(tabParam)) {
       setActiveTab(tabParam as AccountTab);
     }
   }, [searchParams]);
@@ -810,6 +813,43 @@ function AccountPageContent() {
           </div>
         </BentoCard>
       </BentoGrid>
+    </div>
+  );
+
+  const renderFavoritesTab = () => (
+    <div className={styles.tabView}>
+      <div className={styles.header}>
+        <h1 className="text-display">My Favourites</h1>
+        <p className={styles.subhead}>Your curated personal wishlist across GERKINK collections.</p>
+      </div>
+
+      {favoritesLoading ? (
+        <div className={styles.favoritesGrid}>
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className={styles.favoriteSkeleton}>
+              <div className={styles.skeletonImage} />
+              <div className={styles.skeletonMeta} />
+            </div>
+          ))}
+        </div>
+      ) : favoriteProducts.length === 0 ? (
+        <div className={styles.emptyOrdersState}>
+          <span className={styles.emptyOrdersIcon}>♥</span>
+          <h3 className={styles.emptyOrdersTitle}>NOTHING SAVED.</h3>
+          <p className={styles.emptyOrdersSubtitle}>
+            You&apos;re apparently committing to everything.
+          </p>
+          <Link href="/shop" className="btn btn-primary btn-sm" style={{ marginTop: '0.5rem' }}>
+            SHOP THE COLLECTION →
+          </Link>
+        </div>
+      ) : (
+        <div className={styles.favoritesGrid}>
+          {favoriteProducts.map((prod) => (
+            <ProductCard key={prod.id} product={prod} />
+          ))}
+        </div>
+      )}
     </div>
   );
 
@@ -2125,6 +2165,12 @@ function AccountPageContent() {
             ✦ Custom Requests {customRequests.length > 0 && <span className="tag" style={{ marginLeft: 'auto', fontSize: '0.7rem', padding: '0.1rem 0.4rem' }}>{customRequests.length}</span>}
           </button>
           <button
+            onClick={() => setActiveTab('favorites')}
+            className={`${styles.sidebarButton} ${activeTab === 'favorites' ? styles.sidebarButtonActive : ''}`}
+          >
+            ♥ Favourites {favoriteIds.length > 0 && <span className="tag" style={{ marginLeft: 'auto', fontSize: '0.7rem', padding: '0.1rem 0.4rem' }}>{favoriteIds.length}</span>}
+          </button>
+          <button
             onClick={() => setActiveTab('payouts')}
             className={`${styles.sidebarButton} ${activeTab === 'payouts' ? styles.sidebarButtonActive : ''}`}
           >
@@ -2155,6 +2201,7 @@ function AccountPageContent() {
           {activeTab === 'dashboard' && renderDashboardTab()}
           {activeTab === 'orders' && renderOrdersTab()}
           {activeTab === 'custom_designs' && renderCustomDesignsTab()}
+          {activeTab === 'favorites' && renderFavoritesTab()}
           {activeTab === 'payouts' && renderPayoutsTab()}
           {activeTab === 'analytics' && renderAnalyticsTab()}
           {activeTab === 'rewards' && renderRewardsTab()}

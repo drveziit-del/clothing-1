@@ -9,6 +9,7 @@ import { getHoverRoast, getCartRoast } from '@/lib/utils/roasts';
 import type { Product } from '@/types';
 import { useCurrency } from '@/context/CurrencyContext';
 import { getSmallVariant } from '@/lib/utils/sizes';
+import { useFavorites } from '@/context/FavoritesContext';
 import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
@@ -20,9 +21,10 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
   const { addItem } = useCart();
   const { toast } = useRoast();
   const { formatPrice } = useCurrency();
+  const { isFavorited, toggleFavorite } = useFavorites();
   const [hoverRoast, setHoverRoast] = useState('');
   const [roastVisible, setRoastVisible] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const isWishlisted = isFavorited(product.id);
 
   const safeVariants = Array.isArray(product.variants) ? product.variants : [];
   // Memoized so the useEffect below (and the compiler) sees a stable reference.
@@ -57,7 +59,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
+    toggleFavorite(product.id, product);
   };
 
   const categoryLabel = product.section === 'society_fuckers' ? 'Society Fu*kers' : 'Valueless Bi*ches';
@@ -83,6 +85,7 @@ export default function ProductCard({ product, priority = false }: ProductCardPr
           className={`${styles.wishlistBtn} ${isWishlisted ? styles.activeWishlist : ''}`}
           onClick={toggleWishlist}
           aria-label={isWishlisted ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}
+          aria-pressed={isWishlisted}
         >
           <svg
             width="15"

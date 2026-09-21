@@ -89,6 +89,12 @@ export async function executeAccountDeletion(uid: string): Promise<AccountDeleti
     const securePayoutRef = userDocRef.collection('secure_payout_details').doc('payout');
     operations.push((batch) => batch.delete(securePayoutRef));
 
+    // 4.1b Delete user favorites subcollection
+    const favoritesSnap = await userDocRef.collection('favorites').get();
+    favoritesSnap.forEach((doc) => {
+      operations.push((batch) => batch.delete(doc.ref));
+    });
+
     // 4.2 Delete main user document
     operations.push((batch) => batch.delete(userDocRef));
 

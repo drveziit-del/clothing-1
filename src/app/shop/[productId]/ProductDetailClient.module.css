@@ -2077,3 +2077,75 @@
   background: #FFFFFF;
   border-color: #E2E8F0;
 }
+
+/* ── PDP Wishlist / Favourites Button ── */
+.pdpWishlistBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 1.25rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.75rem;
+}
+
+.pdpWishlistBtn:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pdpWishlistBtnActive {
+  background: rgba(255, 71, 87, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pdpWishlistBtnActive svg {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+
+.mobileStickyWishlistBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.mobileStickyWishlistBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mobileStickyWishlistBtnActive {
+  background: rgba(255, 71, 87, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mobileStickyWishlistBtnActive svg {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+
