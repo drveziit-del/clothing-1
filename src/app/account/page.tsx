@@ -2054,7 +2054,7 @@ function AccountPageContent() {
                     ✦ CUSTOM {req.productType?.toUpperCase()}
                   </span>
                   <span className={req.paymentStatus === 'paid' ? styles.statusBadgePaid : styles.statusBadgeProcessing}>
-                    ${req.prepaymentAmount || 15} {req.paymentStatus === 'paid' ? 'PAID ✓' : 'PENDING'}
+                    {req.currency === 'INR' ? `₹${req.prepaymentAmount || 1250}` : `$${req.prepaymentAmount || 15}`} {req.paymentStatus === 'paid' ? 'PAID ✓' : 'PENDING'}
                   </span>
                 </div>
               </div>
@@ -2064,7 +2064,7 @@ function AccountPageContent() {
                   "{req.description ? req.description.slice(0, 140) + (req.description.length > 140 ? '...' : '') : 'Custom concept'}"
                 </p>
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                  <span>Level: <strong>{req.plan === 'better_quality' || req.plan === 'priority' ? 'Better Quality ($20)' : 'Regular ($15)'}</strong></span>
+                  <span>Level: <strong>{req.plan === 'better_quality' || req.plan === 'priority' ? 'Better Quality' : 'Regular'}</strong></span>
                   <span>Files: <strong>{req.uploads?.length || 0} attached</strong></span>
                   <span>Status: <strong style={{ color: req.status === 'NEEDS_INFORMATION' ? '#f59e0b' : '#ff6b6b' }}>{req.status?.replace(/_/g, ' ')}</strong></span>
                 </div>
@@ -2073,7 +2073,9 @@ function AccountPageContent() {
               <div className={styles.orderFooter}>
                 <div className={styles.footerPrice}>
                   <span className={styles.totalPriceLabel}>Prepayment</span>
-                  <span className={styles.totalPriceAmount}>${req.prepaymentAmount || 15} USD</span>
+                  <span className={styles.totalPriceAmount}>
+                    {req.currency === 'INR' ? `₹${req.prepaymentAmount || 1250} INR` : `$${req.prepaymentAmount || 15} USD`}
+                  </span>
                 </div>
                 <div className={styles.footerActions}>
                   <Link

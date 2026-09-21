@@ -149,13 +149,18 @@ export interface CustomDesignRequest {
   uploads: CustomDesignUpload[];
 
   plan: CustomDesignPlan;
-  prepaymentAmount: number; // 15 or 20 authoritative USD
-  currency: 'USD';
+  prepaymentAmount: number; // 15 or 20 authoritative USD, or INR equivalent
+  prepaymentAmountUSD?: number;
+  currency: 'USD' | 'INR';
 
-  paymentProvider: 'paypal';
+  paymentProvider: 'paypal' | 'razorpay';
   paymentStatus: 'pending' | 'processing' | 'paid' | 'failed' | 'cancelled' | 'review_required';
-  paymentReference?: string; // PayPal Capture ID
+  paymentReference?: string; // PayPal Capture ID or Razorpay Payment ID
   paypalOrderId?: string;
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  razorpaySignature?: string;
+  country?: string;
   idempotencyKey?: string;
 
   reconciliationRequired?: boolean;
@@ -204,10 +209,13 @@ export interface CustomerSafeCustomDesignRequest {
   uploads: CustomerSafeCustomDesignUpload[];
   plan: CustomDesignPlan;
   prepaymentAmount: number;
-  currency: 'USD';
-  paymentProvider: 'paypal';
+  prepaymentAmountUSD?: number;
+  currency: 'USD' | 'INR';
+  paymentProvider: 'paypal' | 'razorpay';
   paymentStatus: 'pending' | 'processing' | 'paid' | 'failed' | 'cancelled' | 'review_required';
   paypalOrderId?: string;
+  razorpayOrderId?: string;
+  country?: string;
   paymentPolicyVersion: string;
   paymentPolicyAccepted: boolean;
   paymentPolicyAcceptedAt: string | any;
@@ -242,10 +250,13 @@ export function toCustomerSafeCustomDesignDto(docData: any, docId: string): Cust
     })),
     plan: docData.plan,
     prepaymentAmount: docData.prepaymentAmount,
+    prepaymentAmountUSD: docData.prepaymentAmountUSD,
     currency: docData.currency || 'USD',
     paymentProvider: docData.paymentProvider || 'paypal',
     paymentStatus: docData.paymentStatus || 'pending',
     paypalOrderId: docData.paypalOrderId,
+    razorpayOrderId: docData.razorpayOrderId,
+    country: docData.country,
     paymentPolicyVersion: docData.paymentPolicyVersion || '',
     paymentPolicyAccepted: Boolean(docData.paymentPolicyAccepted),
     paymentPolicyAcceptedAt: docData.paymentPolicyAcceptedAt,
@@ -268,6 +279,7 @@ export const createCustomDesignSchema = z.object({
   description: z.string().min(10, 'Description must be at least 10 characters').max(3000),
   additionalNotes: z.string().max(1000).optional().default(''),
   plan: z.enum(['regular', 'better_quality', 'basic', 'priority']),
+  country: z.string().min(2).max(2).toUpperCase().default('US'),
   paymentPolicyAccepted: z.literal(true, {
     message: 'You must accept the non-refundable prepayment policy to proceed.',
   }),

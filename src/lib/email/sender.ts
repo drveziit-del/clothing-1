@@ -1029,6 +1029,7 @@ export interface CustomDesignEmailDetails {
   productType?: string;
   plan?: string;
   prepaymentAmount?: number;
+  currency?: string;
   message?: string;
   newStatus?: string;
   description?: string;
@@ -1046,6 +1047,11 @@ export async function sendCustomDesignNotification(details: CustomDesignEmailDet
   const adminUrl = `${appUrl}/admin/custom-designs/${details.requestId}`;
   const accountUrl = `${appUrl}/account/custom-design/${details.requestId}`;
 
+  const currency = details.currency || 'USD';
+  const formattedAmount = currency === 'INR'
+    ? `₹${details.prepaymentAmount} INR`
+    : `$${details.prepaymentAmount || 15} USD`;
+
   interface OutboundMail {
     to: string;
     subject: string;
@@ -1057,7 +1063,7 @@ export async function sendCustomDesignNotification(details: CustomDesignEmailDet
 
   if (details.type === 'request_submitted') {
     // 1. Customer Confirmation Receipt Email
-    const custSubject = `[CONFIRMED] Custom Request #${details.requestNumber} Received — $${details.prepaymentAmount || 15} USD`;
+    const custSubject = `[CONFIRMED] Custom Request #${details.requestNumber} Received — ${formattedAmount}`;
     const custHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #07090e; color: #f3f4f6; padding: 32px; border-radius: 8px; max-width: 600px; margin: 0 auto; border: 1px solid #1f2937;">
         <div style="border-bottom: 2px solid #ff6b6b; padding-bottom: 16px; margin-bottom: 24px;">
@@ -1071,7 +1077,7 @@ export async function sendCustomDesignNotification(details: CustomDesignEmailDet
 
         <div style="font-size: 14px; line-height: 1.6; color: #e5e7eb;">
           <p>Thank you for submitting your custom design concept to GERKINK.</p>
-          <p>Your non-refundable prepayment of <strong>$${details.prepaymentAmount || 15} USD</strong> for the <strong>${planLabel}</strong> custom review tier has been confirmed.</p>
+          <p>Your non-refundable prepayment of <strong>${formattedAmount}</strong> for the <strong>${planLabel}</strong> custom review tier has been confirmed.</p>
           <p>Our studio team is currently reviewing your uploaded files and concept. You will be notified as your request progresses.</p>
         </div>
 
@@ -1089,7 +1095,7 @@ export async function sendCustomDesignNotification(details: CustomDesignEmailDet
             ` : ''}
             <tr>
               <td style="padding: 4px 0; color: #8b949e;">Prepayment:</td>
-              <td style="padding: 4px 0; font-weight: 600; color: #2ed573;">$${details.prepaymentAmount || 15} USD PAID ✓</td>
+              <td style="padding: 4px 0; font-weight: 600; color: #2ed573;">${formattedAmount} PAID ✓</td>
             </tr>
           </table>
         </div>
@@ -1114,7 +1120,7 @@ export async function sendCustomDesignNotification(details: CustomDesignEmailDet
     });
 
     // 2. GERKINK Atelier Studio Intake Email (sent to custom@gerkink.shop)
-    const studioSubject = `🎨 [NEW CUSTOM REQUEST] #${details.requestNumber} — ${details.productType || 'Custom Piece'} ($${details.prepaymentAmount || 15} USD Paid)`;
+    const studioSubject = `🎨 [NEW CUSTOM REQUEST] #${details.requestNumber} — ${details.productType || 'Custom Piece'} (${formattedAmount} Paid)`;
     const uploadsListHtml = details.uploads && details.uploads.length > 0
       ? details.uploads.map((u) => `<li>${escapeHtml(u.originalName)} (${(u.size / 1024 / 1024).toFixed(2)} MB)</li>`).join('')
       : '<li>No files uploaded</li>';
@@ -1142,11 +1148,11 @@ export async function sendCustomDesignNotification(details: CustomDesignEmailDet
             </tr>
             <tr>
               <td style="padding: 6px 0; color: #8b949e;">Prepayment Level:</td>
-              <td style="padding: 6px 0; font-weight: 700;">${planLabel} ($${details.prepaymentAmount || 15} USD)</td>
+              <td style="padding: 6px 0; font-weight: 700;">${planLabel} (${formattedAmount})</td>
             </tr>
             <tr>
               <td style="padding: 6px 0; color: #8b949e;">Prepayment Status:</td>
-              <td style="padding: 6px 0; font-weight: 700; color: #2ed573;">$${details.prepaymentAmount || 15} USD PAID ✓</td>
+              <td style="padding: 6px 0; font-weight: 700; color: #2ed573;">${formattedAmount} PAID ✓</td>
             </tr>
             ${details.paymentReference ? `
             <tr>

@@ -3,6 +3,9 @@ import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { cookies } from 'next/headers';
 import { isRateLimited } from '@/lib/utils/rateLimit';
 import { paypalGateway } from '@/lib/paypal/client';
+import { createRazorpayOrder } from '@/lib/razorpay/client';
+import { getRateForCurrency } from '@/lib/currency/rates';
+import { COUNTRIES } from '@/lib/utils/countries';
 import {
   createCustomDesignSchema,
   PLAN_PRICING,
@@ -77,7 +80,7 @@ export async function POST(request: NextRequest) {
 
   const data = parseResult.data;
 
-  // Finding 4.1: Upload Ownership Guard — verify every upload path belongs strictly to the authenticated user
+  // Upload Ownership Guard — verify every upload path belongs strictly to the authenticated user
   const expectedUploadPrefix = `custom-design/${uid}/`;
   for (const upload of data.uploads) {
     if (!upload.storagePath || !upload.storagePath.startsWith(expectedUploadPrefix)) {
@@ -89,15 +92,40 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // 3. Server-authoritative pricing (never trust browser-sent amounts)
+  // 3. Server-authoritative country validation & routing
+  const rawCountry = (data.country || 'US').trim().toUpperCase();
+  const isValidCountry = COUNTRIES.some((c) => c.code === rawCountry);
+  const validatedCountry = isValidCountry ? rawCountry : 'US';
+  const isIndia = validatedCountry === 'IN';
+
+  // 4. Server-authoritative pricing (never trust browser-sent amounts)
   const planDetails = PLAN_PRICING[data.plan];
   if (!planDetails) {
     return NextResponse.json({ error: 'Invalid plan selected' }, { status: 400 });
   }
-  const authoritativeAmount = planDetails.amount; // 15 or 20 USD
+  const authoritativeUSD = planDetails.amount; // 15 or 20 USD
 
-  // 4. Idempotency & Reuse Check:
-  // If an idempotencyKey is provided, check if a request exists in PAYMENT_PENDING
+  let targetCurrency: 'USD' | 'INR' = 'USD';
+  let targetAmount = authoritativeUSD;
+  let targetGateway: 'paypal' | 'razorpay' = 'paypal';
+
+  if (isIndia) {
+    targetCurrency = 'INR';
+    targetGateway = 'razorpay';
+    let inrRate = 83.5;
+    try {
+      inrRate = await getRateForCurrency('INR');
+    } catch (rateErr) {
+      console.warn('[custom-design/create-request] Using fallback rate 83.5:', rateErr);
+    }
+    targetAmount = Math.round(authoritativeUSD * inrRate);
+  } else {
+    targetCurrency = 'USD';
+    targetGateway = 'paypal';
+    targetAmount = authoritativeUSD;
+  }
+
+  // 5. Idempotency & Reuse Check:
   const idempotencyKey = data.idempotencyKey || `idem_${uid}_${Date.now()}`;
   const existingDocs = await adminDb
     .collection('customDesignRequests')
@@ -122,49 +150,102 @@ export async function POST(request: NextRequest) {
 
     const now = new Date().toISOString();
 
-    // Finding 4.2: If existing request has an active paypalOrderId with identical plan/amount, reuse it but preserve latest form data
-    if (
-      existingData.paypalOrderId &&
-      existingData.status === 'PAYMENT_PENDING' &&
-      existingData.plan === data.plan &&
-      existingData.prepaymentAmount === authoritativeAmount
-    ) {
-      await existingDoc.ref.update({
-        productType: data.productType,
-        preferredSize: data.preferredSize,
-        preferredColor: data.preferredColor,
-        productPreference: data.productPreference,
-        description: data.description,
-        additionalNotes: data.additionalNotes,
-        uploads: data.uploads.map((u) => ({
-          fileId: u.fileId,
-          originalName: u.originalName,
-          mimeType: u.mimeType,
-          size: u.size,
-          storagePath: u.storagePath,
-          uploadedAt: u.uploadedAt || now,
-        })),
-        updatedAt: now,
-      });
+    // Check if we can reuse the existing gateway order
+    const sameGateway = existingData.paymentProvider === targetGateway;
+    const samePlan = existingData.plan === data.plan;
+    const sameCountry = (existingData.country || 'US') === validatedCountry;
 
-      return NextResponse.json({
-        requestId: existingDoc.id,
-        requestNumber: existingData.requestId,
-        paypalOrderId: existingData.paypalOrderId,
-        status: 'PAYMENT_PENDING',
-        reused: true,
-      });
+    if (sameGateway && samePlan && sameCountry && existingData.status === 'PAYMENT_PENDING') {
+      if (targetGateway === 'paypal' && existingData.paypalOrderId) {
+        await existingDoc.ref.update({
+          productType: data.productType,
+          preferredSize: data.preferredSize,
+          preferredColor: data.preferredColor,
+          productPreference: data.productPreference,
+          description: data.description,
+          additionalNotes: data.additionalNotes,
+          uploads: data.uploads.map((u) => ({
+            fileId: u.fileId,
+            originalName: u.originalName,
+            mimeType: u.mimeType,
+            size: u.size,
+            storagePath: u.storagePath,
+            uploadedAt: u.uploadedAt || now,
+          })),
+          updatedAt: now,
+        });
+
+        return NextResponse.json({
+          requestId: existingDoc.id,
+          requestNumber: existingData.requestId,
+          gateway: 'paypal',
+          currency: 'USD',
+          amount: authoritativeUSD,
+          paypalOrderId: existingData.paypalOrderId,
+          status: 'PAYMENT_PENDING',
+          reused: true,
+        });
+      }
+
+      if (targetGateway === 'razorpay' && existingData.razorpayOrderId) {
+        await existingDoc.ref.update({
+          productType: data.productType,
+          preferredSize: data.preferredSize,
+          preferredColor: data.preferredColor,
+          productPreference: data.productPreference,
+          description: data.description,
+          additionalNotes: data.additionalNotes,
+          uploads: data.uploads.map((u) => ({
+            fileId: u.fileId,
+            originalName: u.originalName,
+            mimeType: u.mimeType,
+            size: u.size,
+            storagePath: u.storagePath,
+            uploadedAt: u.uploadedAt || now,
+          })),
+          updatedAt: now,
+        });
+
+        return NextResponse.json({
+          requestId: existingDoc.id,
+          requestNumber: existingData.requestId,
+          gateway: 'razorpay',
+          currency: 'INR',
+          amount: existingData.prepaymentAmount,
+          amountPaise: existingData.prepaymentAmount * 100,
+          razorpayOrderId: existingData.razorpayOrderId,
+          status: 'PAYMENT_PENDING',
+          reused: true,
+        });
+      }
     }
 
-    // If plan changed or paypalOrderId missing, re-create a PayPal order with authoritative amount and update document
+    // Refresh order on the authoritative gateway
     try {
-      const paypalOrder = await paypalGateway.createOrder(authoritativeAmount, existingData.requestId);
+      let refreshedPaypalOrderId: string | undefined;
+      let refreshedRazorpayOrderId: string | undefined;
+      let amountPaise: number | undefined;
+
+      if (targetGateway === 'razorpay') {
+        const rzOrder = await createRazorpayOrder(authoritativeUSD, existingData.requestId, true);
+        refreshedRazorpayOrderId = rzOrder.id;
+        amountPaise = rzOrder.amount;
+      } else {
+        const ppOrder = await paypalGateway.createOrder(authoritativeUSD, existingData.requestId);
+        refreshedPaypalOrderId = ppOrder.id;
+      }
+
       await existingDoc.ref.update({
-        paypalOrderId: paypalOrder.id,
+        paypalOrderId: refreshedPaypalOrderId || null,
+        razorpayOrderId: refreshedRazorpayOrderId || null,
+        paymentProvider: targetGateway,
+        currency: targetCurrency,
+        prepaymentAmount: targetAmount,
+        prepaymentAmountUSD: authoritativeUSD,
+        country: validatedCountry,
         paymentStatus: 'pending',
         status: 'PAYMENT_PENDING',
         plan: data.plan,
-        prepaymentAmount: authoritativeAmount,
         productType: data.productType,
         preferredSize: data.preferredSize,
         preferredColor: data.preferredColor,
@@ -183,31 +264,48 @@ export async function POST(request: NextRequest) {
       });
 
       return NextResponse.json({
+        success: true,
         requestId: existingDoc.id,
         requestNumber: existingData.requestId,
-        paypalOrderId: paypalOrder.id,
+        gateway: targetGateway,
+        paymentProvider: targetGateway,
+        currency: targetCurrency,
+        amount: targetAmount,
+        amountPaise,
+        amountUSD: authoritativeUSD,
+        paypalOrderId: refreshedPaypalOrderId,
+        razorpayOrderId: refreshedRazorpayOrderId,
+        razorpayKeyId: targetGateway === 'razorpay' ? process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID : undefined,
         status: 'PAYMENT_PENDING',
         reused: true,
       });
     } catch (err: any) {
-      console.error('[custom-design/create-request] Failed to refresh PayPal order:', err);
+      console.error('[custom-design/create-request] Failed to refresh payment order:', err);
       return NextResponse.json({ error: 'Failed to initialize payment gateway' }, { status: 500 });
     }
   }
 
-  // 5. Create new custom request
+  // 6. Create new custom request document
   const requestNumber = generateHumanRequestNumber();
   const docRef = adminDb.collection('customDesignRequests').doc();
   const now = new Date().toISOString();
 
-  // 6. Create PayPal Order natively in USD
-  let paypalOrderId: string;
+  let paypalOrderId: string | undefined;
+  let razorpayOrderId: string | undefined;
+  let amountPaise: number | undefined;
+
   try {
-    const paypalOrder = await paypalGateway.createOrder(authoritativeAmount, requestNumber);
-    paypalOrderId = paypalOrder.id;
+    if (targetGateway === 'razorpay') {
+      const rzOrder = await createRazorpayOrder(authoritativeUSD, requestNumber, true);
+      razorpayOrderId = rzOrder.id;
+      amountPaise = rzOrder.amount;
+    } else {
+      const ppOrder = await paypalGateway.createOrder(authoritativeUSD, requestNumber);
+      paypalOrderId = ppOrder.id;
+    }
   } catch (err: any) {
-    console.error('[custom-design/create-request] PayPal createOrder failed:', err);
-    return NextResponse.json({ error: 'Failed to initialize PayPal order' }, { status: 500 });
+    console.error(`[custom-design/create-request] ${targetGateway} createOrder failed:`, err);
+    return NextResponse.json({ error: `Failed to initialize ${targetGateway} order` }, { status: 500 });
   }
 
   // 7. Store document in Firestore
@@ -232,11 +330,14 @@ export async function POST(request: NextRequest) {
       uploadedAt: u.uploadedAt || now,
     })),
     plan: data.plan,
-    prepaymentAmount: authoritativeAmount,
-    currency: 'USD',
-    paymentProvider: 'paypal',
+    prepaymentAmount: targetAmount,
+    prepaymentAmountUSD: authoritativeUSD,
+    currency: targetCurrency,
+    paymentProvider: targetGateway,
     paymentStatus: 'pending',
     paypalOrderId,
+    razorpayOrderId,
+    country: validatedCountry,
     idempotencyKey,
     paymentPolicyVersion: CURRENT_POLICY_VERSION,
     paymentPolicyAccepted: true,
@@ -262,9 +363,15 @@ export async function POST(request: NextRequest) {
     success: true,
     requestId: docRef.id,
     requestNumber,
+    gateway: targetGateway,
+    paymentProvider: targetGateway,
+    currency: targetCurrency,
+    amount: targetAmount,
+    amountPaise,
+    amountUSD: authoritativeUSD,
     paypalOrderId,
-    amount: authoritativeAmount,
-    currency: 'USD',
+    razorpayOrderId,
+    razorpayKeyId: targetGateway === 'razorpay' ? process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID : undefined,
     status: 'PAYMENT_PENDING',
   });
 }

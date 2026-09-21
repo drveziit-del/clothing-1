@@ -338,12 +338,27 @@ export default function AdminCustomDesignDetailClient({ requestId }: { requestId
             </div>
             <div className={styles.fieldRow}>
               <span className={styles.fieldLabel}>Prepayment Amount</span>
-              <span className={styles.fieldValue} style={{ color: '#2ed573' }}>${requestData.prepaymentAmount} USD</span>
+              <span className={styles.fieldValue} style={{ color: '#2ed573' }}>
+                {requestData.currency === 'INR'
+                  ? `₹${requestData.prepaymentAmount} INR`
+                  : `$${requestData.prepaymentAmount} USD`}
+                {requestData.prepaymentAmountUSD && requestData.currency === 'INR' && (
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginLeft: '0.35rem' }}>
+                    (${requestData.prepaymentAmountUSD} USD base)
+                  </span>
+                )}
+              </span>
             </div>
             <div className={styles.fieldRow}>
               <span className={styles.fieldLabel}>Payment Provider</span>
-              <span className={styles.fieldValue}>{requestData.paymentProvider.toUpperCase()}</span>
+              <span className={styles.fieldValue}>{requestData.paymentProvider?.toUpperCase() || 'PAYPAL'}</span>
             </div>
+            {requestData.country && (
+              <div className={styles.fieldRow}>
+                <span className={styles.fieldLabel}>Billing Country</span>
+                <span className={styles.fieldValue}>{requestData.country}</span>
+              </div>
+            )}
             <div className={styles.fieldRow}>
               <span className={styles.fieldLabel}>Payment Status</span>
               <span className={styles.fieldValue} style={{ color: requestData.paymentStatus === 'paid' ? '#2ed573' : '#eab308' }}>

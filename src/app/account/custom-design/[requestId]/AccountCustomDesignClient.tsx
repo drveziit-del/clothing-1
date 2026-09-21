@@ -104,10 +104,14 @@ export default function AccountCustomDesignClient({ requestId }: { requestId: st
   const isApprovalReq = requestData.status === 'CUSTOMER_APPROVAL_REQUIRED' || requestData.status === 'DESIGN_READY';
   const isApproved = requestData.status === 'APPROVED' || requestData.status === 'READY_FOR_PRODUCTION' || requestData.status === 'IN_PRODUCTION';
 
+  const formattedPrepayment = requestData.currency === 'INR'
+    ? `₹${requestData.prepaymentAmount} INR`
+    : `$${requestData.prepaymentAmount} USD`;
+
   // Finding 4.4: Derive display from requestData.paymentStatus and status, never hardcode "PAID"
   const getPaymentStatusDisplay = () => {
     if (requestData.paymentStatus === 'paid' || requestData.status === 'SUBMITTED' || isApproved || requestData.status === 'UNDER_REVIEW') {
-      return { text: `$${requestData.prepaymentAmount} USD PAID ✓`, color: '#2ed573' };
+      return { text: `${formattedPrepayment} PAID ✓`, color: '#2ed573' };
     }
     if (requestData.paymentStatus === 'review_required' || requestData.status === 'MANUAL_REVIEW') {
       return { text: 'REVIEW REQUIRED ⚠️', color: '#ffa502' };
@@ -156,7 +160,7 @@ export default function AccountCustomDesignClient({ requestId }: { requestId: st
                 Prepayment Level
               </span>
               <span style={{ fontWeight: 700 }}>
-                {formatPlanLabel(requestData.plan)} (${requestData.prepaymentAmount})
+                {formatPlanLabel(requestData.plan)} ({formattedPrepayment})
               </span>
             </div>
             <div>

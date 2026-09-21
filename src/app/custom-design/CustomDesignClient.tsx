@@ -14,6 +14,7 @@ import {
   PLAN_PRICING,
   CURRENT_POLICY_VERSION,
 } from '@/lib/custom-design/types';
+import { COUNTRIES } from '@/lib/utils/countries';
 import styles from './custom-design.module.css';
 
 const PRODUCT_TYPES: CustomDesignProductType[] = [
@@ -58,6 +59,7 @@ export default function CustomDesignClient() {
   const [plan, setPlan] = useState<CustomDesignPlan>('regular');
 
   // Step 3: Policy & Payment State
+  const [billingCountry, setBillingCountry] = useState<string>('US');
   const [policyAccepted, setPolicyAccepted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
@@ -95,11 +97,36 @@ export default function CustomDesignClient() {
         if (draft.description) setDescription(draft.description);
         if (draft.additionalNotes) setAdditionalNotes(draft.additionalNotes);
         if (draft.plan) setPlan(draft.plan);
+        if (draft.billingCountry) setBillingCountry(draft.billingCountry);
         if (Array.isArray(draft.uploads)) setUploads(draft.uploads);
       }
     } catch {
       // non-fatal
     }
+  }, []);
+
+  // Pre-fill country from authenticated user profile if available and not set in draft
+  useEffect(() => {
+    const userCountry = (user as any)?.shippingAddress?.country;
+    if (userCountry) {
+      try {
+        const savedDraft = sessionStorage.getItem('gk_custom_design_draft');
+        if (!savedDraft || !JSON.parse(savedDraft).billingCountry) {
+          setBillingCountry(String(userCountry).toUpperCase());
+        }
+      } catch {
+        setBillingCountry(String(userCountry).toUpperCase());
+      }
+    }
+  }, [user]);
+
+  // Load Razorpay checkout script dynamically
+  useEffect(() => {
+    if (typeof window === 'undefined' || window.Razorpay) return;
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
   }, []);
 
   // Sync draft to sessionStorage on changes
@@ -114,6 +141,7 @@ export default function CustomDesignClient() {
       description,
       additionalNotes,
       plan,
+      billingCountry,
       uploads,
     };
     try {
@@ -131,6 +159,7 @@ export default function CustomDesignClient() {
     description,
     additionalNotes,
     plan,
+    billingCountry,
     uploads,
   ]);
 
@@ -241,6 +270,7 @@ export default function CustomDesignClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           idempotencyKey,
+          country: billingCountry,
           productType,
           preferredSize: resolvedSize,
           preferredColor: resolvedColor,
@@ -266,6 +296,127 @@ export default function CustomDesignClient() {
       toast(err?.message || 'Initialization error', 'error');
       setIsSubmitting(false);
       throw err;
+    }
+  };
+
+  // Razorpay Payment Handler (India INR Prepayment)
+  const handleRazorpayPayment = async () => {
+    setPaymentError(null);
+
+    if (!isOnline) {
+      toast('Cannot submit custom design request while offline. Please check your connection.', 'error');
+      return;
+    }
+
+    if (!user) {
+      toast('Authentication required to submit your request.', 'error');
+      return;
+    }
+
+    if (!description.trim() || description.trim().length < 10) {
+      toast('Please describe your idea with at least 10 characters.', 'error');
+      return;
+    }
+
+    if (uploads.length === 0) {
+      toast('Please upload at least one artwork or reference file.', 'error');
+      return;
+    }
+
+    if (!policyAccepted) {
+      toast('You must acknowledge that this prepayment is non-refundable.', 'error');
+      return;
+    }
+
+    if (typeof window === 'undefined' || !window.Razorpay) {
+      toast('Razorpay gateway is loading. Please try again in a moment.', 'error');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/custom-design/create-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          idempotencyKey,
+          country: billingCountry,
+          productType,
+          preferredSize: resolvedSize,
+          preferredColor: resolvedColor,
+          productPreference: productPreference.trim(),
+          description: description.trim(),
+          additionalNotes: additionalNotes.trim(),
+          plan,
+          paymentPolicyAccepted: true,
+          policyVersion: CURRENT_POLICY_VERSION,
+          uploads,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to initialize request');
+      }
+
+      setPendingRequestId(data.requestId);
+
+      const rzp = new window.Razorpay({
+        key: data.razorpayKeyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '',
+        amount: data.amount,
+        currency: data.currency || 'INR',
+        order_id: data.razorpayOrderId,
+        name: 'GERKINK',
+        description: `Custom Design Prepayment (${currentPlanDetails.label})`,
+        prefill: {
+          email: user?.email,
+          name: user?.displayName || user?.email,
+        },
+        theme: { color: '#FF6B6B' },
+        handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+          try {
+            setIsSubmitting(true);
+            const capRes = await fetch('/api/custom-design/capture-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                requestId: data.requestId,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const capData = await capRes.json();
+            if (!capRes.ok) {
+              throw new Error(capData.error || 'Payment capture failed');
+            }
+
+            sessionStorage.removeItem('gk_custom_design_idem_key');
+            sessionStorage.removeItem('gk_custom_design_draft');
+            toast('Custom design prepayment confirmed!', 'success');
+            router.push(`/custom-design/confirmation/${data.requestId}`);
+          } catch (err: any) {
+            console.error('[CustomDesign] Razorpay capture error:', err);
+            setPaymentError(err?.message || "PAYMENT DIDN'T GO THROUGH.");
+            toast(err?.message || 'Payment verification failed', 'error');
+          } finally {
+            setIsSubmitting(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setIsSubmitting(false);
+            toast('Payment window closed.');
+          },
+        },
+      });
+
+      rzp.open();
+    } catch (err: any) {
+      setPaymentError(err?.message || 'Failed to initialize payment');
+      toast(err?.message || 'Initialization error', 'error');
+      setIsSubmitting(false);
     }
   };
 
@@ -994,10 +1145,55 @@ export default function CustomDesignClient() {
                       <span className={styles.summaryVal}>{currentPlanDetails.label}</span>
                     </div>
 
+                    {/* Country / Market Selection */}
+                    <div className={styles.countrySelectSection}>
+                      <label htmlFor="billing-country-select" className={styles.countrySelectLabel}>
+                        <span>Billing Country / Market</span>
+                        <span style={{ fontSize: '0.72rem', color: '#ff6b6b' }}>MANDATORY</span>
+                      </label>
+                      <div className={styles.selectWrapper}>
+                        <select
+                          id="billing-country-select"
+                          className={styles.countrySelectDropdown}
+                          value={billingCountry}
+                          onChange={(e) => setBillingCountry(e.target.value.toUpperCase())}
+                          disabled={isSubmitting}
+                        >
+                          {COUNTRIES.map((c) => (
+                            <option key={c.code} value={c.code}>
+                              {c.name} ({c.code})
+                            </option>
+                          ))}
+                        </select>
+                        <span className={styles.selectArrow}>▼</span>
+                      </div>
+                      <p className={styles.countryRoutingNote}>
+                        {billingCountry === 'IN'
+                          ? '🇮🇳 India routing: Billed in INR (₹) via Razorpay.'
+                          : '🌍 International routing: Billed in USD ($) via PayPal.'}
+                      </p>
+                    </div>
+
                     <div className={styles.summaryRow}>
                       <span className={styles.summaryLabel}>Prepayment Amount</span>
                       <span className={styles.summaryPriceVal}>
-                        ${currentPlanDetails.amount}.00 USD
+                        {billingCountry === 'IN' ? (
+                          <>
+                            ₹{Math.round(currentPlanDetails.amount * 83.5).toLocaleString('en-IN')} INR
+                            <span className={styles.approxUsdNote}>
+                              (${currentPlanDetails.amount}.00 USD authoritative base)
+                            </span>
+                          </>
+                        ) : (
+                          <>${currentPlanDetails.amount}.00 USD</>
+                        )}
+                      </span>
+                    </div>
+
+                    <div className={styles.summaryRow}>
+                      <span className={styles.summaryLabel}>Payment Gateway</span>
+                      <span className={styles.gatewayPill}>
+                        {billingCountry === 'IN' ? 'Razorpay (India)' : 'PayPal (International)'}
                       </span>
                     </div>
                   </div>
@@ -1022,7 +1218,9 @@ export default function CustomDesignClient() {
                       <div className={styles.policyNoticeHeader}>
                         <span>NON-REFUNDABLE PREPAYMENT</span>
                         <span className={styles.policyNoticeAmount}>
-                          ${currentPlanDetails.amount}.00 USD
+                          {billingCountry === 'IN'
+                            ? `₹${Math.round(currentPlanDetails.amount * 83.5).toLocaleString('en-IN')} INR`
+                            : `$${currentPlanDetails.amount}.00 USD`}
                         </span>
                       </div>
                       <p className={styles.policyNoticeText}>
@@ -1038,7 +1236,9 @@ export default function CustomDesignClient() {
                           required
                         />
                         <span className={styles.policyCheckboxText}>
-                          I understand that the ${currentPlanDetails.amount} Custom Design prepayment is non-refundable.
+                          {billingCountry === 'IN'
+                            ? `I understand that the ₹${Math.round(currentPlanDetails.amount * 83.5).toLocaleString('en-IN')} INR ($${currentPlanDetails.amount} USD equivalent) Custom Design prepayment is non-refundable.`
+                            : `I understand that the $${currentPlanDetails.amount} Custom Design prepayment is non-refundable.`}
                         </span>
                       </label>
                     </div>
@@ -1118,12 +1318,26 @@ export default function CustomDesignClient() {
                         </div>
                       ) : !policyAccepted ? (
                         <div className={styles.policyRequiredPrompt}>
-                          Please acknowledge the non-refundable prepayment checkbox above to proceed with PayPal payment.
+                          Please acknowledge the non-refundable prepayment checkbox above to proceed with payment.
+                        </div>
+                      ) : billingCountry === 'IN' ? (
+                        <div className={styles.razorpayIntegrationArea} style={{ opacity: isOnline ? 1 : 0.55, pointerEvents: isOnline ? 'auto' : 'none' }}>
+                          <p className={styles.paypalAuthorizationNote}>
+                            Pay securely with Razorpay (UPI, Cards, NetBanking):
+                          </p>
+                          <button
+                            type="button"
+                            className={styles.razorpayPayBtn}
+                            onClick={handleRazorpayPayment}
+                            disabled={isSubmitting || !isOnline || uploads.length === 0 || !description.trim() || description.trim().length < 10 || !policyAccepted}
+                          >
+                            {isSubmitting ? 'PROCESSING...' : `PAY ₹${Math.round(currentPlanDetails.amount * 83.5).toLocaleString('en-IN')} VIA RAZORPAY →`}
+                          </button>
                         </div>
                       ) : paypalClientId ? (
                         <div className={styles.paypalIntegrationArea} style={{ opacity: isOnline ? 1 : 0.55, pointerEvents: isOnline ? 'auto' : 'none' }}>
                           <p className={styles.paypalAuthorizationNote}>
-                            Authorize ${currentPlanDetails.amount} USD prepayment via PayPal:
+                            Pay securely with PayPal:
                           </p>
                           <PayPalScriptProvider options={{ clientId: paypalClientId, currency: 'USD' }}>
                             <PayPalButtons

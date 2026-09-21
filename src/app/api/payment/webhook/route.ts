@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { processReferral } from '@/lib/referral/engine';
 import { createOrder as createPrintifyOrder } from '@/lib/printify/client';
 import { normalizeCountryCode, normalizeRegionCode } from '@/lib/utils/isoCodes';
+import { sendCustomDesignNotification } from '@/lib/email/sender';
 import type { Order } from '@/types';
 
 function verifyWebhookSignature(body: string, signature: string): boolean {
@@ -43,6 +44,84 @@ export async function POST(request: NextRequest) {
     .get();
 
   if (snap.empty) {
+    // Check if this Razorpay order belongs to a custom design request
+    const customSnap = await adminDb
+      .collection('customDesignRequests')
+      .where('razorpayOrderId', '==', razorpayOrderId)
+      .limit(1)
+      .get();
+
+    if (!customSnap.empty) {
+      const customDoc = customSnap.docs[0];
+      const customRef = customDoc.ref;
+      const customData = customDoc.data();
+
+      if (event.event === 'payment.captured') {
+        const now = new Date().toISOString();
+        let shouldNotify = false;
+
+        await adminDb.runTransaction(async (transaction) => {
+          const docSnap = await transaction.get(customRef);
+          if (!docSnap.exists) return;
+          const data = docSnap.data()!;
+
+          if (data.paymentStatus === 'paid' || data.status === 'SUBMITTED') {
+            return; // idempotent
+          }
+
+          const updatedHistory = [...(data.statusHistory || [])];
+          updatedHistory.push({
+            from: data.status,
+            to: 'SUBMITTED',
+            actor: 'system',
+            timestamp: now,
+            reason: `Razorpay webhook payment.captured ${payment.entity.id} received`,
+          });
+
+          transaction.update(customRef, {
+            status: 'SUBMITTED',
+            paymentStatus: 'paid',
+            paymentReference: payment.entity.id,
+            razorpayPaymentId: payment.entity.id,
+            webhookProcessedAt: FieldValue.serverTimestamp(),
+            updatedAt: now,
+            statusHistory: updatedHistory,
+          });
+
+          shouldNotify = true;
+        });
+
+        if (shouldNotify) {
+          try {
+            await sendCustomDesignNotification({
+              type: 'request_submitted',
+              requestId: customDoc.id,
+              requestNumber: customData.requestId,
+              customerEmail: customData.customerEmail,
+              customerName: customData.customerName,
+              productType: customData.productType,
+              plan: customData.plan,
+              prepaymentAmount: customData.prepaymentAmount,
+              currency: customData.currency || 'INR',
+              description: customData.description,
+              preferredSize: customData.preferredSize,
+              preferredColor: customData.preferredColor,
+              productPreference: customData.productPreference,
+              additionalNotes: customData.additionalNotes,
+              uploads: customData.uploads,
+              paymentReference: payment.entity.id,
+            });
+          } catch (emailErr) {
+            console.warn('[payment/webhook] Custom design notification failed non-fatally:', emailErr);
+          }
+        }
+
+        return NextResponse.json({ status: 'ok', customDesign: true });
+      }
+
+      return NextResponse.json({ status: 'ok', ignored: true });
+    }
+
     return NextResponse.json({ error: 'Order not found' }, { status: 404 });
   }
 

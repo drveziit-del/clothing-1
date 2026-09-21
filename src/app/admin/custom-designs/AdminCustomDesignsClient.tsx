@@ -141,9 +141,12 @@ export default function AdminCustomDesignsClient() {
                     )}
                   </td>
                   <td className={styles.td}>
-                    <span style={{ fontWeight: 700 }}>${r.prepaymentAmount} USD</span>
+                    <span style={{ fontWeight: 700 }}>
+                      {r.currency === 'INR' ? `₹${r.prepaymentAmount} INR` : `$${r.prepaymentAmount} USD`}
+                    </span>
                     <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>
                       {r.plan === 'better_quality' || r.plan === 'priority' ? 'Better Quality' : 'Regular'}
+                      {r.paymentProvider && ` · ${r.paymentProvider.toUpperCase()}`}
                     </div>
                   </td>
                   <td className={styles.td}>

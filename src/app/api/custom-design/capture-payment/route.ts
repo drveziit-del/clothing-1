@@ -4,13 +4,34 @@ import { cookies } from 'next/headers';
 import { isRateLimited } from '@/lib/utils/rateLimit';
 import { paypalGateway } from '@/lib/paypal/client';
 import { sendCustomDesignNotification } from '@/lib/email/sender';
+import crypto from 'crypto';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
 
+function verifyRazorpaySignature(
+  orderId: string,
+  paymentId: string,
+  signature: string
+): boolean {
+  const secret = process.env.RAZORPAY_KEY_SECRET;
+  if (!secret) throw new Error('RAZORPAY_KEY_SECRET not set');
+  const body = `${orderId}|${paymentId}`;
+  const expected = crypto.createHmac('sha256', secret).update(body).digest('hex');
+  const expectedBuf = Buffer.from(expected);
+  const signatureBuf = Buffer.from(signature);
+  if (expectedBuf.length !== signatureBuf.length) return false;
+  return crypto.timingSafeEqual(expectedBuf, signatureBuf);
+}
+
 const captureSchema = z.object({
   requestId: z.string().min(1),
-  paypalOrderId: z.string().min(1),
+  // PayPal
+  paypalOrderId: z.string().optional(),
+  // Razorpay
+  razorpay_order_id: z.string().optional(),
+  razorpay_payment_id: z.string().optional(),
+  razorpay_signature: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -46,7 +67,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: result.error.issues[0]?.message || 'Validation error' }, { status: 400 });
   }
 
-  const { requestId, paypalOrderId } = result.data;
+  const { requestId, paypalOrderId, razorpay_order_id, razorpay_payment_id, razorpay_signature } = result.data;
 
   // 3. Fetch custom request document & check ownership
   const reqRef = adminDb.collection('customDesignRequests').doc(requestId);
@@ -58,15 +79,9 @@ export async function POST(request: NextRequest) {
 
   const reqData = reqDoc.data()!;
 
-  // IDOR Guard: Only the request owner can capture payment
+  // IDOR Guard: Only the request owner can capture/verify payment
   if (reqData.userId !== uid) {
     return NextResponse.json({ error: 'Forbidden: You do not own this custom request' }, { status: 403 });
-  }
-
-  // Binding Guard: Check that the provided PayPal order matches the one stored on the request
-  if (!reqData.paypalOrderId || reqData.paypalOrderId !== paypalOrderId) {
-    console.error(`[custom-design/capture] PayPal order ID mismatch: stored ${reqData.paypalOrderId} vs received ${paypalOrderId}`);
-    return NextResponse.json({ error: 'PayPal order ID mismatch' }, { status: 403 });
   }
 
   // Idempotency Guard: If already captured or paid, return success immediately
@@ -82,7 +97,108 @@ export async function POST(request: NextRequest) {
 
   const now = new Date().toISOString();
 
-  // 4. Move state to PAYMENT_PROCESSING (only if not already in PAYMENT_PROCESSING)
+  // ─────────────────────────────────────────────────────────────
+  // BRANCH A: RAZORPAY PAYMENT VERIFICATION (INDIA / INR)
+  // ─────────────────────────────────────────────────────────────
+  if (reqData.paymentProvider === 'razorpay') {
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return NextResponse.json({ error: 'Missing Razorpay payment parameters' }, { status: 400 });
+    }
+
+    if (reqData.razorpayOrderId !== razorpay_order_id) {
+      console.error(`[custom-design/capture] Razorpay order ID mismatch: stored ${reqData.razorpayOrderId} vs received ${razorpay_order_id}`);
+      return NextResponse.json({ error: 'Razorpay order ID mismatch' }, { status: 403 });
+    }
+
+    let signatureValid = false;
+    try {
+      signatureValid = verifyRazorpaySignature(razorpay_order_id, razorpay_payment_id, razorpay_signature);
+    } catch (err: any) {
+      console.error('[custom-design/capture] Razorpay signature verification error:', err);
+      return NextResponse.json({ error: 'Server payment configuration error' }, { status: 500 });
+    }
+
+    if (!signatureValid) {
+      console.error(`[custom-design/capture] Invalid Razorpay signature for request ${requestId}`);
+      return NextResponse.json({ error: 'Invalid payment signature' }, { status: 400 });
+    }
+
+    // Atomically commit transition to paid & submitted
+    await adminDb.runTransaction(async (transaction) => {
+      const currentSnap = await transaction.get(reqRef);
+      if (!currentSnap.exists) throw new Error('Request not found');
+      const currentData = currentSnap.data()!;
+
+      if (currentData.paymentStatus === 'paid') return;
+
+      const updatedHistory = [...(currentData.statusHistory || [])];
+      updatedHistory.push({
+        from: currentData.status,
+        to: 'SUBMITTED',
+        actor: 'system',
+        timestamp: now,
+        reason: `Razorpay payment ${razorpay_payment_id} verified and request officially submitted for review`,
+      });
+
+      transaction.update(reqRef, {
+        paymentStatus: 'paid',
+        paymentReference: razorpay_payment_id,
+        razorpayPaymentId: razorpay_payment_id,
+        razorpaySignature: razorpay_signature,
+        status: 'SUBMITTED',
+        updatedAt: now,
+        statusHistory: updatedHistory,
+      });
+    });
+
+    // Send Confirmation Notification
+    try {
+      await sendCustomDesignNotification({
+        type: 'request_submitted',
+        requestId: reqDoc.id,
+        requestNumber: reqData.requestId,
+        customerEmail: reqData.customerEmail,
+        customerName: reqData.customerName,
+        productType: reqData.productType,
+        plan: reqData.plan,
+        prepaymentAmount: reqData.prepaymentAmount,
+        currency: reqData.currency || 'INR',
+        description: reqData.description,
+        preferredSize: reqData.preferredSize,
+        preferredColor: reqData.preferredColor,
+        productPreference: reqData.productPreference,
+        additionalNotes: reqData.additionalNotes,
+        uploads: reqData.uploads,
+        paymentReference: razorpay_payment_id,
+      });
+    } catch (emailErr) {
+      console.warn('[custom-design/capture] Email notification failed non-fatally:', emailErr);
+    }
+
+    return NextResponse.json({
+      success: true,
+      requestId,
+      requestNumber: reqData.requestId,
+      status: 'SUBMITTED',
+      paymentStatus: 'paid',
+      paymentReference: razorpay_payment_id,
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // BRANCH B: PAYPAL PAYMENT CAPTURE (INTERNATIONAL / USD)
+  // ─────────────────────────────────────────────────────────────
+  if (!paypalOrderId) {
+    return NextResponse.json({ error: 'Missing PayPal order ID' }, { status: 400 });
+  }
+
+  // Binding Guard: Check that the provided PayPal order matches the one stored on the request
+  if (!reqData.paypalOrderId || reqData.paypalOrderId !== paypalOrderId) {
+    console.error(`[custom-design/capture] PayPal order ID mismatch: stored ${reqData.paypalOrderId} vs received ${paypalOrderId}`);
+    return NextResponse.json({ error: 'PayPal order ID mismatch' }, { status: 403 });
+  }
+
+  // Move state to PAYMENT_PROCESSING
   if (reqData.status !== 'PAYMENT_PROCESSING') {
     await reqRef.update({
       status: 'PAYMENT_PROCESSING',
@@ -101,13 +217,12 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  // 5. Authoritatively capture order via PayPal REST API
+  // Authoritatively capture order via PayPal REST API
   let captureResult: { captureId: string; status: string; amountValue?: number; currency?: string };
   try {
     captureResult = await paypalGateway.captureOrder(paypalOrderId);
   } catch (err: any) {
     console.error(`[custom-design/capture] PayPal capture failed for ${paypalOrderId}:`, err);
-    // Mark as PAYMENT_FAILED so customer can retry
     await reqRef.update({
       status: 'PAYMENT_FAILED',
       paymentStatus: 'failed',
@@ -167,7 +282,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // 6. Amount & Currency Integrity Guard: verify captured amount matches server-authoritative prepayment amount ($15 or $20)
+  // Amount & Currency Integrity Guard: verify captured amount matches server-authoritative prepayment amount ($15 or $20)
   const expectedAmount = Number(reqData.prepaymentAmount);
   const amountMismatch =
     typeof captureResult.amountValue === 'number' &&
@@ -217,7 +332,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // 7. Transactionally update request to PAID and SUBMITTED
+  // Transactionally update request to PAID and SUBMITTED
   const finalTimestamp = new Date().toISOString();
   await adminDb.runTransaction(async (transaction) => {
     const currentSnap = await transaction.get(reqRef);
@@ -227,7 +342,6 @@ export async function POST(request: NextRequest) {
     if (currentData.paymentStatus === 'paid') return; // idempotent
 
     const updatedHistory = [...(currentData.statusHistory || [])];
-    // Finding 4.3: Accurately record real transition from PAYMENT_PROCESSING to SUBMITTED
     updatedHistory.push({
       from: currentData.status,
       to: 'SUBMITTED',
@@ -245,7 +359,7 @@ export async function POST(request: NextRequest) {
     });
   });
 
-  // 8. Send Confirmation & Admin Notification
+  // Send Confirmation & Admin Notification
   try {
     await sendCustomDesignNotification({
       type: 'request_submitted',
@@ -256,6 +370,7 @@ export async function POST(request: NextRequest) {
       productType: reqData.productType,
       plan: reqData.plan,
       prepaymentAmount: reqData.prepaymentAmount,
+      currency: 'USD',
       description: reqData.description,
       preferredSize: reqData.preferredSize,
       preferredColor: reqData.preferredColor,

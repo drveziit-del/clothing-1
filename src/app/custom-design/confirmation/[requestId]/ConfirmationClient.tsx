@@ -54,10 +54,14 @@ export default function ConfirmationClient({ requestId }: { requestId: string })
   const isReviewRequired = requestData.paymentStatus === 'review_required' || requestData.status === 'MANUAL_REVIEW';
   const isFailed = requestData.paymentStatus === 'failed' || requestData.status === 'PAYMENT_FAILED';
 
+  const formattedAmount = requestData.currency === 'INR'
+    ? `₹${requestData.prepaymentAmount} INR`
+    : `$${requestData.prepaymentAmount} USD`;
+
   const paymentDisplay = isPaid
-    ? `$${requestData.prepaymentAmount} USD PAID ✓`
+    ? `${formattedAmount} PAID ✓`
     : isReviewRequired
-    ? `$${requestData.prepaymentAmount} USD — REVIEW REQUIRED ⚠️`
+    ? `${formattedAmount} — REVIEW REQUIRED ⚠️`
     : isFailed
     ? 'PAYMENT FAILED ✗'
     : 'PAYMENT PENDING';
@@ -116,8 +120,16 @@ export default function ConfirmationClient({ requestId }: { requestId: string })
           </div>
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Prepayment Level</span>
-            <span className={styles.summaryVal}>{formatPlanLabel(requestData.plan)} (${requestData.prepaymentAmount})</span>
+            <span className={styles.summaryVal}>{formatPlanLabel(requestData.plan)} ({formattedAmount})</span>
           </div>
+          {requestData.paymentProvider && (
+            <div className={styles.summaryRow}>
+              <span className={styles.summaryLabel}>Payment Gateway</span>
+              <span className={styles.summaryVal} style={{ textTransform: 'uppercase' }}>
+                {requestData.paymentProvider}
+              </span>
+            </div>
+          )}
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Prepayment Status</span>
             <span className={styles.paidBadge} style={{ color: paymentColor }}>{paymentDisplay}</span>
