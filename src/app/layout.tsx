@@ -9,6 +9,9 @@ import RoastToast from "@/components/ui/RoastToast";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import { NetworkStatusProvider } from "@/context/NetworkStatusContext";
 import NetworkStatusPill from "@/components/ui/NetworkStatusPill";
+import { CookieConsentProvider } from "@/context/CookieConsentContext";
+import CookieBanner from "@/components/ui/CookieBanner";
+import CookiePreferencesModal from "@/components/ui/CookiePreferencesModal";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://gerkink.shop'),
@@ -139,20 +142,24 @@ export default function RootLayout({
         />
       </head>
       <body suppressHydrationWarning>
-        <GoogleAnalytics />
-        <ThemeProvider>
-          <AuthProvider>
-            <CurrencyProvider>
-              <CartProvider>
-                <NetworkStatusProvider>
-                  <LayoutWrapper>{children}</LayoutWrapper>
-                  <NetworkStatusPill />
-                  <RoastToast />
-                </NetworkStatusProvider>
-              </CartProvider>
-            </CurrencyProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <CookieConsentProvider>
+          <GoogleAnalytics />
+          <ThemeProvider>
+            <AuthProvider>
+              <CurrencyProvider>
+                <CartProvider>
+                  <NetworkStatusProvider>
+                    <LayoutWrapper>{children}</LayoutWrapper>
+                    <NetworkStatusPill />
+                    <RoastToast />
+                    <CookieBanner />
+                    <CookiePreferencesModal />
+                  </NetworkStatusProvider>
+                </CartProvider>
+              </CurrencyProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </CookieConsentProvider>
       </body>
     </html>
   );

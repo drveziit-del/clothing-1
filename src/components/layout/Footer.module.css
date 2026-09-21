@@ -71,6 +71,24 @@
 }
 .linkGroup a:hover { color: var(--text-primary); }
 
+.cookiePrefBtn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.cookiePrefBtn:hover { color: var(--text-primary); }
+.cookiePrefBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .bottom {
   display: flex;
   align-items: center;

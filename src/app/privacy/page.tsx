@@ -88,9 +88,18 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className={styles.section}>
-            <h2>5. Session Cookies & Local Storage</h2>
+            <h2>5. Cookies, Local Storage & Consent</h2>
             <p>
-              We utilize <strong>HttpOnly, Secure, SameSite=Strict</strong> cookies for authentication sessions (valid for 5 days) to eliminate cross-site scripting (XSS) and cross-site request forgery (CSRF) vulnerabilities. Local storage is used exclusively to retain your shopping cart items and currency preference across browser reloads.
+              We categorize browser storage into four distinct operational tiers:
+            </p>
+            <ul>
+              <li><strong>Strictly Necessary:</strong> Includes <strong>HttpOnly, Secure, SameSite=Strict</strong> cookies for authentication sessions (valid for 5 days), edge proxy routing flags, shopping cart retention, PayPal/Razorpay payment transaction tokens, and Cloudflare bot/DDoS mitigation. These cannot be disabled as the store cannot function securely without them.</li>
+              <li><strong>Analytics & Performance:</strong> Aggregated, privacy-focused site metrics and Google Analytics telemetry used to understand store performance and visitor flows. Strictly gated: optional analytics scripts never load or execute without explicit consent.</li>
+              <li><strong>Marketing & Attribution:</strong> 30-day referral attribution cookies used when visiting via an affiliate or creator link to ensure sales commissions are credited accurately.</li>
+              <li><strong>Functional Preferences:</strong> Remembers your chosen currency (e.g. USD / INR), theme mode, and garment sizing preferences across visits.</li>
+            </ul>
+            <p>
+              You can adjust or revoke your cookie choices at any time by clicking <strong>Cookie Preferences</strong> in the website footer.
             </p>
           </section>
 

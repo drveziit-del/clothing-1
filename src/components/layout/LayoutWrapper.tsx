@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { Suspense } from 'react';
+import { useCookieConsent } from '@/context/CookieConsentContext';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import GSAPPageTransition from '@/components/animation/GSAPPageTransition';
@@ -17,12 +18,13 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
   const { setReferralCode } = useCart();
+  const { consent } = useCookieConsent();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Track site visit once per session (deferred to idle time to avoid hydration bandwidth contention)
-    if (!sessionStorage.getItem('gk_visited')) {
+    // Track site visit once per session — strictly gated behind Analytics consent
+    if (consent?.analytics && !sessionStorage.getItem('gk_visited')) {
       sessionStorage.setItem('gk_visited', 'true');
       const trackVisit = () => {
         fetch('/api/analytics/visit', { method: 'POST' }).catch((err) =>
@@ -45,21 +47,23 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
     if (ref) {
       setReferralCode(ref);
 
-      // If arrived via ?ref= URL param, ensure 30-day attribution cookie is also persisted
-      if (refParam) {
-        const exp = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
-        document.cookie = `referral=${encodeURIComponent(ref)}; expires=${exp}; path=/; SameSite=Lax`;
-      }
+      // 30-day attribution cookie and click tracking — strictly gated behind Marketing consent
+      if (consent?.marketing) {
+        if (refParam) {
+          const exp = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+          document.cookie = `referral=${encodeURIComponent(ref)}; expires=${exp}; path=/; SameSite=Lax`;
+        }
 
-      const key = `gk_clk_${ref}`;
-      if (!localStorage.getItem(key)) {
-        localStorage.setItem(key, 'true');
-        fetch(`/api/referral/click?code=${ref}`, { method: 'POST' }).catch((err) =>
-          console.error('Click tracking error:', err)
-        );
+        const key = `gk_clk_${ref}`;
+        if (!localStorage.getItem(key)) {
+          localStorage.setItem(key, 'true');
+          fetch(`/api/referral/click?code=${ref}`, { method: 'POST' }).catch((err) =>
+            console.error('Click tracking error:', err)
+          );
+        }
       }
     }
-  }, [setReferralCode, pathname]);
+  }, [setReferralCode, pathname, consent]);
 
   if (isAdminRoute) {
     return <>{children}</>;

@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getFirestoreDb, getFirestoreModule } from '@/lib/firebase/config';
+import { useCookieConsent } from '@/context/CookieConsentContext';
 import styles from './Footer.module.css';
 
 export default function Footer() {
   const pathname = usePathname();
   const isHomePage = pathname === '/';
   const [tagline, setTagline] = useState('We are nobody.\nOur clothes speak louder.');
+  const { openPreferences } = useCookieConsent();
 
   useEffect(() => {
     let unsub: (() => void) | null = null;
@@ -177,6 +179,13 @@ export default function Footer() {
               <Link href="/refund">Refund &amp; Replace</Link>
               <Link href="/shipping">Shipment</Link>
               <Link href="/disclaimer">Disclaimer</Link>
+              <button
+                type="button"
+                onClick={openPreferences}
+                className={styles.cookiePrefBtn}
+              >
+                Cookie Preferences
+              </button>
             </div>
           </nav>
         </div>

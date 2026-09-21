@@ -1,11 +1,14 @@
 'use client';
 
 import Script from 'next/script';
+import { useCookieConsent } from '@/context/CookieConsentContext';
 
 export default function GoogleAnalytics() {
+  const { consent } = useCookieConsent();
   const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
-  if (!measurementId) return null;
+  // Strictly gate Google Analytics behind explicit user consent
+  if (!consent?.analytics || !measurementId) return null;
 
   return (
     <>
