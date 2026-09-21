@@ -12,6 +12,7 @@ interface Product {
   title: string;
   description: string;
   section: 'society_fuckers' | 'valueless_bitches';
+  category?: string;
   price: number;
   tier?: number;
   isPublished: boolean;
@@ -135,6 +136,15 @@ export default function AdminProductsPage() {
               render: (r) => (
                 <span className={`tag ${r.section === 'society_fuckers' ? 'tag-mist' : 'tag-coral'}`}>
                   {r.section === 'society_fuckers' ? 'Society Fu*kers' : 'Valueless Bi*ches'}
+                </span>
+              ),
+            },
+            {
+              key: 'category',
+              label: 'Category',
+              render: (r) => (
+                <span style={{ fontSize: '0.82rem', color: r.category ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                  {r.category || '—'}
                 </span>
               ),
             },

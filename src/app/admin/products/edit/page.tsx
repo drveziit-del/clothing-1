@@ -90,6 +90,7 @@ function EditProductForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [section, setSection] = useState<'society_fuckers' | 'valueless_bitches'>('valueless_bitches');
+  const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [tier, setTier] = useState('');
   const [prebookingPrice, setPrebookingPrice] = useState('');
@@ -264,6 +265,7 @@ function EditProductForm() {
         setTitle(data.title || '');
         setDescription(data.description || '');
         setSection(data.section || 'valueless_bitches');
+        setCategory(data.category || '');
         setPrice(data.price ? data.price.toString() : '');
         setTier(data.tier ? data.tier.toString() : '');
         setPrebookingPrice(data.prebookingPrice ? data.prebookingPrice.toString() : '');
@@ -452,6 +454,7 @@ function EditProductForm() {
           title,
           description,
           section,
+          category: category.trim() || null,
           price: Number(price),
           tier: tier ? Number(tier) : null,
           prebookingPrice: prebookingPrice ? Number(prebookingPrice) : null,
@@ -624,7 +627,7 @@ function EditProductForm() {
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
               <div>
                 <label className="input-label">Collection</label>
                 <select
@@ -640,6 +643,25 @@ function EditProductForm() {
                   <option value="valueless_bitches">Valueless Bi*ches (Streetwear)</option>
                   <option value="society_fuckers">Society Fu*kers (Luxury)</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="input-label">Category</label>
+                <input
+                  type="text"
+                  className="input"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  placeholder="e.g. T-Shirt, Hoodie, Sweatshirt"
+                  list="category-suggestions"
+                />
+                <datalist id="category-suggestions">
+                  <option value="T-Shirt" />
+                  <option value="Hoodie" />
+                  <option value="Sweatshirt" />
+                  <option value="Accessory" />
+                  <option value="Jackets" />
+                </datalist>
               </div>
 
               <div>

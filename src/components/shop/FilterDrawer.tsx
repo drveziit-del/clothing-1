@@ -20,14 +20,14 @@ export interface FilterDrawerProps {
   catalogMaxPrice: number;
   hasAvailabilityFilter: boolean;
   // Active filter state
-  activeCategory: string;
+  activeCategories: string[];
   activeSizes: string[];
   activeColors: string[];
   activeMinPrice: number;
   activeMaxPrice: number;
   activeInStockOnly: boolean;
   // Change handlers
-  onSelectCategory: (category: string) => void;
+  onToggleCategory: (category: string) => void;
   onToggleSize: (size: string) => void;
   onToggleColor: (color: string) => void;
   onChangePriceRange: (min: number, max: number) => void;
@@ -47,13 +47,13 @@ export default function FilterDrawer({
   catalogMinPrice,
   catalogMaxPrice,
   hasAvailabilityFilter,
-  activeCategory,
+  activeCategories,
   activeSizes,
   activeColors,
   activeMinPrice,
   activeMaxPrice,
   activeInStockOnly,
-  onSelectCategory,
+  onToggleCategory,
   onToggleSize,
   onToggleColor,
   onChangePriceRange,
@@ -66,13 +66,13 @@ export default function FilterDrawer({
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
-    if (activeCategory) count += 1;
+    count += activeCategories.length;
     count += activeSizes.length;
     count += activeColors.length;
     if (activeMinPrice > catalogMinPrice || activeMaxPrice < catalogMaxPrice) count += 1;
     if (activeInStockOnly) count += 1;
     return count;
-  }, [activeCategory, activeSizes, activeColors, activeMinPrice, activeMaxPrice, activeInStockOnly, catalogMinPrice, catalogMaxPrice]);
+  }, [activeCategories, activeSizes, activeColors, activeMinPrice, activeMaxPrice, activeInStockOnly, catalogMinPrice, catalogMaxPrice]);
 
   if (!isOpen) return null;
 
@@ -116,25 +116,41 @@ export default function FilterDrawer({
           {/* 1. Category Filter (Dynamically rendered if available) */}
           {availableCategories.length > 0 && (
             <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>CATEGORY</h3>
-              <div className={styles.pillGroup}>
-                <button
-                  type="button"
-                  onClick={() => onSelectCategory('')}
-                  className={`${styles.pill} ${!activeCategory ? styles.pillActive : ''}`}
-                >
-                  All
-                </button>
-                {availableCategories.map((cat) => (
+              <div className={styles.sectionHeaderRow}>
+                <h3 className={styles.sectionTitle}>CATEGORY</h3>
+                {activeCategories.length > 0 && (
                   <button
-                    key={cat}
                     type="button"
-                    onClick={() => onSelectCategory(activeCategory === cat ? '' : cat)}
-                    className={`${styles.pill} ${activeCategory === cat ? styles.pillActive : ''}`}
+                    onClick={() => activeCategories.forEach((c) => onToggleCategory(c))}
+                    className={styles.resetSectionBtn}
                   >
-                    {cat}
+                    Reset
                   </button>
-                ))}
+                )}
+              </div>
+              <div className={styles.categoryList}>
+                {availableCategories.map((cat) => {
+                  const isSelected = activeCategories.includes(cat);
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => onToggleCategory(cat)}
+                      className={`${styles.categoryOption} ${isSelected ? styles.categoryOptionActive : ''}`}
+                      role="checkbox"
+                      aria-checked={isSelected}
+                    >
+                      <span className={`${styles.checkbox} ${isSelected ? styles.checkboxActive : ''}`} aria-hidden>
+                        {isSelected && (
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        )}
+                      </span>
+                      <span className={styles.categoryName}>{cat}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

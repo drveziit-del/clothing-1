@@ -76,6 +76,7 @@ export const createProductSchema = z.object({
   slug: z.string().min(2).max(200).optional(),
   description: z.string().max(5000).nullish(),
   section: z.enum(['society_fuckers', 'valueless_bitches']),
+  category: z.string().max(100).nullish(),
   price: z.number().positive(),
   tier: z.number().int().min(1).max(5).nullish(),
   prebookingPrice: z.number().nonnegative().nullish(),

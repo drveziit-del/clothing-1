@@ -149,37 +149,63 @@
   text-decoration: underline;
 }
 
-/* Category Pills */
-.pillGroup {
+/* Category Checkbox List */
+.categoryList {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.45rem;
 }
 
-.pill {
-  padding: 0.5rem 0.9rem;
+.categoryOption {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  padding: 0.5rem 0.85rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 6px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text-secondary);
   cursor: pointer;
+  text-align: left;
   transition: all 0.15s ease;
-  min-height: 40px;
+  width: 100%;
 }
 
-.pill:hover {
+.categoryOption:hover {
   background: var(--surface);
-  color: var(--text-primary);
   border-color: var(--text-muted);
 }
 
-.pillActive {
-  background: rgba(255, 71, 87, 0.15);
+.categoryOptionActive {
+  background: rgba(255, 71, 87, 0.1);
   border-color: rgba(255, 71, 87, 0.6);
-  color: var(--accent);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: #ffffff;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.checkboxActive {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.categoryName {
+  flex: 1;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 /* Size Grid */

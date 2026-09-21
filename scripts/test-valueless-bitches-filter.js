@@ -528,18 +528,18 @@ async function runSuite() {
   
   // Clone products and mutate one attribute
   const mutatedProducts = JSON.parse(JSON.stringify(products));
-  mutatedProducts[0].category = 'sweatshirt';
+  mutatedProducts[0].category = 'cyber-jacket';
   mutatedProducts[0].variants[0].size = '10XL';
   mutatedProducts[0].variants[0].color = 'Neon Purple';
 
-  const mutatedCategoryResult = evaluateFilters(mutatedProducts, { category: 'sweatshirt' });
+  const mutatedCategoryResult = evaluateFilters(mutatedProducts, { category: 'cyber-jacket' });
   const mutatedSizeResult = evaluateFilters(mutatedProducts, { sizes: ['10XL'] });
   const mutatedColorResult = evaluateFilters(mutatedProducts, { colors: ['Neon Purple'] });
 
   assert(
     mutatedCategoryResult.length === 1 && mutatedCategoryResult[0].id === mutatedProducts[0].id,
     'MUTATION-01',
-    'Mutation test: changing product category to "sweatshirt" dynamically isolates that product'
+    'Mutation test: changing product category to "cyber-jacket" dynamically isolates that product'
   );
   assert(
     mutatedSizeResult.length === 1 && mutatedSizeResult[0].id === mutatedProducts[0].id,

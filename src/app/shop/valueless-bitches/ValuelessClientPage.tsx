@@ -89,7 +89,7 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
   const parseUrlState = useCallback(() => {
     if (typeof window === 'undefined') {
       return {
-        category: '',
+        categories: [] as string[],
         sizes: [] as string[],
         colors: [] as string[],
         minPrice: catalogMinPrice,
@@ -101,8 +101,11 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
 
     const sp = new URLSearchParams(window.location.search);
 
-    // Category
-    const category = sp.get('category') || '';
+    // Categories (comma-separated or single)
+    const categoryParam = sp.get('category') || '';
+    const categories = categoryParam
+      ? categoryParam.split(',').map((c) => c.trim()).filter(Boolean)
+      : [];
 
     // Sizes (comma-separated or multiple)
     const sizeParam = sp.get('size') || '';
@@ -132,7 +135,7 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
     else if (sortParam === 'price_desc' || sortParam === 'price-desc') sort = 'price_desc';
 
     return {
-      category,
+      categories,
       sizes,
       colors,
       minPrice,
@@ -145,7 +148,7 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
   const initialParsed = useMemo(() => parseUrlState(), [parseUrlState]);
 
   // ─── 3. REACT FILTER STATE ────────────────────────────────────
-  const [activeCategory, setActiveCategory] = useState<string>(initialParsed.category);
+  const [activeCategories, setActiveCategories] = useState<string[]>(initialParsed.categories);
   const [activeSizes, setActiveSizes] = useState<string[]>(initialParsed.sizes);
   const [activeColors, setActiveColors] = useState<string[]>(initialParsed.colors);
   const [activeMinPrice, setActiveMinPrice] = useState<number>(initialParsed.minPrice);
@@ -160,7 +163,7 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
   // ─── 4. SYNC FILTER STATE TO URL ──────────────────────────────
   const syncToUrl = useCallback(
     (
-      cat: string,
+      cats: string[],
       szs: string[],
       cls: string[],
       minP: number,
@@ -172,7 +175,7 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
 
       const sp = new URLSearchParams();
 
-      if (cat) sp.set('category', cat);
+      if (cats.length > 0) sp.set('category', cats.join(','));
       if (szs.length > 0) sp.set('size', szs.join(','));
       if (cls.length > 0) sp.set('color', cls.join(','));
       if (minP > catalogMinPrice) sp.set('minPrice', String(minP));
@@ -193,7 +196,7 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
   useEffect(() => {
     const handlePopState = () => {
       const parsed = parseUrlState();
-      setActiveCategory(parsed.category);
+      setActiveCategories(parsed.categories);
       setActiveSizes(parsed.sizes);
       setActiveColors(parsed.colors);
       setActiveMinPrice(parsed.minPrice);
@@ -213,7 +216,7 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
       return;
     }
     syncToUrl(
-      activeCategory,
+      activeCategories,
       activeSizes,
       activeColors,
       activeMinPrice,
@@ -222,7 +225,7 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
       activeSort
     );
   }, [
-    activeCategory,
+    activeCategories,
     activeSizes,
     activeColors,
     activeMinPrice,
@@ -233,6 +236,12 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
   ]);
 
   // ─── 5. HANDLERS ──────────────────────────────────────────────
+  const handleToggleCategory = useCallback((cat: string) => {
+    setActiveCategories((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+    );
+  }, []);
+
   const handleToggleSize = useCallback((size: string) => {
     setActiveSizes((prev) =>
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
@@ -251,25 +260,26 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
   }, []);
 
   const handleClearAll = useCallback(() => {
-    setActiveCategory('');
+    setActiveCategories([]);
     setActiveSizes([]);
     setActiveColors([]);
     setActiveMinPrice(catalogMinPrice);
     setActiveMaxPrice(catalogMaxPrice);
     setActiveInStockOnly(false);
     setActiveSort('newest');
-    syncToUrl('', [], [], catalogMinPrice, catalogMaxPrice, false, 'newest');
+    syncToUrl([], [], [], catalogMinPrice, catalogMaxPrice, false, 'newest');
   }, [catalogMinPrice, catalogMaxPrice, syncToUrl]);
 
   // ─── 6. FILTER & SORT EVALUATION ──────────────────────────────
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
-      // 1. Category check
-      if (activeCategory) {
-        const matchesCategory =
-          (p.category && p.category.toLowerCase() === activeCategory.toLowerCase()) ||
+      // 1. Category check (OR within activeCategories)
+      if (activeCategories.length > 0) {
+        const matchesCategory = activeCategories.some((cat) =>
+          (p.category && p.category.toLowerCase() === cat.toLowerCase()) ||
           (Array.isArray(p.tags) &&
-            p.tags.some((t) => t.toLowerCase() === activeCategory.toLowerCase()));
+            p.tags.some((t) => t.toLowerCase() === cat.toLowerCase()))
+        );
         if (!matchesCategory) return false;
       }
 
@@ -303,7 +313,7 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
     });
   }, [
     products,
-    activeCategory,
+    activeCategories,
     activeSizes,
     activeColors,
     activeMinPrice,
@@ -330,14 +340,14 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
-    if (activeCategory) count += 1;
+    count += activeCategories.length;
     count += activeSizes.length;
     count += activeColors.length;
     if (activeMinPrice > catalogMinPrice || activeMaxPrice < catalogMaxPrice) count += 1;
     if (activeInStockOnly) count += 1;
     return count;
   }, [
-    activeCategory,
+    activeCategories,
     activeSizes,
     activeColors,
     activeMinPrice,
@@ -369,13 +379,13 @@ export function ValuelessClientPage({ products }: ValuelessClientPageProps) {
         catalogMinPrice={catalogMinPrice}
         catalogMaxPrice={catalogMaxPrice}
         hasAvailabilityFilter={hasAvailabilityFilter}
-        activeCategory={activeCategory}
+        activeCategories={activeCategories}
         activeSizes={activeSizes}
         activeColors={activeColors}
         activeMinPrice={activeMinPrice}
         activeMaxPrice={activeMaxPrice}
         activeInStockOnly={activeInStockOnly}
-        onSelectCategory={setActiveCategory}
+        onToggleCategory={handleToggleCategory}
         onToggleSize={handleToggleSize}
         onToggleColor={handleToggleColor}
         onChangePriceRange={handleChangePriceRange}

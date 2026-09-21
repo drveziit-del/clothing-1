@@ -93,6 +93,7 @@ function AddProductForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [section, setSection] = useState<'society_fuckers' | 'valueless_bitches'>('valueless_bitches');
+  const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [tier, setTier] = useState('');
   const [prebookingPrice, setPrebookingPrice] = useState('');
@@ -404,6 +405,7 @@ function AddProductForm() {
           title,
           description,
           section,
+          category: category.trim() || undefined,
           price: Number(price),
           tier: tier ? Number(tier) : undefined,
           prebookingPrice: prebookingPrice ? Number(prebookingPrice) : undefined,
@@ -572,7 +574,7 @@ function AddProductForm() {
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
               <div>
                 <label className="input-label">Collection</label>
                 <select
@@ -588,6 +590,25 @@ function AddProductForm() {
                   <option value="valueless_bitches">Valueless Bi*ches (Streetwear)</option>
                   <option value="society_fuckers">Society Fu*kers (Luxury)</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="input-label">Category</label>
+                <input
+                  type="text"
+                  className="input"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  placeholder="e.g. T-Shirt, Hoodie, Sweatshirt"
+                  list="category-suggestions"
+                />
+                <datalist id="category-suggestions">
+                  <option value="T-Shirt" />
+                  <option value="Hoodie" />
+                  <option value="Sweatshirt" />
+                  <option value="Accessory" />
+                  <option value="Jackets" />
+                </datalist>
               </div>
 
               <div>
